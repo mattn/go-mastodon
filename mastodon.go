@@ -116,3 +116,70 @@ func (c *client) GetTimeline(path string) ([]Timeline, error) {
 	}
 	return timeline, nil
 }
+
+type AppConfig struct {
+	Server     string
+	ClientName string
+
+	// Where the user should be redirected after authorization (for no redirect, use urn:ietf:wg:oauth:2.0:oob)
+	RedirectURIs string
+
+	// This can be a space-separated list of the following items: "read", "write" and "follow".
+	Scopes string
+
+	// Optional.
+	Website string
+}
+
+type appClient struct {
+	http.Client
+	appConfig *AppConfig
+}
+
+// NewAppClient returns a new AppClient.
+func NewAppClient(appConfig *AppConfig) *appClient {
+	return &appClient{
+		Client:    *http.DefaultClient,
+		appConfig: appConfig,
+	}
+}
+
+// App is mastodon app.
+type App struct {
+	ID           int    `json:"id"`
+	RedirectURI  string `json:"redirect_uri"`
+	ClientID     string `json:"client_id"`
+	ClientSecret string `json:"client_secret"`
+}
+
+func (c *appClient) RegistrationApp() (*App, error) {
+	params := url.Values{}
+	params.Set("client_name", c.appConfig.ClientName)
+	params.Set("redirect_uris", c.appConfig.RedirectURIs)
+	params.Set("scopes", c.appConfig.Scopes)
+	params.Set("website", c.appConfig.Website)
+
+	url, err := url.Parse(c.appConfig.Server)
+	if err != nil {
+		return nil, err
+	}
+	url.Path = "/api/v1/apps"
+
+	req, err := http.NewRequest("POST", url.String(), strings.NewReader(params.Encode()))
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	app := &App{}
+	err = json.NewDecoder(resp.Body).Decode(app)
+	if err != nil {
+		return nil, err
+	}
+
+	return app, nil
+}

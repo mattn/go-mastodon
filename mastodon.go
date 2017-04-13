@@ -116,3 +116,60 @@ func (c *client) GetTimeline(path string) ([]Timeline, error) {
 	}
 	return timeline, nil
 }
+
+// AppConfig is a setting for registering applications.
+type AppConfig struct {
+	http.Client
+	Server     string
+	ClientName string
+
+	// Where the user should be redirected after authorization (for no redirect, use urn:ietf:wg:oauth:2.0:oob)
+	RedirectURIs string
+
+	// This can be a space-separated list of the following items: "read", "write" and "follow".
+	Scopes string
+
+	// Optional.
+	Website string
+}
+
+// Application is mastodon application.
+type Application struct {
+	ID           int    `json:"id"`
+	RedirectURI  string `json:"redirect_uri"`
+	ClientID     string `json:"client_id"`
+	ClientSecret string `json:"client_secret"`
+}
+
+// RegisterApp returns the mastodon application.
+func RegisterApp(appConfig *AppConfig) (*Application, error) {
+	params := url.Values{}
+	params.Set("client_name", appConfig.ClientName)
+	params.Set("redirect_uris", appConfig.RedirectURIs)
+	params.Set("scopes", appConfig.Scopes)
+	params.Set("website", appConfig.Website)
+
+	url, err := url.Parse(appConfig.Server)
+	if err != nil {
+		return nil, err
+	}
+	url.Path = "/api/v1/apps"
+
+	req, err := http.NewRequest("POST", url.String(), strings.NewReader(params.Encode()))
+	if err != nil {
+		return nil, err
+	}
+	resp, err := appConfig.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	app := &Application{}
+	err = json.NewDecoder(resp.Body).Decode(app)
+	if err != nil {
+		return nil, err
+	}
+
+	return app, nil
+}

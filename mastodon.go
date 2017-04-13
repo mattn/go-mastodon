@@ -117,7 +117,9 @@ func (c *client) GetTimeline(path string) ([]Timeline, error) {
 	return timeline, nil
 }
 
+// AppConfig is a setting for registering applications.
 type AppConfig struct {
+	http.Client
 	Server     string
 	ClientName string
 
@@ -131,35 +133,23 @@ type AppConfig struct {
 	Website string
 }
 
-type appClient struct {
-	http.Client
-	appConfig *AppConfig
-}
-
-// NewAppClient returns a new AppClient.
-func NewAppClient(appConfig *AppConfig) *appClient {
-	return &appClient{
-		Client:    *http.DefaultClient,
-		appConfig: appConfig,
-	}
-}
-
-// App is mastodon app.
-type App struct {
+// Application is mastodon application.
+type Application struct {
 	ID           int    `json:"id"`
 	RedirectURI  string `json:"redirect_uri"`
 	ClientID     string `json:"client_id"`
 	ClientSecret string `json:"client_secret"`
 }
 
-func (c *appClient) RegistrationApp() (*App, error) {
+// RegisterApp returns the mastodon application.
+func RegisterApp(appConfig *AppConfig) (*Application, error) {
 	params := url.Values{}
-	params.Set("client_name", c.appConfig.ClientName)
-	params.Set("redirect_uris", c.appConfig.RedirectURIs)
-	params.Set("scopes", c.appConfig.Scopes)
-	params.Set("website", c.appConfig.Website)
+	params.Set("client_name", appConfig.ClientName)
+	params.Set("redirect_uris", appConfig.RedirectURIs)
+	params.Set("scopes", appConfig.Scopes)
+	params.Set("website", appConfig.Website)
 
-	url, err := url.Parse(c.appConfig.Server)
+	url, err := url.Parse(appConfig.Server)
 	if err != nil {
 		return nil, err
 	}
@@ -169,13 +159,13 @@ func (c *appClient) RegistrationApp() (*App, error) {
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.Do(req)
+	resp, err := appConfig.Do(req)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
-	app := &App{}
+	app := &Application{}
 	err = json.NewDecoder(resp.Body).Decode(app)
 	if err != nil {
 		return nil, err

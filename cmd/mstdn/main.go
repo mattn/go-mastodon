@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -17,7 +18,9 @@ import (
 	"golang.org/x/net/html"
 )
 
-var blockTags = []string{"div", "br", "p", "blockquote", "pre", "h1", "h2", "h3", "h4", "h5", "h6"}
+var (
+	toot = flag.String("t", "", "toot text")
+)
 
 func extractText(node *html.Node, w *bytes.Buffer) {
 	if node.Type == html.TextNode {
@@ -32,14 +35,6 @@ func extractText(node *html.Node, w *bytes.Buffer) {
 	}
 	for c := node.FirstChild; c != nil; c = c.NextSibling {
 		extractText(c, w)
-	}
-	if node.Type == html.ElementNode {
-		for _, bt := range blockTags {
-			if strings.ToLower(node.Data) == bt {
-				w.WriteString("\n")
-				break
-			}
-		}
 	}
 }
 
@@ -67,7 +62,7 @@ func prompt() (string, string, error) {
 
 func getConfig() (string, *mastodon.Config, error) {
 	dir := os.Getenv("HOME")
-	if dir == "" && runtime.GOOS == "windows" {
+	if runtime.GOOS == "windows" {
 		dir = os.Getenv("APPDATA")
 		if dir == "" {
 			dir = filepath.Join(os.Getenv("USERPROFILE"), "Application Data", "mstdn")
@@ -86,8 +81,8 @@ func getConfig() (string, *mastodon.Config, error) {
 	}
 	config := &mastodon.Config{
 		Server:       "https://mstdn.jp",
-		ClientID:     "654a15390204e70d74f8d9264526e017e26d323e20e3f983409c157115009862",
-		ClientSecret: "17274242a0846ebadcdda77727666c9d475f1989b56ad9bd959021f62f92a84c",
+		ClientID:     "7d1873f3940af3e9128c81d5a2ddb3f235ccfa1cd11761efd3b8426f40898fe8",
+		ClientSecret: "3c8ea997c580f196453e97c1c58f6f5c131f668456bbe1ed37aaccac719397db",
 	}
 	if err == nil {
 		err = json.Unmarshal(b, &config)
@@ -99,19 +94,21 @@ func getConfig() (string, *mastodon.Config, error) {
 }
 
 func main() {
+	flag.Parse()
+
 	file, config, err := getConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	c := mastodon.NewClient(config)
+	client := mastodon.NewClient(config)
 
 	if config.AccessToken == "" {
 		email, password, err := prompt()
 		if err != nil {
 			log.Fatal(err)
 		}
-		err = c.Authenticate(email, password)
+		err = client.Authenticate(email, password)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -126,7 +123,17 @@ func main() {
 		return
 	}
 
-	timeline, err := c.GetTimeline("/api/v1/timelines/home")
+	if *toot != "" {
+		_, err = client.PostStatus(&mastodon.Toot{
+			Status: *toot,
+		})
+		if err != nil {
+			log.Fatal(err)
+		}
+		return
+	}
+
+	timeline, err := client.GetTimelineHome()
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -37,7 +37,7 @@ func (c *client) Authenticate(username, password string) error {
 	params.Set("grant_type", "password")
 	params.Set("username", username)
 	params.Set("password", password)
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/%s", c.config.Server, "/oauth/token"), strings.NewReader(params.Encode()))
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s%s", c.config.Server, "/oauth/token"), strings.NewReader(params.Encode()))
 	if err != nil {
 		return err
 	}
@@ -50,7 +50,7 @@ func (c *client) Authenticate(username, password string) error {
 	res := struct {
 		AccessToken string `json:"access_token"`
 	}{}
-	err = json.NewDecoder(resp.Body).Decode(&res)
+	err = json.NewDecoder(io.TeeReader(resp.Body, os.Stdout)).Decode(&res)
 	if err != nil {
 		return err
 	}
@@ -98,7 +98,7 @@ type Timeline struct {
 }
 
 func (c *client) GetTimeline(path string) ([]Timeline, error) {
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s", c.config.Server, "/api/v1/timelines/home"), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s%s", c.config.Server, "/api/v1/timelines/home"), nil)
 	if err != nil {
 		return nil, err
 	}

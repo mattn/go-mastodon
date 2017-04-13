@@ -2,11 +2,9 @@ package mastodon
 
 import (
 	"encoding/json"
-	"fmt"
-	"io"
 	"net/http"
 	"net/url"
-	"os"
+	"path"
 	"strings"
 	"time"
 )
@@ -37,7 +35,15 @@ func (c *client) Authenticate(username, password string) error {
 	params.Set("grant_type", "password")
 	params.Set("username", username)
 	params.Set("password", password)
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s%s", c.config.Server, "/oauth/token"), strings.NewReader(params.Encode()))
+	params.Set("scope", "read write follow")
+
+	url, err := url.Parse(c.config.Server)
+	if err != nil {
+		return err
+	}
+	url.Path = path.Join(url.Path, "/oauth/token")
+
+	req, err := http.NewRequest("POST", url.String(), strings.NewReader(params.Encode()))
 	if err != nil {
 		return err
 	}
@@ -50,7 +56,7 @@ func (c *client) Authenticate(username, password string) error {
 	res := struct {
 		AccessToken string `json:"access_token"`
 	}{}
-	err = json.NewDecoder(io.TeeReader(resp.Body, os.Stdout)).Decode(&res)
+	err = json.NewDecoder(resp.Body).Decode(&res)
 	if err != nil {
 		return err
 	}
@@ -58,8 +64,19 @@ func (c *client) Authenticate(username, password string) error {
 	return nil
 }
 
-type Timeline struct {
-	ID                 int         `json:"id"`
+type Visibility int64
+
+type Toot struct {
+	Status      string  `json:"status"`
+	InReplyToID int64   `json:"in_reply_to_id"`
+	MediaIDs    []int64 `json:"in_reply_to_id"`
+	Sensitive   bool    `json:"sensitive"`
+	SpoilerText string  `json:"spoiler_text"`
+	Visibility  string  `json:"visibility"`
+}
+
+type Status struct {
+	ID                 int64       `json:"id"`
 	CreatedAt          time.Time   `json:"created_at"`
 	InReplyToID        interface{} `json:"in_reply_to_id"`
 	InReplyToAccountID interface{} `json:"in_reply_to_account_id"`
@@ -68,15 +85,15 @@ type Timeline struct {
 	Visibility         string      `json:"visibility"`
 	Application        interface{} `json:"application"`
 	Account            struct {
-		ID             int       `json:"id"`
+		ID             int64     `json:"id"`
 		Username       string    `json:"username"`
 		Acct           string    `json:"acct"`
 		DisplayName    string    `json:"display_name"`
 		Locked         bool      `json:"locked"`
 		CreatedAt      time.Time `json:"created_at"`
-		FollowersCount int       `json:"followers_count"`
-		FollowingCount int       `json:"following_count"`
-		StatusesCount  int       `json:"statuses_count"`
+		FollowersCount int64     `json:"followers_count"`
+		FollowingCount int64     `json:"following_count"`
+		StatusesCount  int64     `json:"statuses_count"`
 		Note           string    `json:"note"`
 		URL            string    `json:"url"`
 		Avatar         string    `json:"avatar"`
@@ -90,15 +107,21 @@ type Timeline struct {
 	URI              string        `json:"uri"`
 	Content          string        `json:"content"`
 	URL              string        `json:"url"`
-	ReblogsCount     int           `json:"reblogs_count"`
-	FavouritesCount  int           `json:"favourites_count"`
+	ReblogsCount     int64         `json:"reblogs_count"`
+	FavouritesCount  int64         `json:"favourites_count"`
 	Reblog           interface{}   `json:"reblog"`
 	Favourited       interface{}   `json:"favourited"`
 	Reblogged        interface{}   `json:"reblogged"`
 }
 
-func (c *client) GetTimeline(path string) ([]Timeline, error) {
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s%s", c.config.Server, "/api/v1/timelines/home"), nil)
+func (c *client) GetTimelineHome() ([]*Status, error) {
+	url, err := url.Parse(c.config.Server)
+	if err != nil {
+		return nil, err
+	}
+	url.Path = path.Join(url.Path, "/api/v1/timelines/home")
+
+	req, err := http.NewRequest("GET", url.String(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -109,12 +132,44 @@ func (c *client) GetTimeline(path string) ([]Timeline, error) {
 	}
 	defer resp.Body.Close()
 
-	var timeline []Timeline
-	err = json.NewDecoder(io.TeeReader(resp.Body, os.Stdout)).Decode(&timeline)
+	var statuses []*Status
+	err = json.NewDecoder(resp.Body).Decode(&statuses)
 	if err != nil {
 		return nil, err
 	}
-	return timeline, nil
+	return statuses, nil
+}
+
+func (c *client) PostStatus(toot *Toot) (*Status, error) {
+	params := url.Values{}
+	params.Set("status", toot.Status)
+	//params.Set("in_reply_to_id", fmt.Sprint(toot.InReplyToID))
+	// TODO: media_ids, senstitive, spoiler_text, visibility
+	//params.Set("visibility", "public")
+
+	url, err := url.Parse(c.config.Server)
+	if err != nil {
+		return nil, err
+	}
+	url.Path = path.Join(url.Path, "/api/v1/statuses")
+
+	req, err := http.NewRequest("POST", url.String(), strings.NewReader(params.Encode()))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Authorization", "Bearer "+c.config.AccessToken)
+	resp, err := c.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var status Status
+	err = json.NewDecoder(resp.Body).Decode(&status)
+	if err != nil {
+		return nil, err
+	}
+	return &status, nil
 }
 
 // AppConfig is a setting for registering applications.
@@ -135,7 +190,7 @@ type AppConfig struct {
 
 // Application is mastodon application.
 type Application struct {
-	ID           int    `json:"id"`
+	ID           int64  `json:"id"`
 	RedirectURI  string `json:"redirect_uri"`
 	ClientID     string `json:"client_id"`
 	ClientSecret string `json:"client_secret"`
@@ -153,7 +208,7 @@ func RegisterApp(appConfig *AppConfig) (*Application, error) {
 	if err != nil {
 		return nil, err
 	}
-	url.Path = "/api/v1/apps"
+	url.Path = path.Join(url.Path, "/api/v1/apps")
 
 	req, err := http.NewRequest("POST", url.String(), strings.NewReader(params.Encode()))
 	if err != nil {

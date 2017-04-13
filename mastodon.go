@@ -2,6 +2,7 @@ package mastodon
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 	"path"
@@ -64,6 +65,50 @@ func (c *client) Authenticate(username, password string) error {
 	return nil
 }
 
+type Account struct {
+	ID             int64     `json:"id"`
+	Username       string    `json:"username"`
+	Acct           string    `json:"acct"`
+	DisplayName    string    `json:"display_name"`
+	Locked         bool      `json:"locked"`
+	CreatedAt      time.Time `json:"created_at"`
+	FollowersCount int64     `json:"followers_count"`
+	FollowingCount int64     `json:"following_count"`
+	StatusesCount  int64     `json:"statuses_count"`
+	Note           string    `json:"note"`
+	URL            string    `json:"url"`
+	Avatar         string    `json:"avatar"`
+	AvatarStatic   string    `json:"avatar_static"`
+	Header         string    `json:"header"`
+	HeaderStatic   string    `json:"header_static"`
+}
+
+func (c *client) GetAccount(id int) (*Account, error) {
+	url, err := url.Parse(c.config.Server)
+	if err != nil {
+		return nil, err
+	}
+	url.Path = path.Join(url.Path, fmt.Sprintf("/api/v1/accounts/%d", id))
+
+	req, err := http.NewRequest("GET", url.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Authorization", "Bearer "+c.config.AccessToken)
+	resp, err := c.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	account := &Account{}
+	err = json.NewDecoder(resp.Body).Decode(account)
+	if err != nil {
+		return nil, err
+	}
+	return account, nil
+}
+
 type Visibility int64
 
 type Toot struct {
@@ -76,42 +121,26 @@ type Toot struct {
 }
 
 type Status struct {
-	ID                 int64       `json:"id"`
-	CreatedAt          time.Time   `json:"created_at"`
-	InReplyToID        interface{} `json:"in_reply_to_id"`
-	InReplyToAccountID interface{} `json:"in_reply_to_account_id"`
-	Sensitive          bool        `json:"sensitive"`
-	SpoilerText        string      `json:"spoiler_text"`
-	Visibility         string      `json:"visibility"`
-	Application        interface{} `json:"application"`
-	Account            struct {
-		ID             int64     `json:"id"`
-		Username       string    `json:"username"`
-		Acct           string    `json:"acct"`
-		DisplayName    string    `json:"display_name"`
-		Locked         bool      `json:"locked"`
-		CreatedAt      time.Time `json:"created_at"`
-		FollowersCount int64     `json:"followers_count"`
-		FollowingCount int64     `json:"following_count"`
-		StatusesCount  int64     `json:"statuses_count"`
-		Note           string    `json:"note"`
-		URL            string    `json:"url"`
-		Avatar         string    `json:"avatar"`
-		AvatarStatic   string    `json:"avatar_static"`
-		Header         string    `json:"header"`
-		HeaderStatic   string    `json:"header_static"`
-	} `json:"account"`
-	MediaAttachments []interface{} `json:"media_attachments"`
-	Mentions         []interface{} `json:"mentions"`
-	Tags             []interface{} `json:"tags"`
-	URI              string        `json:"uri"`
-	Content          string        `json:"content"`
-	URL              string        `json:"url"`
-	ReblogsCount     int64         `json:"reblogs_count"`
-	FavouritesCount  int64         `json:"favourites_count"`
-	Reblog           interface{}   `json:"reblog"`
-	Favourited       interface{}   `json:"favourited"`
-	Reblogged        interface{}   `json:"reblogged"`
+	ID                 int64         `json:"id"`
+	CreatedAt          time.Time     `json:"created_at"`
+	InReplyToID        interface{}   `json:"in_reply_to_id"`
+	InReplyToAccountID interface{}   `json:"in_reply_to_account_id"`
+	Sensitive          bool          `json:"sensitive"`
+	SpoilerText        string        `json:"spoiler_text"`
+	Visibility         string        `json:"visibility"`
+	Application        interface{}   `json:"application"`
+	Account            Account       `json:"account"`
+	MediaAttachments   []interface{} `json:"media_attachments"`
+	Mentions           []interface{} `json:"mentions"`
+	Tags               []interface{} `json:"tags"`
+	URI                string        `json:"uri"`
+	Content            string        `json:"content"`
+	URL                string        `json:"url"`
+	ReblogsCount       int64         `json:"reblogs_count"`
+	FavouritesCount    int64         `json:"favourites_count"`
+	Reblog             interface{}   `json:"reblog"`
+	Favourited         interface{}   `json:"favourited"`
+	Reblogged          interface{}   `json:"reblogged"`
 }
 
 func (c *client) GetTimelineHome() ([]*Status, error) {

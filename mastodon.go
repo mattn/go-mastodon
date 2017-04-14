@@ -345,7 +345,7 @@ func (c *Client) StreamingPublic(ctx context.Context) (chan Event, error) {
 	return q, nil
 }
 
-// GetAccount return Account.
+// Follow send follow-request.
 func (c *Client) Follow(uri string) (*Account, error) {
 	params := url.Values{}
 	params.Set("uri", uri)
@@ -356,4 +356,17 @@ func (c *Client) Follow(uri string) (*Account, error) {
 		return nil, err
 	}
 	return &account, nil
+}
+
+// GetFollowRequest return follow-requests.
+func (c *Client) GetFollowRequests(uri string) ([]*Account, error) {
+	params := url.Values{}
+	params.Set("uri", uri)
+
+	var accounts []*Account
+	err := c.doAPI("GET", "/api/v1/follow_requests", params, &accounts)
+	if err != nil {
+		return nil, err
+	}
+	return accounts, nil
 }

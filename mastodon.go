@@ -314,8 +314,10 @@ func (c *Client) StreamingPublic(ctx context.Context) (chan Event, error) {
 						switch name {
 						case "update":
 							var status Status
-							json.Unmarshal([]byte(token[1]), &status)
-							q <- &UpdateEvent{&status}
+							err = json.Unmarshal([]byte(token[1]), &status)
+							if err == nil {
+								q <- &UpdateEvent{&status}
+							}
 						case "notification":
 						case "delete":
 						}

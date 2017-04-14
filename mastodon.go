@@ -113,28 +113,52 @@ type Toot struct {
 	Visibility  string  `json:"visibility"`
 }
 
+// Mention hold information for mention.
+type Mention struct {
+	URL      string `json:"url"`
+	Username string `json:"username"`
+	Acct     string `json:"acct"`
+	ID       int64  `json:"id"`
+}
+
+// Tag hold information for tag.
+type Tag struct {
+	Name string `json:"name"`
+	URL  string `json:"url"`
+}
+
+// Attachment hold information for attachment.
+type Attachment struct {
+	ID         int64  `json:"id"`
+	Type       string `json:"type"`
+	URL        string `json:"url"`
+	RemoteURL  string `json:"remote_url"`
+	PreviewURL string `json:"preview_url"`
+	TextURL    string `json:"text_url"`
+}
+
 // Status is struct to hold status.
 type Status struct {
-	ID                 int64         `json:"id"`
-	CreatedAt          time.Time     `json:"created_at"`
-	InReplyToID        interface{}   `json:"in_reply_to_id"`
-	InReplyToAccountID interface{}   `json:"in_reply_to_account_id"`
-	Sensitive          bool          `json:"sensitive"`
-	SpoilerText        string        `json:"spoiler_text"`
-	Visibility         string        `json:"visibility"`
-	Application        interface{}   `json:"application"`
-	Account            Account       `json:"account"`
-	MediaAttachments   []interface{} `json:"media_attachments"`
-	Mentions           []interface{} `json:"mentions"`
-	Tags               []interface{} `json:"tags"`
-	URI                string        `json:"uri"`
-	Content            string        `json:"content"`
-	URL                string        `json:"url"`
-	ReblogsCount       int64         `json:"reblogs_count"`
-	FavouritesCount    int64         `json:"favourites_count"`
-	Reblog             interface{}   `json:"reblog"`
-	Favourited         interface{}   `json:"favourited"`
-	Reblogged          interface{}   `json:"reblogged"`
+	ID                 int64        `json:"id"`
+	CreatedAt          time.Time    `json:"created_at"`
+	InReplyToID        interface{}  `json:"in_reply_to_id"`
+	InReplyToAccountID interface{}  `json:"in_reply_to_account_id"`
+	Sensitive          bool         `json:"sensitive"`
+	SpoilerText        string       `json:"spoiler_text"`
+	Visibility         string       `json:"visibility"`
+	Application        Application  `json:"application"`
+	Account            Account      `json:"account"`
+	MediaAttachments   []Attachment `json:"media_attachments"`
+	Mentions           []Mention    `json:"mentions"`
+	Tags               []Tag        `json:"tags"`
+	URI                string       `json:"uri"`
+	Content            string       `json:"content"`
+	URL                string       `json:"url"`
+	ReblogsCount       int64        `json:"reblogs_count"`
+	FavouritesCount    int64        `json:"favourites_count"`
+	Reblog             *Status      `json:"reblog"`
+	Favourited         interface{}  `json:"favourited"`
+	Reblogged          interface{}  `json:"reblogged"`
 }
 
 // GetTimelineHome return statuses from home timeline.

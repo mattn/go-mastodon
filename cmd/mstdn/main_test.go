@@ -1,6 +1,9 @@
 package main
 
 import (
+	"encoding/json"
+	"io/ioutil"
+	"log"
 	"os"
 	"testing"
 )
@@ -51,5 +54,57 @@ func TestTextContent(t *testing.T) {
 		if got != test.want {
 			t.Fatalf("want %q but %q", test.want, got)
 		}
+	}
+}
+
+func TestGetConfig(t *testing.T) {
+	tmpdir, err := ioutil.TempDir("", "mstdn")
+	if err != nil {
+		t.Fatal(err)
+	}
+	home := os.Getenv("HOME")
+	appdata := os.Getenv("APPDATA")
+	os.Setenv("HOME", tmpdir)
+	os.Setenv("APPDATA", tmpdir)
+	defer func() {
+		os.RemoveAll(tmpdir)
+		os.Setenv("HOME", home)
+		os.Setenv("APPDATA", appdata)
+	}()
+
+	file, config, err := getConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(file); err == nil {
+		t.Fatal("should not exists")
+	}
+	if config.AccessToken != "" {
+		t.Fatalf("should be empty: %v", config.AccessToken)
+	}
+	if config.ClientID == "" {
+		t.Fatalf("should not be empty")
+	}
+	if config.ClientSecret == "" {
+		t.Fatalf("should not be empty")
+	}
+	config.AccessToken = "foo"
+	b, err := json.MarshalIndent(config, "", "  ")
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = ioutil.WriteFile(file, b, 0700)
+	if err != nil {
+		log.Fatal(err)
+	}
+	file, config, err = getConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(file); err != nil {
+		t.Fatalf("should exists: %v", err)
+	}
+	if got := config.AccessToken; got != "foo" {
+		t.Fatalf("want %q but %q", "foo", got)
 	}
 }

@@ -2,6 +2,7 @@ package mastodon
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -121,4 +122,5 @@ func TestForTheCoverages(t *testing.T) {
 	(*NotificationEvent)(nil).event()
 	(*DeleteEvent)(nil).event()
 	(*ErrorEvent)(nil).event()
+	(&ErrorEvent{io.EOF}).Error()
 }

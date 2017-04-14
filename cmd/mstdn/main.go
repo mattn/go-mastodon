@@ -190,7 +190,8 @@ func timeline(client *mastodon.Client) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	for _, t := range timeline {
+	for i := len(timeline) - 1; i >= 0; i-- {
+		t := timeline[i]
 		color.Set(color.FgHiRed)
 		fmt.Println(t.Account.Username)
 		color.Set(color.Reset)

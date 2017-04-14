@@ -34,24 +34,25 @@ func readFile(filename string) ([]byte, error) {
 	return ioutil.ReadFile(filename)
 }
 
-func extractText(node *html.Node, w *bytes.Buffer) {
-	if node.Type == html.TextNode {
-		data := strings.Trim(node.Data, "\r\n")
-		if data != "" {
-			w.WriteString(data + "\n")
-		}
-	}
-	for c := node.FirstChild; c != nil; c = c.NextSibling {
-		extractText(c, w)
-	}
-}
-
 func textContent(s string) string {
 	doc, err := html.Parse(strings.NewReader(s))
 	if err != nil {
 		log.Fatal(err)
 	}
 	var buf bytes.Buffer
+
+	var extractText func(node *html.Node, w *bytes.Buffer)
+	extractText = func(node *html.Node, w *bytes.Buffer) {
+		if node.Type == html.TextNode {
+			data := strings.Trim(node.Data, "\r\n")
+			if data != "" {
+				w.WriteString(data + "\n")
+			}
+		}
+		for c := node.FirstChild; c != nil; c = c.NextSibling {
+			extractText(c, w)
+		}
+	}
 	extractText(doc, &buf)
 	return buf.String()
 }
@@ -111,6 +112,25 @@ func getConfig() (string, *mastodon.Config, error) {
 	return file, config, nil
 }
 
+func authenticate(client *mastodon.Client, config *mastodon.Config, file string) {
+	email, password, err := prompt()
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = client.Authenticate(email, password)
+	if err != nil {
+		log.Fatal(err)
+	}
+	b, err := json.MarshalIndent(config, "", "  ")
+	if err != nil {
+		log.Fatal("failed to store file:", err)
+	}
+	err = ioutil.WriteFile(file, b, 0700)
+	if err != nil {
+		log.Fatal("failed to store file:", err)
+	}
+}
+
 func main() {
 	flag.Parse()
 
@@ -122,22 +142,7 @@ func main() {
 	client := mastodon.NewClient(config)
 
 	if config.AccessToken == "" {
-		email, password, err := prompt()
-		if err != nil {
-			log.Fatal(err)
-		}
-		err = client.Authenticate(email, password)
-		if err != nil {
-			log.Fatal(err)
-		}
-		b, err := json.MarshalIndent(config, "", "  ")
-		if err != nil {
-			log.Fatal("failed to store file:", err)
-		}
-		err = ioutil.WriteFile(file, b, 0700)
-		if err != nil {
-			log.Fatal("failed to store file:", err)
-		}
+		authenticate(client, config, file)
 		return
 	}
 	if *fromfile != "" {
@@ -145,13 +150,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		_, err = client.PostStatus(&mastodon.Toot{
-			Status: string(text),
-		})
-		if err != nil {
-			log.Fatal(err)
-		}
-		return
+		*toot = string(text)
 	}
 
 	if *toot != "" {

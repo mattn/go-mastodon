@@ -48,7 +48,7 @@ func (c *Client) doAPI(method string, uri string, params url.Values, res interfa
 		return nil
 	}
 
-	if method == "GET" && resp.StatusCode != 200 {
+	if method == "GET" && resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("bad request: %v", resp.Status)
 	}
 
@@ -90,7 +90,7 @@ func (c *Client) Authenticate(username, password string) error {
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("bad authorization: %v", resp.Status)
 	}
 
@@ -133,7 +133,11 @@ type Application struct {
 func RegisterApp(appConfig *AppConfig) (*Application, error) {
 	params := url.Values{}
 	params.Set("client_name", appConfig.ClientName)
-	params.Set("redirect_uris", appConfig.RedirectURIs)
+	if appConfig.RedirectURIs == "" {
+		params.Set("redirect_uris", "urn:ietf:wg:oauth:2.0:oob")
+	} else {
+		params.Set("redirect_uris", appConfig.RedirectURIs)
+	}
 	params.Set("scopes", appConfig.Scopes)
 	params.Set("website", appConfig.Website)
 
@@ -147,19 +151,24 @@ func RegisterApp(appConfig *AppConfig) (*Application, error) {
 	if err != nil {
 		return nil, err
 	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	resp, err := appConfig.Do(req)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
-	app := &Application{}
-	err = json.NewDecoder(resp.Body).Decode(app)
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("bad request: %v", resp.Status)
+	}
+
+	var app Application
+	err = json.NewDecoder(resp.Body).Decode(&app)
 	if err != nil {
 		return nil, err
 	}
 
-	return app, nil
+	return &app, nil
 }
 
 // Account hold information for mastodon account.

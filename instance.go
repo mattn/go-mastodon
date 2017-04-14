@@ -1,5 +1,7 @@
 package mastodon
 
+import "net/http"
+
 // Instance hold information for mastodon instance.
 type Instance struct {
 	URI         string `json:"uri"`
@@ -11,7 +13,7 @@ type Instance struct {
 // GetInstance return Instance.
 func (c *Client) GetInstance() (*Instance, error) {
 	var instance Instance
-	err := c.doAPI("GET", "/api/v1/instance", nil, &instance)
+	err := c.doAPI(http.MethodGet, "/api/v1/instance", nil, &instance)
 	if err != nil {
 		return nil, err
 	}

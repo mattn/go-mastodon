@@ -215,7 +215,7 @@ func (c *Client) GetAccount(id int) (*Account, error) {
 	return &account, nil
 }
 
-// GetAccountCurrentUser return current user Account.
+// GetAccountCurrentUser return Account of current user.
 func (c *Client) GetAccountCurrentUser() (*Account, error) {
 	var account Account
 	err := c.doAPI("GET", "/api/v1/accounts/verify_credentials", nil, &account)

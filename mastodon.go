@@ -1,7 +1,10 @@
 package mastodon
 
 import (
+	"bufio"
+	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 	"path"
@@ -227,4 +230,76 @@ func (c *client) PostStatus(toot *Toot) (*Status, error) {
 		return nil, err
 	}
 	return &status, nil
+}
+
+type UpdateEvent struct {
+	Status *Status
+}
+
+func (e *UpdateEvent) event() {}
+
+type NotificationEvent struct {
+}
+
+func (e *NotificationEvent) event() {}
+
+type DeleteEvent struct {
+	ID int64
+}
+
+func (e *DeleteEvent) event() {}
+
+type Event interface {
+	event()
+}
+
+func (c *client) StreamingPublic(ctx context.Context) (chan Event, error) {
+	url, err := url.Parse(c.config.Server)
+	if err != nil {
+		return nil, err
+	}
+	url.Path = path.Join(url.Path, "/api/v1/streaming/public")
+
+	req, err := http.NewRequest("GET", url.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Authorization", "Bearer "+c.config.AccessToken)
+	resp, err := c.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	q := make(chan Event)
+	go func() {
+		defer ctx.Done()
+		name := ""
+		s := bufio.NewScanner(resp.Body)
+		for s.Scan() {
+			line := s.Text()
+			token := strings.SplitN(line, ":", 2)
+			if len(token) != 2 {
+				continue
+			}
+			switch strings.TrimSpace(token[0]) {
+			case "event":
+				name = strings.TrimSpace(token[1])
+			case "data":
+				switch name {
+				case "update":
+					var status Status
+					json.Unmarshal([]byte(token[1]), &status)
+					q <- &UpdateEvent{&status}
+				case "notification":
+				case "delete":
+				}
+			}
+		}
+		fmt.Println(s.Err())
+	}()
+	go func() {
+		<-ctx.Done()
+		resp.Body.Close()
+	}()
+	return q, nil
 }

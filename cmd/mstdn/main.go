@@ -3,23 +3,27 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"runtime"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/mattn/go-mastodon"
 	"github.com/mattn/go-tty"
 	"golang.org/x/net/html"
 )
 
 var (
-	toot = flag.String("t", "", "toot text")
+	toot   = flag.String("t", "", "toot text")
+	stream = flag.Bool("S", false, "streaming public")
 )
 
 func extractText(node *html.Node, w *bytes.Buffer) {
@@ -36,6 +40,16 @@ func extractText(node *html.Node, w *bytes.Buffer) {
 	for c := node.FirstChild; c != nil; c = c.NextSibling {
 		extractText(c, w)
 	}
+}
+
+func textContent(s string) string {
+	doc, err := html.Parse(strings.NewReader(s))
+	if err != nil {
+		log.Fatal(err)
+	}
+	var buf bytes.Buffer
+	extractText(doc, &buf)
+	return buf.String()
 }
 
 func prompt() (string, string, error) {
@@ -132,19 +146,39 @@ func main() {
 		}
 		return
 	}
+	if *stream {
+		ctx, cancel := context.WithCancel(context.Background())
+		sc := make(chan os.Signal, 1)
+		signal.Notify(sc, os.Interrupt)
+		q, err := client.StreamingPublic(ctx)
+		if err != nil {
+			log.Fatal(err)
+		}
+		go func() {
+			<-sc
+			cancel()
+			close(q)
+		}()
+		for e := range q {
+			switch t := e.(type) {
+			case *mastodon.UpdateEvent:
+				color.Set(color.FgHiRed)
+				fmt.Println(t.Status.Account.Username)
+				color.Set(color.Reset)
+				fmt.Println(textContent(t.Status.Content))
+			}
+		}
+		return
+	}
 
 	timeline, err := client.GetTimelineHome()
 	if err != nil {
 		log.Fatal(err)
 	}
 	for _, t := range timeline {
-		doc, err := html.Parse(strings.NewReader(t.Content))
-		if err != nil {
-			log.Fatal(err)
-		}
-		var buf bytes.Buffer
-		extractText(doc, &buf)
+		color.Set(color.FgHiRed)
 		fmt.Println(t.Account.Username)
-		fmt.Println(buf.String())
+		color.Set(color.Reset)
+		fmt.Println(textContent(t.Content))
 	}
 }

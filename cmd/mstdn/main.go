@@ -63,6 +63,17 @@ func textContent(s string) string {
 	return buf.String()
 }
 
+var (
+	readUsername func() (string, error) = func() (string, error) {
+		b, _, err := bufio.NewReader(os.Stdin).ReadLine()
+		if err != nil {
+			return "", err
+		}
+		return string(b), nil
+	}
+	readPassword func() (string, error)
+)
+
 func prompt() (string, string, error) {
 	t, err := tty.Open()
 	if err != nil {
@@ -71,14 +82,18 @@ func prompt() (string, string, error) {
 	defer t.Close()
 
 	fmt.Print("E-Mail: ")
-	b, _, err := bufio.NewReader(os.Stdin).ReadLine()
+	email, err := readUsername()
 	if err != nil {
 		return "", "", err
 	}
-	email := string(b)
 
 	fmt.Print("Password: ")
-	password, err := t.ReadPassword()
+	var password string
+	if readPassword == nil {
+		password, err = t.ReadPassword()
+	} else {
+		password, err = readPassword()
+	}
 	if err != nil {
 		return "", "", err
 	}

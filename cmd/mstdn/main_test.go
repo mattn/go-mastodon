@@ -108,3 +108,22 @@ func TestGetConfig(t *testing.T) {
 		t.Fatalf("want %q but %q", "foo", got)
 	}
 }
+
+func TestPrompt(t *testing.T) {
+	readUsername = func() (string, error) {
+		return "foo", nil
+	}
+	readPassword = func() (string, error) {
+		return "bar", nil
+	}
+	username, password, err := prompt()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if username != "foo" {
+		t.Fatalf("want %q but %q", "foo", username)
+	}
+	if password != "bar" {
+		t.Fatalf("want %q but %q", "bar", password)
+	}
+}

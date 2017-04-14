@@ -319,7 +319,7 @@ type Event interface {
 	event()
 }
 
-func handleReader(q chan Event, r io.Reader) error {
+func handleReader(ctx context.Context, q chan Event, r io.Reader) error {
 	name := ""
 	s := bufio.NewScanner(r)
 	for s.Scan() {
@@ -335,7 +335,7 @@ func handleReader(q chan Event, r io.Reader) error {
 			switch name {
 			case "update":
 				var status Status
-				err = json.Unmarshal([]byte(token[1]), &status)
+				err := json.Unmarshal([]byte(token[1]), &status)
 				if err == nil {
 					q <- &UpdateEvent{&status}
 				}
@@ -369,12 +369,11 @@ func (c *Client) StreamingPublic(ctx context.Context) (chan Event, error) {
 				resp, err = c.Do(req)
 			}
 			if err == nil {
-				err = handleReader(resp.Body)
+				err = handleReader(ctx, q, resp.Body)
+				resp.Body.Close()
 				if err == nil {
 					break
 				}
-				resp.Body.Close()
-				return err
 			} else {
 				q <- &ErrorEvent{err}
 			}

@@ -78,11 +78,16 @@ func (c *Client) Authenticate(username, password string) error {
 	if err != nil {
 		return err
 	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	resp, err := c.Do(req)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("bad authorization: %v", resp.Status)
+	}
 
 	res := struct {
 		AccessToken string `json:"access_token"`

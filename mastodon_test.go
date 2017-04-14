@@ -124,7 +124,7 @@ func TestForTheCoverages(t *testing.T) {
 	(*NotificationEvent)(nil).event()
 	(*DeleteEvent)(nil).event()
 	(*ErrorEvent)(nil).event()
-	(&ErrorEvent{io.EOF}).Error()
+	_ = (&ErrorEvent{io.EOF}).Error()
 }
 
 func TestGetAccount(t *testing.T) {

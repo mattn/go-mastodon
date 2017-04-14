@@ -2,6 +2,7 @@ package mastodon
 
 import (
 	"fmt"
+	"net/http"
 	"net/url"
 	"time"
 )
@@ -28,7 +29,7 @@ type Account struct {
 // GetAccount return Account.
 func (c *Client) GetAccount(id int) (*Account, error) {
 	var account Account
-	err := c.doAPI("GET", fmt.Sprintf("/api/v1/accounts/%d", id), nil, &account)
+	err := c.doAPI(http.MethodGet, fmt.Sprintf("/api/v1/accounts/%d", id), nil, &account)
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +39,7 @@ func (c *Client) GetAccount(id int) (*Account, error) {
 // GetAccountCurrentUser return Account of current user.
 func (c *Client) GetAccountCurrentUser() (*Account, error) {
 	var account Account
-	err := c.doAPI("GET", "/api/v1/accounts/verify_credentials", nil, &account)
+	err := c.doAPI(http.MethodGet, "/api/v1/accounts/verify_credentials", nil, &account)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +49,7 @@ func (c *Client) GetAccountCurrentUser() (*Account, error) {
 // GetAccountFollowers return followers list.
 func (c *Client) GetAccountFollowers(id int64) ([]*Account, error) {
 	var accounts []*Account
-	err := c.doAPI("GET", fmt.Sprintf("/api/v1/accounts/%d/followers", id), nil, &accounts)
+	err := c.doAPI(http.MethodGet, fmt.Sprintf("/api/v1/accounts/%d/followers", id), nil, &accounts)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +59,7 @@ func (c *Client) GetAccountFollowers(id int64) ([]*Account, error) {
 // GetAccountFollowing return following list.
 func (c *Client) GetAccountFollowing(id int64) ([]*Account, error) {
 	var accounts []*Account
-	err := c.doAPI("GET", fmt.Sprintf("/api/v1/accounts/%d/following", id), nil, &accounts)
+	err := c.doAPI(http.MethodGet, fmt.Sprintf("/api/v1/accounts/%d/following", id), nil, &accounts)
 	if err != nil {
 		return nil, err
 	}
@@ -140,7 +141,7 @@ func (c *Client) GetAccountRelationship(id int64) ([]*Relationship, error) {
 	params.Set("id", fmt.Sprint(id))
 
 	var relationships []*Relationship
-	err := c.doAPI("GET", "/api/v1/accounts/relationship", params, &relationships)
+	err := c.doAPI(http.MethodGet, "/api/v1/accounts/relationship", params, &relationships)
 	if err != nil {
 		return nil, err
 	}
@@ -154,7 +155,7 @@ func (c *Client) AccountsSearch(q string, limit int64) ([]*Account, error) {
 	params.Set("limit", fmt.Sprint(limit))
 
 	var accounts []*Account
-	err := c.doAPI("GET", "/api/v1/accounts/search", params, &accounts)
+	err := c.doAPI(http.MethodGet, "/api/v1/accounts/search", params, &accounts)
 	if err != nil {
 		return nil, err
 	}
@@ -180,7 +181,7 @@ func (c *Client) GetFollowRequests(uri string) ([]*Account, error) {
 	params.Set("uri", uri)
 
 	var accounts []*Account
-	err := c.doAPI("GET", "/api/v1/follow_requests", params, &accounts)
+	err := c.doAPI(http.MethodGet, "/api/v1/follow_requests", params, &accounts)
 	if err != nil {
 		return nil, err
 	}

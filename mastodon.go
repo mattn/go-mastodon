@@ -46,7 +46,7 @@ func (c *Client) doAPI(method string, uri string, params url.Values, res interfa
 		return nil
 	}
 
-	if method == "GET" && resp.StatusCode != http.StatusOK {
+	if method == http.MethodGet && resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("bad request: %v", resp.Status)
 	}
 
@@ -140,7 +140,7 @@ type Status struct {
 // GetTimelineHome return statuses from home timeline.
 func (c *Client) GetTimelineHome() ([]*Status, error) {
 	var statuses []*Status
-	err := c.doAPI("GET", "/api/v1/timelines/home", nil, &statuses)
+	err := c.doAPI(http.MethodGet, "/api/v1/timelines/home", nil, &statuses)
 	if err != nil {
 		return nil, err
 	}

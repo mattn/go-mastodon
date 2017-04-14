@@ -179,6 +179,19 @@ func post(client *mastodon.Client, text string) {
 	}
 }
 
+func timeline(client *mastodon.Client) {
+	timeline, err := client.GetTimelineHome()
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, t := range timeline {
+		color.Set(color.FgHiRed)
+		fmt.Println(t.Account.Username)
+		color.Set(color.Reset)
+		fmt.Println(textContent(t.Content))
+	}
+}
+
 func main() {
 	file, config, err := getConfig()
 	if err != nil {
@@ -202,14 +215,5 @@ func main() {
 		return
 	}
 
-	timeline, err := client.GetTimelineHome()
-	if err != nil {
-		log.Fatal(err)
-	}
-	for _, t := range timeline {
-		color.Set(color.FgHiRed)
-		fmt.Println(t.Account.Username)
-		color.Set(color.Reset)
-		fmt.Println(textContent(t.Content))
-	}
+	timeline(client)
 }

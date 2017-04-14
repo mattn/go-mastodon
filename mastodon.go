@@ -1,11 +1,8 @@
 package mastodon
 
 import (
-	"bufio"
-	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"path"
@@ -172,25 +169,6 @@ func RegisterApp(appConfig *AppConfig) (*Application, error) {
 	return &app, nil
 }
 
-// Account hold information for mastodon account.
-type Account struct {
-	ID             int64     `json:"id"`
-	Username       string    `json:"username"`
-	Acct           string    `json:"acct"`
-	DisplayName    string    `json:"display_name"`
-	Locked         bool      `json:"locked"`
-	CreatedAt      time.Time `json:"created_at"`
-	FollowersCount int64     `json:"followers_count"`
-	FollowingCount int64     `json:"following_count"`
-	StatusesCount  int64     `json:"statuses_count"`
-	Note           string    `json:"note"`
-	URL            string    `json:"url"`
-	Avatar         string    `json:"avatar"`
-	AvatarStatic   string    `json:"avatar_static"`
-	Header         string    `json:"header"`
-	HeaderStatic   string    `json:"header_static"`
-}
-
 // Toot is struct to post status.
 type Toot struct {
 	Status      string  `json:"status"`
@@ -225,46 +203,6 @@ type Status struct {
 	Reblogged          interface{}   `json:"reblogged"`
 }
 
-// GetAccount return Account.
-func (c *Client) GetAccount(id int) (*Account, error) {
-	var account Account
-	err := c.doAPI("GET", fmt.Sprintf("/api/v1/accounts/%d", id), nil, &account)
-	if err != nil {
-		return nil, err
-	}
-	return &account, nil
-}
-
-// GetAccountCurrentUser return Account of current user.
-func (c *Client) GetAccountCurrentUser() (*Account, error) {
-	var account Account
-	err := c.doAPI("GET", "/api/v1/accounts/verify_credentials", nil, &account)
-	if err != nil {
-		return nil, err
-	}
-	return &account, nil
-}
-
-// GetAccountFollowers return followers list.
-func (c *Client) GetAccountFollowers(id int64) ([]*Account, error) {
-	var accounts []*Account
-	err := c.doAPI("GET", fmt.Sprintf("/api/v1/accounts/%d/followers", id), nil, &accounts)
-	if err != nil {
-		return nil, err
-	}
-	return accounts, nil
-}
-
-// GetAccountFollowing return following list.
-func (c *Client) GetAccountFollowing(id int64) ([]*Account, error) {
-	var accounts []*Account
-	err := c.doAPI("GET", fmt.Sprintf("/api/v1/accounts/%d/following", id), nil, &accounts)
-	if err != nil {
-		return nil, err
-	}
-	return accounts, nil
-}
-
 // GetTimelineHome return statuses from home timeline.
 func (c *Client) GetTimelineHome() ([]*Status, error) {
 	var statuses []*Status
@@ -291,126 +229,4 @@ func (c *Client) PostStatus(toot *Toot) (*Status, error) {
 		return nil, err
 	}
 	return &status, nil
-}
-
-// UpdateEvent is struct for passing status event to app.
-type UpdateEvent struct{ Status *Status }
-
-func (e *UpdateEvent) event() {}
-
-// NotificationEvent is struct for passing notification event to app.
-type NotificationEvent struct{}
-
-func (e *NotificationEvent) event() {}
-
-// DeleteEvent is struct for passing deletion event to app.
-type DeleteEvent struct{ ID int64 }
-
-func (e *DeleteEvent) event() {}
-
-// ErrorEvent is struct for passing errors to app.
-type ErrorEvent struct{ err error }
-
-func (e *ErrorEvent) event()        {}
-func (e *ErrorEvent) Error() string { return e.err.Error() }
-
-// Event is interface passing events to app.
-type Event interface {
-	event()
-}
-
-func handleReader(ctx context.Context, q chan Event, r io.Reader) error {
-	name := ""
-	s := bufio.NewScanner(r)
-	for s.Scan() {
-		line := s.Text()
-		token := strings.SplitN(line, ":", 2)
-		if len(token) != 2 {
-			continue
-		}
-		switch strings.TrimSpace(token[0]) {
-		case "event":
-			name = strings.TrimSpace(token[1])
-		case "data":
-			switch name {
-			case "update":
-				var status Status
-				err := json.Unmarshal([]byte(token[1]), &status)
-				if err == nil {
-					q <- &UpdateEvent{&status}
-				}
-			case "notification":
-			case "delete":
-			}
-		default:
-		}
-	}
-	return ctx.Err()
-}
-
-// StreamingPublic return channel to read events.
-func (c *Client) StreamingPublic(ctx context.Context) (chan Event, error) {
-	url, err := url.Parse(c.config.Server)
-	if err != nil {
-		return nil, err
-	}
-	url.Path = path.Join(url.Path, "/api/v1/streaming/public")
-
-	var resp *http.Response
-
-	q := make(chan Event, 10)
-	go func() {
-		defer ctx.Done()
-
-		for {
-			req, err := http.NewRequest("GET", url.String(), nil)
-			if err == nil {
-				req.Header.Set("Authorization", "Bearer "+c.config.AccessToken)
-				resp, err = c.Do(req)
-			}
-			if err == nil {
-				err = handleReader(ctx, q, resp.Body)
-				resp.Body.Close()
-				if err == nil {
-					break
-				}
-			} else {
-				q <- &ErrorEvent{err}
-			}
-			time.Sleep(3 * time.Second)
-		}
-	}()
-	go func() {
-		<-ctx.Done()
-		if resp != nil && resp.Body != nil {
-			resp.Body.Close()
-		}
-	}()
-	return q, nil
-}
-
-// Follow send follow-request.
-func (c *Client) Follow(uri string) (*Account, error) {
-	params := url.Values{}
-	params.Set("uri", uri)
-
-	var account Account
-	err := c.doAPI("POST", "/api/v1/follows", params, &account)
-	if err != nil {
-		return nil, err
-	}
-	return &account, nil
-}
-
-// GetFollowRequests return follow-requests.
-func (c *Client) GetFollowRequests(uri string) ([]*Account, error) {
-	params := url.Values{}
-	params.Set("uri", uri)
-
-	var accounts []*Account
-	err := c.doAPI("GET", "/api/v1/follow_requests", params, &accounts)
-	if err != nil {
-		return nil, err
-	}
-	return accounts, nil
 }

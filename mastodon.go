@@ -26,6 +26,30 @@ type client struct {
 	config *Config
 }
 
+func (c *client) doAPI(method string, uri string, params url.Values, res interface{}) error {
+	url, err := url.Parse(c.config.Server)
+	if err != nil {
+		return err
+	}
+	url.Path = path.Join(url.Path, uri)
+
+	var resp *http.Response
+	req, err := http.NewRequest(method, url.String(), strings.NewReader(params.Encode()))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Authorization", "Bearer "+c.config.AccessToken)
+	resp, err = c.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if res == nil {
+		return nil
+	}
+	return json.NewDecoder(resp.Body).Decode(&res)
+}
+
 func NewClient(config *Config) *client {
 	return &client{
 		Client: *http.DefaultClient,
@@ -179,51 +203,17 @@ type Status struct {
 }
 
 func (c *client) GetAccount(id int) (*Account, error) {
-	url, err := url.Parse(c.config.Server)
+	var account Account
+	err := c.doAPI("GET", fmt.Sprintf("/api/v1/accounts/%d", id), nil, &account)
 	if err != nil {
 		return nil, err
 	}
-	url.Path = path.Join(url.Path, fmt.Sprintf("/api/v1/accounts/%d", id))
-
-	req, err := http.NewRequest("GET", url.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Authorization", "Bearer "+c.config.AccessToken)
-	resp, err := c.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	account := &Account{}
-	err = json.NewDecoder(resp.Body).Decode(account)
-	if err != nil {
-		return nil, err
-	}
-	return account, nil
+	return &account, nil
 }
 
 func (c *client) GetTimelineHome() ([]*Status, error) {
-	url, err := url.Parse(c.config.Server)
-	if err != nil {
-		return nil, err
-	}
-	url.Path = path.Join(url.Path, "/api/v1/timelines/home")
-
-	req, err := http.NewRequest("GET", url.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Authorization", "Bearer "+c.config.AccessToken)
-	resp, err := c.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
 	var statuses []*Status
-	err = json.NewDecoder(resp.Body).Decode(&statuses)
+	err := c.doAPI("GET", "/api/v1/timelines/home", nil, &statuses)
 	if err != nil {
 		return nil, err
 	}
@@ -239,25 +229,8 @@ func (c *client) PostStatus(toot *Toot) (*Status, error) {
 	// TODO: media_ids, senstitive, spoiler_text, visibility
 	//params.Set("visibility", "public")
 
-	url, err := url.Parse(c.config.Server)
-	if err != nil {
-		return nil, err
-	}
-	url.Path = path.Join(url.Path, "/api/v1/statuses")
-
-	req, err := http.NewRequest("POST", url.String(), strings.NewReader(params.Encode()))
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Authorization", "Bearer "+c.config.AccessToken)
-	resp, err := c.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
 	var status Status
-	err = json.NewDecoder(resp.Body).Decode(&status)
+	err := c.doAPI("POST", "/api/v1/statuses", params, &status)
 	if err != nil {
 		return nil, err
 	}

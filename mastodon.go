@@ -14,6 +14,7 @@ import (
 	"time"
 )
 
+// Config is a setting for access mastodon APIs.
 type Config struct {
 	Server       string
 	ClientID     string
@@ -21,12 +22,13 @@ type Config struct {
 	AccessToken  string
 }
 
-type client struct {
+// Client is a API client for mastodon.
+type Client struct {
 	http.Client
 	config *Config
 }
 
-func (c *client) doAPI(method string, uri string, params url.Values, res interface{}) error {
+func (c *Client) doAPI(method string, uri string, params url.Values, res interface{}) error {
 	url, err := url.Parse(c.config.Server)
 	if err != nil {
 		return err
@@ -50,14 +52,16 @@ func (c *client) doAPI(method string, uri string, params url.Values, res interfa
 	return json.NewDecoder(resp.Body).Decode(&res)
 }
 
-func NewClient(config *Config) *client {
-	return &client{
+// NewClient return new mastodon API client.
+func NewClient(config *Config) *Client {
+	return &Client{
 		Client: *http.DefaultClient,
 		config: config,
 	}
 }
 
-func (c *client) Authenticate(username, password string) error {
+// Authenticate get access-token to the API.
+func (c *Client) Authenticate(username, password string) error {
 	params := url.Values{}
 	params.Set("client_id", c.config.ClientID)
 	params.Set("client_secret", c.config.ClientSecret)
@@ -150,6 +154,7 @@ func RegisterApp(appConfig *AppConfig) (*Application, error) {
 	return app, nil
 }
 
+// Account hold information for mastodon account.
 type Account struct {
 	ID             int64     `json:"id"`
 	Username       string    `json:"username"`
@@ -168,17 +173,17 @@ type Account struct {
 	HeaderStatic   string    `json:"header_static"`
 }
 
-type Visibility int64
-
+// Toot is struct to post status.
 type Toot struct {
 	Status      string  `json:"status"`
 	InReplyToID int64   `json:"in_reply_to_id"`
-	MediaIDs    []int64 `json:"in_reply_to_id"`
+	MediaIDs    []int64 `json:"media_ids"`
 	Sensitive   bool    `json:"sensitive"`
 	SpoilerText string  `json:"spoiler_text"`
 	Visibility  string  `json:"visibility"`
 }
 
+// Status is struct to hold status.
 type Status struct {
 	ID                 int64         `json:"id"`
 	CreatedAt          time.Time     `json:"created_at"`
@@ -202,7 +207,8 @@ type Status struct {
 	Reblogged          interface{}   `json:"reblogged"`
 }
 
-func (c *client) GetAccount(id int) (*Account, error) {
+// GetAccount return Account.
+func (c *Client) GetAccount(id int) (*Account, error) {
 	var account Account
 	err := c.doAPI("GET", fmt.Sprintf("/api/v1/accounts/%d", id), nil, &account)
 	if err != nil {
@@ -211,7 +217,8 @@ func (c *client) GetAccount(id int) (*Account, error) {
 	return &account, nil
 }
 
-func (c *client) GetTimelineHome() ([]*Status, error) {
+// GetTimelineHome return statuses from home timeline.
+func (c *Client) GetTimelineHome() ([]*Status, error) {
 	var statuses []*Status
 	err := c.doAPI("GET", "/api/v1/timelines/home", nil, &statuses)
 	if err != nil {
@@ -220,7 +227,8 @@ func (c *client) GetTimelineHome() ([]*Status, error) {
 	return statuses, nil
 }
 
-func (c *client) PostStatus(toot *Toot) (*Status, error) {
+// PostStatus post the toot.
+func (c *Client) PostStatus(toot *Toot) (*Status, error) {
 	params := url.Values{}
 	params.Set("status", toot.Status)
 	if toot.InReplyToID > 0 {
@@ -237,23 +245,27 @@ func (c *client) PostStatus(toot *Toot) (*Status, error) {
 	return &status, nil
 }
 
+// UpdateEvent is struct for passing status event to app.
 type UpdateEvent struct {
 	Status *Status
 }
 
 func (e *UpdateEvent) event() {}
 
+// NotificationEvent is struct for passing notification event to app.
 type NotificationEvent struct {
 }
 
 func (e *NotificationEvent) event() {}
 
+// DeleteEvent is struct for passing deletion event to app.
 type DeleteEvent struct {
 	ID int64
 }
 
 func (e *DeleteEvent) event() {}
 
+// ErrorEvent is struct for passing errors to app.
 type ErrorEvent struct {
 	err error
 }
@@ -261,11 +273,13 @@ type ErrorEvent struct {
 func (e *ErrorEvent) Error() string { return e.err.Error() }
 func (e *ErrorEvent) event()        {}
 
+// Event is interface passing events to app.
 type Event interface {
 	event()
 }
 
-func (c *client) StreamingPublic(ctx context.Context) (chan Event, error) {
+// StreamingPublic return channel to read events.
+func (c *Client) StreamingPublic(ctx context.Context) (chan Event, error) {
 	url, err := url.Parse(c.config.Server)
 	if err != nil {
 		return nil, err

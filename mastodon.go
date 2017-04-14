@@ -1,6 +1,8 @@
 package mastodon
 
 import (
+	"bufio"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -65,6 +67,63 @@ func (c *client) Authenticate(username, password string) error {
 	return nil
 }
 
+// AppConfig is a setting for registering applications.
+type AppConfig struct {
+	http.Client
+	Server     string
+	ClientName string
+
+	// Where the user should be redirected after authorization (for no redirect, use urn:ietf:wg:oauth:2.0:oob)
+	RedirectURIs string
+
+	// This can be a space-separated list of the following items: "read", "write" and "follow".
+	Scopes string
+
+	// Optional.
+	Website string
+}
+
+// Application is mastodon application.
+type Application struct {
+	ID           int64  `json:"id"`
+	RedirectURI  string `json:"redirect_uri"`
+	ClientID     string `json:"client_id"`
+	ClientSecret string `json:"client_secret"`
+}
+
+// RegisterApp returns the mastodon application.
+func RegisterApp(appConfig *AppConfig) (*Application, error) {
+	params := url.Values{}
+	params.Set("client_name", appConfig.ClientName)
+	params.Set("redirect_uris", appConfig.RedirectURIs)
+	params.Set("scopes", appConfig.Scopes)
+	params.Set("website", appConfig.Website)
+
+	url, err := url.Parse(appConfig.Server)
+	if err != nil {
+		return nil, err
+	}
+	url.Path = path.Join(url.Path, "/api/v1/apps")
+
+	req, err := http.NewRequest("POST", url.String(), strings.NewReader(params.Encode()))
+	if err != nil {
+		return nil, err
+	}
+	resp, err := appConfig.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	app := &Application{}
+	err = json.NewDecoder(resp.Body).Decode(app)
+	if err != nil {
+		return nil, err
+	}
+
+	return app, nil
+}
+
 type Account struct {
 	ID             int64     `json:"id"`
 	Username       string    `json:"username"`
@@ -81,32 +140,6 @@ type Account struct {
 	AvatarStatic   string    `json:"avatar_static"`
 	Header         string    `json:"header"`
 	HeaderStatic   string    `json:"header_static"`
-}
-
-func (c *client) GetAccount(id int) (*Account, error) {
-	url, err := url.Parse(c.config.Server)
-	if err != nil {
-		return nil, err
-	}
-	url.Path = path.Join(url.Path, fmt.Sprintf("/api/v1/accounts/%d", id))
-
-	req, err := http.NewRequest("GET", url.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Authorization", "Bearer "+c.config.AccessToken)
-	resp, err := c.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	account := &Account{}
-	err = json.NewDecoder(resp.Body).Decode(account)
-	if err != nil {
-		return nil, err
-	}
-	return account, nil
 }
 
 type Visibility int64
@@ -141,6 +174,32 @@ type Status struct {
 	Reblog             interface{}   `json:"reblog"`
 	Favourited         interface{}   `json:"favourited"`
 	Reblogged          interface{}   `json:"reblogged"`
+}
+
+func (c *client) GetAccount(id int) (*Account, error) {
+	url, err := url.Parse(c.config.Server)
+	if err != nil {
+		return nil, err
+	}
+	url.Path = path.Join(url.Path, fmt.Sprintf("/api/v1/accounts/%d", id))
+
+	req, err := http.NewRequest("GET", url.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Authorization", "Bearer "+c.config.AccessToken)
+	resp, err := c.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	account := &Account{}
+	err = json.NewDecoder(resp.Body).Decode(account)
+	if err != nil {
+		return nil, err
+	}
+	return account, nil
 }
 
 func (c *client) GetTimelineHome() ([]*Status, error) {
@@ -201,59 +260,74 @@ func (c *client) PostStatus(toot *Toot) (*Status, error) {
 	return &status, nil
 }
 
-// AppConfig is a setting for registering applications.
-type AppConfig struct {
-	http.Client
-	Server     string
-	ClientName string
-
-	// Where the user should be redirected after authorization (for no redirect, use urn:ietf:wg:oauth:2.0:oob)
-	RedirectURIs string
-
-	// This can be a space-separated list of the following items: "read", "write" and "follow".
-	Scopes string
-
-	// Optional.
-	Website string
+type UpdateEvent struct {
+	Status *Status
 }
 
-// Application is mastodon application.
-type Application struct {
-	ID           int64  `json:"id"`
-	RedirectURI  string `json:"redirect_uri"`
-	ClientID     string `json:"client_id"`
-	ClientSecret string `json:"client_secret"`
+func (e *UpdateEvent) event() {}
+
+type NotificationEvent struct {
 }
 
-// RegisterApp returns the mastodon application.
-func RegisterApp(appConfig *AppConfig) (*Application, error) {
-	params := url.Values{}
-	params.Set("client_name", appConfig.ClientName)
-	params.Set("redirect_uris", appConfig.RedirectURIs)
-	params.Set("scopes", appConfig.Scopes)
-	params.Set("website", appConfig.Website)
+func (e *NotificationEvent) event() {}
 
-	url, err := url.Parse(appConfig.Server)
+type DeleteEvent struct {
+	ID int64
+}
+
+func (e *DeleteEvent) event() {}
+
+type Event interface {
+	event()
+}
+
+func (c *client) StreamingPublic(ctx context.Context) (chan Event, error) {
+	url, err := url.Parse(c.config.Server)
 	if err != nil {
 		return nil, err
 	}
-	url.Path = path.Join(url.Path, "/api/v1/apps")
+	url.Path = path.Join(url.Path, "/api/v1/streaming/public")
 
-	req, err := http.NewRequest("POST", url.String(), strings.NewReader(params.Encode()))
+	req, err := http.NewRequest("GET", url.String(), nil)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := appConfig.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	app := &Application{}
-	err = json.NewDecoder(resp.Body).Decode(app)
+	req.Header.Set("Authorization", "Bearer "+c.config.AccessToken)
+	resp, err := c.Do(req)
 	if err != nil {
 		return nil, err
 	}
 
-	return app, nil
+	q := make(chan Event)
+	go func() {
+		defer ctx.Done()
+		name := ""
+		s := bufio.NewScanner(resp.Body)
+		for s.Scan() {
+			line := s.Text()
+			token := strings.SplitN(line, ":", 2)
+			if len(token) != 2 {
+				continue
+			}
+			switch strings.TrimSpace(token[0]) {
+			case "event":
+				name = strings.TrimSpace(token[1])
+			case "data":
+				switch name {
+				case "update":
+					var status Status
+					json.Unmarshal([]byte(token[1]), &status)
+					q <- &UpdateEvent{&status}
+				case "notification":
+				case "delete":
+				}
+			}
+		}
+		fmt.Println(s.Err())
+	}()
+	go func() {
+		<-ctx.Done()
+		resp.Body.Close()
+	}()
+	return q, nil
 }

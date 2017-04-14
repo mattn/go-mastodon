@@ -22,9 +22,18 @@ import (
 )
 
 var (
-	toot   = flag.String("t", "", "toot text")
-	stream = flag.Bool("S", false, "streaming public")
+	toot     = flag.String("t", "", "toot text")
+	stream   = flag.Bool("S", false, "streaming public")
+	fromfile = flag.String("ff", "", "post utf-8 string from a file(\"-\" means STDIN)")
 )
+
+func readFile(filename string) ([]byte, error) {
+	if filename == "-" {
+		return ioutil.ReadAll(os.Stdin)
+	} else {
+		return ioutil.ReadFile(filename)
+	}
+}
 
 func extractText(node *html.Node, w *bytes.Buffer) {
 	if node.Type == html.TextNode {
@@ -133,6 +142,19 @@ func main() {
 		err = ioutil.WriteFile(file, b, 0700)
 		if err != nil {
 			log.Fatal("failed to store file:", err)
+		}
+		return
+	}
+	if *fromfile != "" {
+		text, err := readFile(*fromfile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		_, err = client.PostStatus(&mastodon.Toot{
+			Status: string(text),
+		})
+		if err != nil {
+			log.Fatal(err)
 		}
 		return
 	}

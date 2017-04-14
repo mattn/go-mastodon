@@ -30,11 +30,7 @@ func extractText(node *html.Node, w *bytes.Buffer) {
 	if node.Type == html.TextNode {
 		data := strings.Trim(node.Data, "\r\n")
 		if data != "" {
-			w.WriteString(data)
-		}
-	} else if node.Type == html.ElementNode {
-		if node.Data == "li" {
-			w.WriteString("\n* ")
+			w.WriteString(data + "\n")
 		}
 	}
 	for c := node.FirstChild; c != nil; c = c.NextSibling {
@@ -166,6 +162,10 @@ func main() {
 				fmt.Println(t.Status.Account.Username)
 				color.Set(color.Reset)
 				fmt.Println(textContent(t.Status.Content))
+			case *mastodon.ErrorEvent:
+				color.Set(color.FgYellow)
+				fmt.Println(t.Error())
+				color.Set(color.Reset)
 			}
 		}
 		return

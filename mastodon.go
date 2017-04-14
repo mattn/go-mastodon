@@ -5,8 +5,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"path"
 	"strings"
 	"time"
@@ -231,7 +233,9 @@ func (c *client) GetTimelineHome() ([]*Status, error) {
 func (c *client) PostStatus(toot *Toot) (*Status, error) {
 	params := url.Values{}
 	params.Set("status", toot.Status)
-	//params.Set("in_reply_to_id", fmt.Sprint(toot.InReplyToID))
+	if toot.InReplyToID > 0 {
+		params.Set("in_reply_to_id", fmt.Sprint(toot.InReplyToID))
+	}
 	// TODO: media_ids, senstitive, spoiler_text, visibility
 	//params.Set("visibility", "public")
 
@@ -277,6 +281,13 @@ type DeleteEvent struct {
 
 func (e *DeleteEvent) event() {}
 
+type ErrorEvent struct {
+	err error
+}
+
+func (e *ErrorEvent) Error() string { return e.err.Error() }
+func (e *ErrorEvent) event()        {}
+
 type Event interface {
 	event()
 }
@@ -288,46 +299,58 @@ func (c *client) StreamingPublic(ctx context.Context) (chan Event, error) {
 	}
 	url.Path = path.Join(url.Path, "/api/v1/streaming/public")
 
-	req, err := http.NewRequest("GET", url.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Authorization", "Bearer "+c.config.AccessToken)
-	resp, err := c.Do(req)
-	if err != nil {
-		return nil, err
-	}
+	var resp *http.Response
 
-	q := make(chan Event)
+	q := make(chan Event, 10)
 	go func() {
 		defer ctx.Done()
-		name := ""
-		s := bufio.NewScanner(resp.Body)
-		for s.Scan() {
-			line := s.Text()
-			token := strings.SplitN(line, ":", 2)
-			if len(token) != 2 {
-				continue
+
+		for {
+			req, err := http.NewRequest("GET", url.String(), nil)
+			if err == nil {
+				req.Header.Set("Authorization", "Bearer "+c.config.AccessToken)
+				resp, err = c.Do(req)
 			}
-			switch strings.TrimSpace(token[0]) {
-			case "event":
-				name = strings.TrimSpace(token[1])
-			case "data":
-				switch name {
-				case "update":
-					var status Status
-					json.Unmarshal([]byte(token[1]), &status)
-					q <- &UpdateEvent{&status}
-				case "notification":
-				case "delete":
+			if err == nil {
+				name := ""
+				s := bufio.NewScanner(io.TeeReader(resp.Body, os.Stdout))
+				for s.Scan() {
+					line := s.Text()
+					token := strings.SplitN(line, ":", 2)
+					if len(token) != 2 {
+						continue
+					}
+					switch strings.TrimSpace(token[0]) {
+					case "event":
+						name = strings.TrimSpace(token[1])
+					case "data":
+						switch name {
+						case "update":
+							var status Status
+							json.Unmarshal([]byte(token[1]), &status)
+							q <- &UpdateEvent{&status}
+						case "notification":
+						case "delete":
+						}
+					default:
+					}
 				}
+				resp.Body.Close()
+				err = ctx.Err()
+				if err == nil {
+					break
+				}
+			} else {
+				q <- &ErrorEvent{err}
 			}
+			time.Sleep(3 * time.Second)
 		}
-		fmt.Println(s.Err())
 	}()
 	go func() {
 		<-ctx.Done()
-		resp.Body.Close()
+		if resp != nil && resp.Body != nil {
+			resp.Body.Close()
+		}
 	}()
 	return q, nil
 }

@@ -46,11 +46,17 @@ func textContent(s string) string {
 		if node.Type == html.TextNode {
 			data := strings.Trim(node.Data, "\r\n")
 			if data != "" {
-				w.WriteString(data + "\n")
+				w.WriteString(data)
 			}
 		}
 		for c := node.FirstChild; c != nil; c = c.NextSibling {
 			extractText(c, w)
+		}
+		if node.Type == html.ElementNode {
+			name := strings.ToLower(node.Data)
+			if name == "br" {
+				w.WriteString("\n")
+			}
 		}
 	}
 	extractText(doc, &buf)

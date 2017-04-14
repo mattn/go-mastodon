@@ -5,10 +5,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
-	"os"
 	"path"
 	"strings"
 	"time"
@@ -309,7 +307,7 @@ func (c *Client) StreamingPublic(ctx context.Context) (chan Event, error) {
 			}
 			if err == nil {
 				name := ""
-				s := bufio.NewScanner(io.TeeReader(resp.Body, os.Stdout))
+				s := bufio.NewScanner(resp.Body)
 				for s.Scan() {
 					line := s.Text()
 					token := strings.SplitN(line, ":", 2)

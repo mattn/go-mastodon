@@ -1,6 +1,6 @@
 # go-mastodon
 
-[![Build Status](https://travis-ci.org/mattn/go-mastodon.png?branch=master)](https://travis-ci.org/mattn/go-mastodon)
+[![Build Status](https://travis-ci.org/mattn/go-mastodon.svg?branch=master)](https://travis-ci.org/mattn/go-mastodon)
 [![Coverage Status](https://coveralls.io/repos/github/mattn/go-mastodon/badge.svg?branch=master)](https://coveralls.io/github/mattn/go-mastodon?branch=master)
 [![GoDoc](https://godoc.org/github.com/mattn/go-mastodon?status.svg)](http://godoc.org/github.com/mattn/go-mastodon)
 [![Go Report Card](https://goreportcard.com/badge/github.com/mattn/go-mastodon)](https://goreportcard.com/report/github.com/mattn/go-mastodon)

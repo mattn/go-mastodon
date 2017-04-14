@@ -131,9 +131,55 @@ func authenticate(client *mastodon.Client, config *mastodon.Config, file string)
 	}
 }
 
-func main() {
-	flag.Parse()
+func streaming(client *mastodon.Client) {
+	ctx, cancel := context.WithCancel(context.Background())
+	sc := make(chan os.Signal, 1)
+	signal.Notify(sc, os.Interrupt)
+	q, err := client.StreamingPublic(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+	go func() {
+		<-sc
+		cancel()
+		close(q)
+	}()
+	for e := range q {
+		switch t := e.(type) {
+		case *mastodon.UpdateEvent:
+			color.Set(color.FgHiRed)
+			fmt.Println(t.Status.Account.Username)
+			color.Set(color.Reset)
+			fmt.Println(textContent(t.Status.Content))
+		case *mastodon.ErrorEvent:
+			color.Set(color.FgYellow)
+			fmt.Println(t.Error())
+			color.Set(color.Reset)
+		}
+	}
+}
 
+func init() {
+	flag.Parse()
+	if *fromfile != "" {
+		text, err := readFile(*fromfile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		*toot = string(text)
+	}
+}
+
+func post(client *mastodon.Client, text string) {
+	_, err := client.PostStatus(&mastodon.Toot{
+		Status: text,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func main() {
 	file, config, err := getConfig()
 	if err != nil {
 		log.Fatal(err)
@@ -145,49 +191,14 @@ func main() {
 		authenticate(client, config, file)
 		return
 	}
-	if *fromfile != "" {
-		text, err := readFile(*fromfile)
-		if err != nil {
-			log.Fatal(err)
-		}
-		*toot = string(text)
-	}
 
 	if *toot != "" {
-		_, err = client.PostStatus(&mastodon.Toot{
-			Status: *toot,
-		})
-		if err != nil {
-			log.Fatal(err)
-		}
+		post(client, *toot)
 		return
 	}
+
 	if *stream {
-		ctx, cancel := context.WithCancel(context.Background())
-		sc := make(chan os.Signal, 1)
-		signal.Notify(sc, os.Interrupt)
-		q, err := client.StreamingPublic(ctx)
-		if err != nil {
-			log.Fatal(err)
-		}
-		go func() {
-			<-sc
-			cancel()
-			close(q)
-		}()
-		for e := range q {
-			switch t := e.(type) {
-			case *mastodon.UpdateEvent:
-				color.Set(color.FgHiRed)
-				fmt.Println(t.Status.Account.Username)
-				color.Set(color.Reset)
-				fmt.Println(textContent(t.Status.Content))
-			case *mastodon.ErrorEvent:
-				color.Set(color.FgYellow)
-				fmt.Println(t.Error())
-				color.Set(color.Reset)
-			}
-		}
+		streaming(client)
 		return
 	}
 

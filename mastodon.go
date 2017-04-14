@@ -215,6 +215,16 @@ func (c *Client) GetAccount(id int) (*Account, error) {
 	return &account, nil
 }
 
+// GetAccountCurrentUser return current user Account.
+func (c *Client) GetAccountCurrentUser() (*Account, error) {
+	var account Account
+	err := c.doAPI("GET", "/api/v1/accounts/verify_credentials", nil, &account)
+	if err != nil {
+		return nil, err
+	}
+	return &account, nil
+}
+
 // GetAccountFollowers return followers list.
 func (c *Client) GetAccountFollowers(id int64) ([]*Account, error) {
 	var accounts []*Account

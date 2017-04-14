@@ -37,6 +37,14 @@ type Context struct {
 	Descendants []*Status `descendants`
 }
 
+// Card hold information for mastodon card.
+type Card struct {
+	URL         string `json:"url"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Image       string `json:"image"`
+}
+
 // GetStatus return status specified by id.
 func (c *Client) GetStatus(id string) (*Status, error) {
 	var status Status
@@ -55,6 +63,16 @@ func (c *Client) GetStatusContext(id string) (*Context, error) {
 		return nil, err
 	}
 	return &context, nil
+}
+
+// GetStatusCard return status specified by id.
+func (c *Client) GetStatusCard(id string) (*Card, error) {
+	var card Card
+	err := c.doAPI(http.MethodGet, fmt.Sprintf("/api/v1/statuses/%d/card", id), nil, &card)
+	if err != nil {
+		return nil, err
+	}
+	return &card, nil
 }
 
 // GetTimelineHome return statuses from home timeline.

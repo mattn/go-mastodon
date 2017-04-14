@@ -75,3 +75,10 @@ func TestPostStatus(t *testing.T) {
 		t.Fatalf("should not be fail: %v", err)
 	}
 }
+
+func TestForTheCoverages(t *testing.T) {
+	(*UpdateEvent)(nil).event()
+	(*NotificationEvent)(nil).event()
+	(*DeleteEvent)(nil).event()
+	(*ErrorEvent)(nil).event()
+}

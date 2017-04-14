@@ -58,7 +58,7 @@ func TestAccountFollow(t *testing.T) {
 	})
 	rel, err := client.AccountFollow(123)
 	if err == nil {
-		t.Fatalf("should  be fail: %v", err)
+		t.Fatalf("should be fail: %v", err)
 	}
 	rel, err = client.AccountFollow(1234567)
 	if err != nil {

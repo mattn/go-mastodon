@@ -24,14 +24,14 @@ type Client struct {
 }
 
 func (c *Client) doAPI(method string, uri string, params url.Values, res interface{}) error {
-	url, err := url.Parse(c.config.Server)
+	u, err := url.Parse(c.config.Server)
 	if err != nil {
 		return err
 	}
-	url.Path = path.Join(url.Path, uri)
+	u.Path = path.Join(u.Path, uri)
 
 	var resp *http.Response
-	req, err := http.NewRequest(method, url.String(), strings.NewReader(params.Encode()))
+	req, err := http.NewRequest(method, u.String(), strings.NewReader(params.Encode()))
 	if err != nil {
 		return err
 	}
@@ -70,13 +70,13 @@ func (c *Client) Authenticate(username, password string) error {
 	params.Set("password", password)
 	params.Set("scope", "read write follow")
 
-	url, err := url.Parse(c.config.Server)
+	u, err := url.Parse(c.config.Server)
 	if err != nil {
 		return err
 	}
-	url.Path = path.Join(url.Path, "/oauth/token")
+	u.Path = path.Join(u.Path, "/oauth/token")
 
-	req, err := http.NewRequest(http.MethodPost, url.String(), strings.NewReader(params.Encode()))
+	req, err := http.NewRequest(http.MethodPost, u.String(), strings.NewReader(params.Encode()))
 	if err != nil {
 		return err
 	}

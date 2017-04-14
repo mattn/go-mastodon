@@ -104,3 +104,31 @@ func TestAccountUnfollow(t *testing.T) {
 		t.Fatalf("want %t but %t", false, rel.Following)
 	}
 }
+
+func TestGetFollowRequests(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, `[{"Username": "foo"}, {"Username": "bar"}]`)
+		return
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+		AccessToken:  "zoo",
+	})
+	fReqs, err := client.GetFollowRequests()
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	if len(fReqs) != 2 {
+		t.Fatalf("result should be two: %d", len(fReqs))
+	}
+	if fReqs[0].Username != "foo" {
+		t.Fatalf("want %q but %q", "foo", fReqs[0].Username)
+	}
+	if fReqs[1].Username != "bar" {
+		t.Fatalf("want %q but %q", "bar", fReqs[0].Username)
+	}
+}

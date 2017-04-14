@@ -30,9 +30,8 @@ var (
 func readFile(filename string) ([]byte, error) {
 	if filename == "-" {
 		return ioutil.ReadAll(os.Stdin)
-	} else {
-		return ioutil.ReadFile(filename)
 	}
+	return ioutil.ReadFile(filename)
 }
 
 func extractText(node *html.Node, w *bytes.Buffer) {

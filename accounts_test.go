@@ -9,10 +9,6 @@ import (
 
 func TestGetBlocks(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/api/v1/blocks" {
-			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-			return
-		}
 		fmt.Fprintln(w, `[{"Username": "foo"}, {"Username": "bar"}]`)
 		return
 	}))

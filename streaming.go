@@ -82,7 +82,7 @@ func (c *Client) StreamingPublic(ctx context.Context) (chan Event, error) {
 		defer ctx.Done()
 
 		for {
-			req, err := http.NewRequest("GET", url.String(), nil)
+			req, err := http.NewRequest(http.MethodGet, url.String(), nil)
 			if err == nil {
 				req.Header.Set("Authorization", "Bearer "+c.config.AccessToken)
 				resp, err = c.Do(req)

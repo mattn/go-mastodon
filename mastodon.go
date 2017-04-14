@@ -46,7 +46,7 @@ func (c *Client) doAPI(method string, uri string, params url.Values, res interfa
 		return nil
 	}
 
-	if method == "GET" && resp.StatusCode != http.StatusOK {
+	if method == http.MethodGet && resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("bad request: %v", resp.Status)
 	}
 
@@ -77,7 +77,7 @@ func (c *Client) Authenticate(username, password string) error {
 	}
 	url.Path = path.Join(url.Path, "/oauth/token")
 
-	req, err := http.NewRequest("POST", url.String(), strings.NewReader(params.Encode()))
+	req, err := http.NewRequest(http.MethodPost, url.String(), strings.NewReader(params.Encode()))
 	if err != nil {
 		return err
 	}
@@ -140,7 +140,7 @@ type Status struct {
 // GetTimelineHome return statuses from home timeline.
 func (c *Client) GetTimelineHome() ([]*Status, error) {
 	var statuses []*Status
-	err := c.doAPI("GET", "/api/v1/timelines/home", nil, &statuses)
+	err := c.doAPI(http.MethodGet, "/api/v1/timelines/home", nil, &statuses)
 	if err != nil {
 		return nil, err
 	}
@@ -158,7 +158,7 @@ func (c *Client) PostStatus(toot *Toot) (*Status, error) {
 	//params.Set("visibility", "public")
 
 	var status Status
-	err := c.doAPI("POST", "/api/v1/statuses", params, &status)
+	err := c.doAPI(http.MethodPost, "/api/v1/statuses", params, &status)
 	if err != nil {
 		return nil, err
 	}

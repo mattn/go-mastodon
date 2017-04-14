@@ -217,6 +217,15 @@ func (c *Client) GetAccount(id int) (*Account, error) {
 	return &account, nil
 }
 
+func (c *Client) GetAccountFollowers(id int64) ([]*Account, error) {
+	var accounts []*Account
+	err := c.doAPI("GET", fmt.Sprintf("/api/v1/accounts/%d/followers", id), nil, &accounts)
+	if err != nil {
+		return nil, err
+	}
+	return accounts, nil
+}
+
 // GetTimelineHome return statuses from home timeline.
 func (c *Client) GetTimelineHome() ([]*Status, error) {
 	var statuses []*Status

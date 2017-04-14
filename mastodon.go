@@ -47,6 +47,11 @@ func (c *Client) doAPI(method string, uri string, params url.Values, res interfa
 	if res == nil {
 		return nil
 	}
+
+	if method == "GET" && resp.StatusCode != 200 {
+		return fmt.Errorf("bad request: %v", resp.Status)
+	}
+
 	return json.NewDecoder(resp.Body).Decode(&res)
 }
 

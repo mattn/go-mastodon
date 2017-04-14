@@ -77,7 +77,7 @@ func (c *Client) Authenticate(username, password string) error {
 	}
 	url.Path = path.Join(url.Path, "/oauth/token")
 
-	req, err := http.NewRequest("POST", url.String(), strings.NewReader(params.Encode()))
+	req, err := http.NewRequest(http.MethodPost, url.String(), strings.NewReader(params.Encode()))
 	if err != nil {
 		return err
 	}
@@ -158,7 +158,7 @@ func (c *Client) PostStatus(toot *Toot) (*Status, error) {
 	//params.Set("visibility", "public")
 
 	var status Status
-	err := c.doAPI("POST", "/api/v1/statuses", params, &status)
+	err := c.doAPI(http.MethodPost, "/api/v1/statuses", params, &status)
 	if err != nil {
 		return nil, err
 	}

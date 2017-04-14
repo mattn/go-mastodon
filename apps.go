@@ -51,7 +51,7 @@ func RegisterApp(appConfig *AppConfig) (*Application, error) {
 	}
 	url.Path = path.Join(url.Path, "/api/v1/apps")
 
-	req, err := http.NewRequest("POST", url.String(), strings.NewReader(params.Encode()))
+	req, err := http.NewRequest(http.MethodPost, url.String(), strings.NewReader(params.Encode()))
 	if err != nil {
 		return nil, err
 	}

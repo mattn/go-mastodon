@@ -78,7 +78,7 @@ type Relationship struct {
 // AccountFollow follow the account.
 func (c *Client) AccountFollow(id int64) (*Relationship, error) {
 	var relationship Relationship
-	err := c.doAPI("POST", fmt.Sprintf("/api/v1/accounts/%d/follow", id), nil, &relationship)
+	err := c.doAPI(http.MethodPost, fmt.Sprintf("/api/v1/accounts/%d/follow", id), nil, &relationship)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func (c *Client) AccountFollow(id int64) (*Relationship, error) {
 // AccountUnfollow unfollow the account.
 func (c *Client) AccountUnfollow(id int64) (*Relationship, error) {
 	var relationship Relationship
-	err := c.doAPI("POST", fmt.Sprintf("/api/v1/accounts/%d/unfollow", id), nil, &relationship)
+	err := c.doAPI(http.MethodPost, fmt.Sprintf("/api/v1/accounts/%d/unfollow", id), nil, &relationship)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +98,7 @@ func (c *Client) AccountUnfollow(id int64) (*Relationship, error) {
 // AccountBlock block the account.
 func (c *Client) AccountBlock(id int64) (*Relationship, error) {
 	var relationship Relationship
-	err := c.doAPI("POST", fmt.Sprintf("/api/v1/accounts/%d/block", id), nil, &relationship)
+	err := c.doAPI(http.MethodPost, fmt.Sprintf("/api/v1/accounts/%d/block", id), nil, &relationship)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +108,7 @@ func (c *Client) AccountBlock(id int64) (*Relationship, error) {
 // AccountUnblock unblock the account.
 func (c *Client) AccountUnblock(id int64) (*Relationship, error) {
 	var relationship Relationship
-	err := c.doAPI("POST", fmt.Sprintf("/api/v1/accounts/%d/unblock", id), nil, &relationship)
+	err := c.doAPI(http.MethodPost, fmt.Sprintf("/api/v1/accounts/%d/unblock", id), nil, &relationship)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +118,7 @@ func (c *Client) AccountUnblock(id int64) (*Relationship, error) {
 // AccountMute mute the account.
 func (c *Client) AccountMute(id int64) (*Relationship, error) {
 	var relationship Relationship
-	err := c.doAPI("POST", fmt.Sprintf("/api/v1/accounts/%d/mute", id), nil, &relationship)
+	err := c.doAPI(http.MethodPost, fmt.Sprintf("/api/v1/accounts/%d/mute", id), nil, &relationship)
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +128,7 @@ func (c *Client) AccountMute(id int64) (*Relationship, error) {
 // AccountUnmute unmute the account.
 func (c *Client) AccountUnmute(id int64) (*Relationship, error) {
 	var relationship Relationship
-	err := c.doAPI("POST", fmt.Sprintf("/api/v1/accounts/%d/unmute", id), nil, &relationship)
+	err := c.doAPI(http.MethodPost, fmt.Sprintf("/api/v1/accounts/%d/unmute", id), nil, &relationship)
 	if err != nil {
 		return nil, err
 	}
@@ -168,7 +168,7 @@ func (c *Client) Follow(uri string) (*Account, error) {
 	params.Set("uri", uri)
 
 	var account Account
-	err := c.doAPI("POST", "/api/v1/follows", params, &account)
+	err := c.doAPI(http.MethodPost, "/api/v1/follows", params, &account)
 	if err != nil {
 		return nil, err
 	}

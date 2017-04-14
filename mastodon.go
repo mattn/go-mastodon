@@ -215,6 +215,7 @@ func (c *Client) GetAccount(id int) (*Account, error) {
 	return &account, nil
 }
 
+// GetAccountFollowers return followers list.
 func (c *Client) GetAccountFollowers(id int64) ([]*Account, error) {
 	var accounts []*Account
 	err := c.doAPI("GET", fmt.Sprintf("/api/v1/accounts/%d/followers", id), nil, &accounts)
@@ -253,32 +254,25 @@ func (c *Client) PostStatus(toot *Toot) (*Status, error) {
 }
 
 // UpdateEvent is struct for passing status event to app.
-type UpdateEvent struct {
-	Status *Status
-}
+type UpdateEvent struct{ Status *Status }
 
 func (e *UpdateEvent) event() {}
 
 // NotificationEvent is struct for passing notification event to app.
-type NotificationEvent struct {
-}
+type NotificationEvent struct{}
 
 func (e *NotificationEvent) event() {}
 
 // DeleteEvent is struct for passing deletion event to app.
-type DeleteEvent struct {
-	ID int64
-}
+type DeleteEvent struct{ ID int64 }
 
 func (e *DeleteEvent) event() {}
 
 // ErrorEvent is struct for passing errors to app.
-type ErrorEvent struct {
-	err error
-}
+type ErrorEvent struct{ err error }
 
-func (e *ErrorEvent) Error() string { return e.err.Error() }
 func (e *ErrorEvent) event()        {}
+func (e *ErrorEvent) Error() string { return e.err.Error() }
 
 // Event is interface passing events to app.
 type Event interface {
@@ -349,4 +343,17 @@ func (c *Client) StreamingPublic(ctx context.Context) (chan Event, error) {
 		}
 	}()
 	return q, nil
+}
+
+// GetAccount return Account.
+func (c *Client) Follow(uri string) (*Account, error) {
+	params := url.Values{}
+	params.Set("uri", uri)
+
+	var account Account
+	err := c.doAPI("POST", "/api/v1/follows", params, &account)
+	if err != nil {
+		return nil, err
+	}
+	return &account, nil
 }

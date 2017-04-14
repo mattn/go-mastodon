@@ -187,12 +187,9 @@ func (c *Client) FollowRemoteUser(uri string) (*Account, error) {
 }
 
 // GetFollowRequests return follow-requests.
-func (c *Client) GetFollowRequests(uri string) ([]*Account, error) {
-	params := url.Values{}
-	params.Set("uri", uri)
-
+func (c *Client) GetFollowRequests() ([]*Account, error) {
 	var accounts []*Account
-	err := c.doAPI(http.MethodGet, "/api/v1/follow_requests", params, &accounts)
+	err := c.doAPI(http.MethodGet, "/api/v1/follow_requests", nil, &accounts)
 	if err != nil {
 		return nil, err
 	}

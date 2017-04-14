@@ -68,11 +68,12 @@ func (c *Client) GetAccountFollowing(id int64) ([]*Account, error) {
 
 // Relationship hold information for relation-ship to the account.
 type Relationship struct {
-	Following  bool `json:"following"`
-	FollowedBy bool `json:"followed_by"`
-	Blocking   bool `json:"blocking"`
-	Muting     bool `json:"muting"`
-	Requested  bool `json:"requested"`
+	ID         int64 `json:"id"`
+	Following  bool  `json:"following"`
+	FollowedBy bool  `json:"followed_by"`
+	Blocking   bool  `json:"blocking"`
+	Muting     bool  `json:"muting"`
+	Requested  bool  `json:"requested"`
 }
 
 // AccountFollow follow the account.

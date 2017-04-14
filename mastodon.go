@@ -397,7 +397,7 @@ func (c *Client) Follow(uri string) (*Account, error) {
 	return &account, nil
 }
 
-// GetFollowRequest return follow-requests.
+// GetFollowRequests return follow-requests.
 func (c *Client) GetFollowRequests(uri string) ([]*Account, error) {
 	params := url.Values{}
 	params.Set("uri", uri)

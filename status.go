@@ -95,6 +95,16 @@ func (c *Client) GetTimelineHome() ([]*Status, error) {
 	return statuses, nil
 }
 
+// GetTimelineHashtag return statuses from tagged timeline.
+func (c *Client) GetTimelineHashtag(tag string) ([]*Status, error) {
+	var statuses []*Status
+	err := c.doAPI(http.MethodGet, fmt.Sprintf("/api/v1/timelines/tag/%s", (&url.URL{Path: tag}).EscapedPath()), nil, &statuses)
+	if err != nil {
+		return nil, err
+	}
+	return statuses, nil
+}
+
 // PostStatus post the toot.
 func (c *Client) PostStatus(toot *Toot) (*Status, error) {
 	params := url.Values{}

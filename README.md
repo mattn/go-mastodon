@@ -66,7 +66,7 @@ if err != nil {
 * [ ] POST /api/v1/statuses/:id/unfavourite
 * [x] GET /api/v1/timelines/home
 * [x] GET /api/v1/timelines/public
-* [ ] GET /api/v1/timelines/tag/:hashtag
+* [x] GET /api/v1/timelines/tag/:hashtag
 
 ## Installation
 

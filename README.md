@@ -38,9 +38,9 @@ if err != nil {
 * [x] GET /api/v1/accounts/relationships
 * [x] GET /api/v1/accounts/search
 * [x] POST /api/v1/apps
-* [ ] GET /api/v1/blocks
-* [ ] GET /api/v1/favourites
-* [ ] GET /api/v1/follow_requests
+* [x] GET /api/v1/blocks
+* [x] GET /api/v1/favourites
+* [x] GET /api/v1/follow_requests
 * [ ] POST /api/v1/follow_requests/authorize
 * [ ] POST /api/v1/follow_requests/reject
 * [x] POST /api/v1/follows
@@ -65,7 +65,7 @@ if err != nil {
 * [ ] POST /api/v1/statuses/:id/favourite
 * [ ] POST /api/v1/statuses/:id/unfavourite
 * [x] GET /api/v1/timelines/home
-* [ ] GET /api/v1/timelines/public
+* [x] GET /api/v1/timelines/public
 * [ ] GET /api/v1/timelines/tag/:hashtag
 
 ## Installation

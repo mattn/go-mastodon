@@ -6,6 +6,7 @@ import (
 	"os"
 )
 
+// Base64EncodeFileName returns the base64 data URI format string of the file with the file name.
 func Base64EncodeFileName(filename string) (string, error) {
 	file, err := os.Open(filename)
 	if err != nil {
@@ -16,6 +17,7 @@ func Base64EncodeFileName(filename string) (string, error) {
 	return Base64Encode(file)
 }
 
+// Base64Encode returns the base64 data URI format string of the file.
 func Base64Encode(file *os.File) (string, error) {
 	fi, err := file.Stat()
 	if err != nil {

@@ -192,6 +192,11 @@ func run() int {
 			Usage:  "show timeline",
 			Action: cmdTimeline,
 		},
+		{
+			Name:   "notification",
+			Usage:  "show notification",
+			Action: cmdNotification,
+		},
 	}
 	app.Run(os.Args)
 	return 0

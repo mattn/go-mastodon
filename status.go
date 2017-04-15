@@ -122,3 +122,8 @@ func (c *Client) PostStatus(toot *Toot) (*Status, error) {
 	}
 	return &status, nil
 }
+
+// DeleteStatus delete the toot.
+func (c *Client) DeleteStatus(id int64) error {
+	return c.doAPI(http.MethodDelete, fmt.Sprintf("/api/v1/statuses/%d", id), nil, nil)
+}

@@ -59,7 +59,7 @@ if err != nil {
 * [ ] GET /api/v1/statuses/:id/reblogged_by
 * [ ] GET /api/v1/statuses/:id/favourited_by
 * [ ] POST /api/v1/statuses
-* [ ] DELETE /api/v1/statuses/:id
+* [x] DELETE /api/v1/statuses/:id
 * [ ] POST /api/v1/statuses/:id/reblog
 * [ ] POST /api/v1/statuses/:id/unreblog
 * [ ] POST /api/v1/statuses/:id/favourite

@@ -34,8 +34,6 @@ func TestAccountUpdate(t *testing.T) {
 	}
 }
 
-func String(v string) *string { return &v }
-
 func TestGetBlocks(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, `[{"Username": "foo"}, {"Username": "bar"}]`)

@@ -3,26 +3,19 @@ package main
 import (
 	"bufio"
 	"bytes"
-	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
-	"os/signal"
 	"path/filepath"
 	"runtime"
 	"strings"
 
-	"github.com/fatih/color"
 	"github.com/mattn/go-mastodon"
 	"github.com/mattn/go-tty"
 	"github.com/urfave/cli"
 	"golang.org/x/net/html"
 )
-
-var ()
 
 func readFile(filename string) ([]byte, error) {
 	if filename == "-" {
@@ -202,75 +195,6 @@ func run() int {
 	}
 	app.Run(os.Args)
 	return 0
-}
-
-func cmdToot(c *cli.Context) error {
-	if !c.Args().Present() {
-		return errors.New("arguments required")
-	}
-
-	var toot string
-	ff := c.String("ff")
-	if ff != "" {
-		text, err := readFile(ff)
-		if err != nil {
-			log.Fatal(err)
-		}
-		toot = string(text)
-	} else {
-		toot = strings.Join(c.Args().Tail(), " ")
-	}
-	client := c.App.Metadata["client"].(*mastodon.Client)
-	_, err := client.PostStatus(&mastodon.Toot{
-		Status: toot,
-	})
-	return err
-}
-
-func cmdStream(c *cli.Context) error {
-	client := c.App.Metadata["client"].(*mastodon.Client)
-	ctx, cancel := context.WithCancel(context.Background())
-	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, os.Interrupt)
-	q, err := client.StreamingPublic(ctx)
-	if err != nil {
-		return err
-	}
-	go func() {
-		<-sc
-		cancel()
-		close(q)
-	}()
-	for e := range q {
-		switch t := e.(type) {
-		case *mastodon.UpdateEvent:
-			color.Set(color.FgHiRed)
-			fmt.Println(t.Status.Account.Username)
-			color.Set(color.Reset)
-			fmt.Println(textContent(t.Status.Content))
-		case *mastodon.ErrorEvent:
-			color.Set(color.FgYellow)
-			fmt.Println(t.Error())
-			color.Set(color.Reset)
-		}
-	}
-	return nil
-}
-
-func cmdTimeline(c *cli.Context) error {
-	client := c.App.Metadata["client"].(*mastodon.Client)
-	timeline, err := client.GetTimelineHome()
-	if err != nil {
-		return err
-	}
-	for i := len(timeline) - 1; i >= 0; i-- {
-		t := timeline[i]
-		color.Set(color.FgHiRed)
-		fmt.Println(t.Account.Username)
-		color.Set(color.Reset)
-		fmt.Println(textContent(t.Content))
-	}
-	return nil
 }
 
 func main() {

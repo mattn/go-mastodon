@@ -45,13 +45,13 @@ func RegisterApp(appConfig *AppConfig) (*Application, error) {
 	params.Set("scopes", appConfig.Scopes)
 	params.Set("website", appConfig.Website)
 
-	url, err := url.Parse(appConfig.Server)
+	u, err := url.Parse(appConfig.Server)
 	if err != nil {
 		return nil, err
 	}
-	url.Path = path.Join(url.Path, "/api/v1/apps")
+	u.Path = path.Join(u.Path, "/api/v1/apps")
 
-	req, err := http.NewRequest(http.MethodPost, url.String(), strings.NewReader(params.Encode()))
+	req, err := http.NewRequest(http.MethodPost, u.String(), strings.NewReader(params.Encode()))
 	if err != nil {
 		return nil, err
 	}

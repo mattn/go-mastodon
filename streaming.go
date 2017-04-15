@@ -69,11 +69,11 @@ func handleReader(ctx context.Context, q chan Event, r io.Reader) error {
 
 // StreamingPublic return channel to read events.
 func (c *Client) StreamingPublic(ctx context.Context) (chan Event, error) {
-	url, err := url.Parse(c.config.Server)
+	u, err := url.Parse(c.config.Server)
 	if err != nil {
 		return nil, err
 	}
-	url.Path = path.Join(url.Path, "/api/v1/streaming/public")
+	u.Path = path.Join(u.Path, "/api/v1/streaming/public")
 
 	var resp *http.Response
 
@@ -82,7 +82,7 @@ func (c *Client) StreamingPublic(ctx context.Context) (chan Event, error) {
 		defer ctx.Done()
 
 		for {
-			req, err := http.NewRequest(http.MethodGet, url.String(), nil)
+			req, err := http.NewRequest(http.MethodGet, u.String(), nil)
 			if err == nil {
 				req.Header.Set("Authorization", "Bearer "+c.config.AccessToken)
 				resp, err = c.Do(req)

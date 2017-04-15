@@ -26,6 +26,7 @@ if err != nil {
 
 * [x] GET /api/v1/accounts/:id
 * [x] GET /api/v1/accounts/verify_credentials
+* [ ] PATCH /api/v1/accounts/update_credentials
 * [x] GET /api/v1/accounts/:id/followers
 * [x] GET /api/v1/accounts/:id/following
 * [ ] GET /api/v1/accounts/:id/statuses

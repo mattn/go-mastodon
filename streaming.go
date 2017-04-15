@@ -68,14 +68,15 @@ func handleReader(ctx context.Context, q chan Event, r io.Reader) error {
 	return ctx.Err()
 }
 
-// StreamingPublic return channel to read events.
-func (c *Client) StreamingPublic(ctx context.Context) (chan Event, error) {
+func (c *Client) streaming(ctx context.Context, p string, tag string) (chan Event, error) {
 	u, err := url.Parse(c.config.Server)
 	if err != nil {
 		return nil, err
 	}
-	u.Path = path.Join(u.Path, "/api/v1/streaming/public")
+	u.Path = path.Join(u.Path, "/api/v1/streaming/"+p)
 
+	params := url.Values{}
+	params.Set("tag", tag)
 	var resp *http.Response
 
 	q := make(chan Event, 10)
@@ -83,7 +84,11 @@ func (c *Client) StreamingPublic(ctx context.Context) (chan Event, error) {
 		defer ctx.Done()
 
 		for {
-			req, err := http.NewRequest(http.MethodGet, u.String(), nil)
+			var in io.Reader
+			if tag != "" {
+				in = strings.NewReader(params.Encode())
+			}
+			req, err := http.NewRequest(http.MethodGet, u.String(), in)
 			if err == nil {
 				req.Header.Set("Authorization", "Bearer "+c.config.AccessToken)
 				resp, err = c.Do(req)
@@ -110,4 +115,20 @@ func (c *Client) StreamingPublic(ctx context.Context) (chan Event, error) {
 		}
 	}()
 	return q, nil
+
+}
+
+// StreamingPublic return channel to read events on public.
+func (c *Client) StreamingPublic(ctx context.Context) (chan Event, error) {
+	return c.streaming(ctx, "public", "")
+}
+
+// StreamingHome return channel to read events on home.
+func (c *Client) StreamingHome(ctx context.Context) (chan Event, error) {
+	return c.streaming(ctx, "home", "")
+}
+
+// StreamingHashtag return channel to read events on tagged timeline.
+func (c *Client) StreamingHashtag(ctx context.Context, tag string) (chan Event, error) {
+	return c.streaming(ctx, "hashtag", tag)
 }

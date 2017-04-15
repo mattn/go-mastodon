@@ -135,3 +135,9 @@ type Attachment struct {
 	PreviewURL string `json:"preview_url"`
 	TextURL    string `json:"text_url"`
 }
+
+type Results struct {
+	Accounts []*Account `json:"accounts"`
+	Statuses []*Status  `json:"statuses"`
+	Hashtags []string   `json:"hashtags"`
+}

@@ -202,6 +202,11 @@ func run() int {
 			Usage:  "show instance information",
 			Action: cmdInstance,
 		},
+		{
+			Name:   "account",
+			Usage:  "show account information",
+			Action: cmdAccount,
+		},
 	}
 	app.Run(os.Args)
 	return 0

@@ -66,6 +66,16 @@ func (c *Client) GetAccountFollowing(id int64) ([]*Account, error) {
 	return accounts, nil
 }
 
+// GetBlocks return block list.
+func (c *Client) GetBlocks() ([]*Account, error) {
+	var accounts []*Account
+	err := c.doAPI(http.MethodGet, "/api/v1/blocks", nil, &accounts)
+	if err != nil {
+		return nil, err
+	}
+	return accounts, nil
+}
+
 // Relationship hold information for relation-ship to the account.
 type Relationship struct {
 	ID         int64 `json:"id"`
@@ -177,12 +187,9 @@ func (c *Client) FollowRemoteUser(uri string) (*Account, error) {
 }
 
 // GetFollowRequests return follow-requests.
-func (c *Client) GetFollowRequests(uri string) ([]*Account, error) {
-	params := url.Values{}
-	params.Set("uri", uri)
-
+func (c *Client) GetFollowRequests() ([]*Account, error) {
 	var accounts []*Account
-	err := c.doAPI(http.MethodGet, "/api/v1/follow_requests", params, &accounts)
+	err := c.doAPI(http.MethodGet, "/api/v1/follow_requests", nil, &accounts)
 	if err != nil {
 		return nil, err
 	}

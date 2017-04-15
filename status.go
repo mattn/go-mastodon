@@ -45,6 +45,16 @@ type Card struct {
 	Image       string `json:"image"`
 }
 
+// GetFavourites return the favorite list of the current user.
+func (c *Client) GetFavourites() ([]*Status, error) {
+	var statuses []*Status
+	err := c.doAPI(http.MethodGet, "/api/v1/favourites", nil, &statuses)
+	if err != nil {
+		return nil, err
+	}
+	return statuses, nil
+}
+
 // GetStatus return status specified by id.
 func (c *Client) GetStatus(id string) (*Status, error) {
 	var status Status

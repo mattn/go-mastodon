@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -86,16 +87,19 @@ func (c *Client) StreamingPublic(ctx context.Context) (chan Event, error) {
 			if err == nil {
 				req.Header.Set("Authorization", "Bearer "+c.config.AccessToken)
 				resp, err = c.Do(req)
+				if resp.StatusCode != 200 {
+					err = fmt.Errorf("bad request: %v", resp.Status)
+				}
 			}
 			if err == nil {
 				err = handleReader(ctx, q, resp.Body)
-				resp.Body.Close()
 				if err == nil {
 					break
 				}
 			} else {
 				q <- &ErrorEvent{err}
 			}
+			resp.Body.Close()
 			time.Sleep(3 * time.Second)
 		}
 	}()

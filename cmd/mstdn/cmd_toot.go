@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"log"
-	"strings"
 
 	"github.com/mattn/go-mastodon"
 	"github.com/urfave/cli"
@@ -23,7 +22,7 @@ func cmdToot(c *cli.Context) error {
 		}
 		toot = string(text)
 	} else {
-		toot = strings.Join(c.Args().Tail(), " ")
+		toot = argstr(c)
 	}
 	client := c.App.Metadata["client"].(*mastodon.Client)
 	_, err := client.PostStatus(&mastodon.Toot{

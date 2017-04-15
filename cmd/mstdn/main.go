@@ -143,6 +143,14 @@ func authenticate(client *mastodon.Client, config *mastodon.Config, file string)
 	return nil
 }
 
+func argstr(c *cli.Context) string {
+	a := []string{}
+	for i := 0; i < c.NArg(); i++ {
+		a = append(a, c.Args().Get(i))
+	}
+	return strings.Join(a, " ")
+}
+
 func fatalIf(err error) {
 	if err == nil {
 		return
@@ -206,6 +214,11 @@ func run() int {
 			Name:   "account",
 			Usage:  "show account information",
 			Action: cmdAccount,
+		},
+		{
+			Name:   "search",
+			Usage:  "search content",
+			Action: cmdSearch,
 		},
 	}
 	app.Run(os.Args)

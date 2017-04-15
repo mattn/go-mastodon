@@ -197,6 +197,11 @@ func run() int {
 			Usage:  "show notification",
 			Action: cmdNotification,
 		},
+		{
+			Name:   "instance",
+			Usage:  "show instance information",
+			Action: cmdInstance,
+		},
 	}
 	app.Run(os.Args)
 	return 0

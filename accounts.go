@@ -46,6 +46,42 @@ func (c *Client) GetAccountCurrentUser() (*Account, error) {
 	return &account, nil
 }
 
+// Profile is a struct for updating profiles.
+type Profile struct {
+	// If it is nil it will not be updated.
+	// If it is empty, update it with empty.
+	DisplayName *string
+	Note        *string
+
+	// Set the base64 encoded character string of the image.
+	Avatar string
+	Header string
+}
+
+// AccountUpdate updates the information of the current user.
+func (c *Client) AccountUpdate(profile *Profile) (*Account, error) {
+	params := url.Values{}
+	if profile.DisplayName != nil {
+		params.Set("display_name", *profile.DisplayName)
+	}
+	if profile.Note != nil {
+		params.Set("note", *profile.Note)
+	}
+	if profile.Avatar != "" {
+		params.Set("avatar", profile.Avatar)
+	}
+	if profile.Header != "" {
+		params.Set("header", profile.Header)
+	}
+
+	var account Account
+	err := c.doAPI(http.MethodPatch, "/api/v1/accounts/update_credentials", params, &account)
+	if err != nil {
+		return nil, err
+	}
+	return &account, nil
+}
+
 // GetAccountFollowers return followers list.
 func (c *Client) GetAccountFollowers(id int64) ([]*Account, error) {
 	var accounts []*Account

@@ -127,3 +127,16 @@ func (c *Client) PostStatus(toot *Toot) (*Status, error) {
 func (c *Client) DeleteStatus(id int64) error {
 	return c.doAPI(http.MethodDelete, fmt.Sprintf("/api/v1/statuses/%d", id), nil, nil)
 }
+
+// Search search content with query.
+func (c *Client) Search(q string, resolve bool) (*Results, error) {
+	params := url.Values{}
+	params.Set("q", q)
+	params.Set("resolve", fmt.Sprint(resolve))
+	var results Results
+	err := c.doAPI(http.MethodGet, "/api/v1/search", params, &results)
+	if err != nil {
+		return nil, err
+	}
+	return &results, nil
+}

@@ -82,6 +82,16 @@ func (c *Client) AccountUpdate(profile *Profile) (*Account, error) {
 	return &account, nil
 }
 
+// GetAccountStatuses return statuses by specified accuont.
+func (c *Client) GetAccountStatuses(id int64) ([]*Status, error) {
+	var statuses []*Status
+	err := c.doAPI(http.MethodGet, fmt.Sprintf("/api/v1/accounts/%d/statuses", id), nil, &statuses)
+	if err != nil {
+		return nil, err
+	}
+	return statuses, nil
+}
+
 // GetAccountFollowers return followers list.
 func (c *Client) GetAccountFollowers(id int64) ([]*Account, error) {
 	var accounts []*Account

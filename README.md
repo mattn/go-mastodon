@@ -29,7 +29,7 @@ if err != nil {
 * [x] PATCH /api/v1/accounts/update_credentials
 * [x] GET /api/v1/accounts/:id/followers
 * [x] GET /api/v1/accounts/:id/following
-* [ ] GET /api/v1/accounts/:id/statuses
+* [x] GET /api/v1/accounts/:id/statuses
 * [x] POST /api/v1/accounts/:id/follow
 * [x] POST /api/v1/accounts/:id/unfollow
 * [x] GET /api/v1/accounts/:id/block

@@ -50,8 +50,8 @@ if err != nil {
 * [x] GET /api/v1/notifications
 * [x] GET /api/v1/notifications/:id
 * [x] POST /api/v1/notifications/clear
-* [ ] GET /api/v1/reports
-* [ ] POST /api/v1/reports
+* [x] GET /api/v1/reports
+* [x] POST /api/v1/reports
 * [ ] GET /api/v1/search
 * [x] GET /api/v1/statuses/:id
 * [x] GET /api/v1/statuses/:id/context

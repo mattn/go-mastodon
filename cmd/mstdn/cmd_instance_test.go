@@ -25,6 +25,6 @@ func TestCmdInstance(t *testing.T) {
 		},
 	)
 	if !strings.Contains(out, "zzz") {
-		t.Fatalf("%q should be contained in output of instance command: %v", "zzz", out)
+		t.Fatalf("%q should be contained in output of command: %v", "zzz", out)
 	}
 }

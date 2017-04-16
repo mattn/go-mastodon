@@ -9,22 +9,22 @@ import (
 	"github.com/urfave/cli"
 )
 
-func TestCmdNotification(t *testing.T) {
+func TestCmdAccount(t *testing.T) {
 	out := testWithServer(
 		func(w http.ResponseWriter, r *http.Request) {
 			switch r.URL.Path {
-			case "/api/v1/notifications":
-				fmt.Fprintln(w, `[{"type": "rebloged", "status": {"content": "foo"}}]`)
+			case "/api/v1/accounts/verify_credentials":
+				fmt.Fprintln(w, `{"username": "zzz"}`)
 				return
 			}
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		},
 		func(app *cli.App) {
-			app.Run([]string{"mstdn", "notification"})
+			app.Run([]string{"mstdn", "account"})
 		},
 	)
-	if !strings.Contains(out, "rebloged") {
-		t.Fatalf("%q should be contained in output of command: %v", "rebloged", out)
+	if !strings.Contains(out, "zzz") {
+		t.Fatalf("%q should be contained in output of command: %v", "zzz", out)
 	}
 }

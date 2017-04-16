@@ -129,7 +129,13 @@ func TestAccountUnfollow(t *testing.T) {
 }
 
 func TestGetFollowRequests(t *testing.T) {
+	canErr := true
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if canErr {
+			canErr = false
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
 		fmt.Fprintln(w, `[{"Username": "foo"}, {"Username": "bar"}]`)
 		return
 	}))
@@ -141,6 +147,10 @@ func TestGetFollowRequests(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
+	_, err := client.GetFollowRequests()
+	if err == nil {
+		t.Fatalf("should be fail: %v", err)
+	}
 	fReqs, err := client.GetFollowRequests()
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)

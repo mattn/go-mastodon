@@ -9,10 +9,6 @@ import (
 )
 
 func cmdToot(c *cli.Context) error {
-	if !c.Args().Present() {
-		return errors.New("arguments required")
-	}
-
 	var toot string
 	ff := c.String("ff")
 	if ff != "" {
@@ -22,6 +18,9 @@ func cmdToot(c *cli.Context) error {
 		}
 		toot = string(text)
 	} else {
+		if !c.Args().Present() {
+			return errors.New("arguments required")
+		}
 		toot = argstr(c)
 	}
 	client := c.App.Metadata["client"].(*mastodon.Client)

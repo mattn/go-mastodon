@@ -53,7 +53,7 @@ if err != nil {
 * [x] POST /api/v1/notifications/clear
 * [ ] GET /api/v1/reports
 * [ ] POST /api/v1/reports
-* [ ] GET /api/v1/search
+* [x] GET /api/v1/search
 * [x] GET /api/v1/statuses/:id
 * [x] GET /api/v1/statuses/:id/context
 * [x] GET /api/v1/statuses/:id/card

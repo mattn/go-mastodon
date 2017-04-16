@@ -56,7 +56,7 @@ func (c *Client) GetFavourites() ([]*Status, error) {
 }
 
 // GetStatus return status specified by id.
-func (c *Client) GetStatus(id string) (*Status, error) {
+func (c *Client) GetStatus(id int64) (*Status, error) {
 	var status Status
 	err := c.doAPI(http.MethodGet, fmt.Sprintf("/api/v1/statuses/%d", id), nil, &status)
 	if err != nil {
@@ -66,7 +66,7 @@ func (c *Client) GetStatus(id string) (*Status, error) {
 }
 
 // GetStatusContext return status specified by id.
-func (c *Client) GetStatusContext(id string) (*Context, error) {
+func (c *Client) GetStatusContext(id int64) (*Context, error) {
 	var context Context
 	err := c.doAPI(http.MethodGet, fmt.Sprintf("/api/v1/statuses/%d/context", id), nil, &context)
 	if err != nil {
@@ -76,7 +76,7 @@ func (c *Client) GetStatusContext(id string) (*Context, error) {
 }
 
 // GetStatusCard return status specified by id.
-func (c *Client) GetStatusCard(id string) (*Card, error) {
+func (c *Client) GetStatusCard(id int64) (*Card, error) {
 	var card Card
 	err := c.doAPI(http.MethodGet, fmt.Sprintf("/api/v1/statuses/%d/card", id), nil, &card)
 	if err != nil {

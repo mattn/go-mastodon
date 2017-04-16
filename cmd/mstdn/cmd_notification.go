@@ -17,11 +17,11 @@ func cmdNotification(c *cli.Context) error {
 	for _, n := range notifications {
 		if n.Status != nil {
 			color.Set(color.FgHiRed)
-			fmt.Print(n.Account.Username)
+			fmt.Fprint(c.App.Writer, n.Account.Username)
 			color.Set(color.Reset)
-			fmt.Println(" " + n.Type)
+			fmt.Fprintln(c.App.Writer, " "+n.Type)
 			s := n.Status
-			fmt.Println(textContent(s.Content))
+			fmt.Fprintln(c.App.Writer, textContent(s.Content))
 		}
 	}
 	return nil

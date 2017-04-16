@@ -106,3 +106,63 @@ func TestGetFavouritedBy(t *testing.T) {
 		t.Fatalf("want %q but %q", "bar", fbs[0].Username)
 	}
 }
+
+func TestReblog(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/api/v1/statuses/1234567/reblog" {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+		fmt.Fprintln(w, `{"Content": "zzz"}`)
+		return
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+		AccessToken:  "zoo",
+	})
+	_, err := client.Reblog(123)
+	if err == nil {
+		t.Fatalf("should be fail: %v", err)
+	}
+	status, err := client.Reblog(1234567)
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	if status.Content != "zzz" {
+		t.Fatalf("want %q but %q", "zzz", status.Content)
+	}
+}
+
+func TestUnreblog(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/api/v1/statuses/1234567/unreblog" {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+		fmt.Fprintln(w, `{"Content": "zzz"}`)
+		return
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+		AccessToken:  "zoo",
+	})
+	_, err := client.Unreblog(123)
+	if err == nil {
+		t.Fatalf("should be fail: %v", err)
+	}
+	status, err := client.Unreblog(1234567)
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	if status.Content != "zzz" {
+		t.Fatalf("want %q but %q", "zzz", status.Content)
+	}
+}

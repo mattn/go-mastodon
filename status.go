@@ -105,7 +105,7 @@ func (c *Client) GetFavouritedBy(id int64) ([]*Account, error) {
 	return accounts, nil
 }
 
-// Reblog is reblog the toot of id.
+// Reblog is reblog the toot of id and return status of reblog.
 func (c *Client) Reblog(id int64) (*Status, error) {
 	var status Status
 	err := c.doAPI(http.MethodPost, fmt.Sprintf("/api/v1/statuses/%d/reblog", id), nil, &status)
@@ -115,7 +115,7 @@ func (c *Client) Reblog(id int64) (*Status, error) {
 	return &status, nil
 }
 
-// Unreblog is unreblog the toot of id.
+// Unreblog is unreblog the toot of id and return status of the original toot.
 func (c *Client) Unreblog(id int64) (*Status, error) {
 	var status Status
 	err := c.doAPI(http.MethodPost, fmt.Sprintf("/api/v1/statuses/%d/unreblog", id), nil, &status)

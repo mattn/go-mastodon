@@ -17,9 +17,9 @@ func cmdTimeline(c *cli.Context) error {
 	for i := len(timeline) - 1; i >= 0; i-- {
 		t := timeline[i]
 		color.Set(color.FgHiRed)
-		fmt.Println(t.Account.Username)
+		fmt.Fprintln(c.App.Writer, t.Account.Username)
 		color.Set(color.Reset)
-		fmt.Println(textContent(t.Content))
+		fmt.Fprintln(c.App.Writer, textContent(t.Content))
 	}
 	return nil
 }

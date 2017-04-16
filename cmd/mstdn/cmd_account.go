@@ -13,17 +13,17 @@ func cmdAccount(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("URI           : %v\n", account.Acct)
-	fmt.Printf("ID            : %v\n", account.ID)
-	fmt.Printf("Username      : %v\n", account.Username)
-	fmt.Printf("Acct          : %v\n", account.Acct)
-	fmt.Printf("DisplayName   : %v\n", account.DisplayName)
-	fmt.Printf("Locked        : %v\n", account.Locked)
-	fmt.Printf("CreatedAt     : %v\n", account.CreatedAt.Local())
-	fmt.Printf("FollowersCount: %v\n", account.FollowersCount)
-	fmt.Printf("FollowingCount: %v\n", account.FollowingCount)
-	fmt.Printf("StatusesCount : %v\n", account.StatusesCount)
-	fmt.Printf("Note          : %v\n", account.Note)
-	fmt.Printf("URL           : %v\n", account.URL)
+	fmt.Fprintf(c.App.Writer, "URI           : %v\n", account.Acct)
+	fmt.Fprintf(c.App.Writer, "ID            : %v\n", account.ID)
+	fmt.Fprintf(c.App.Writer, "Username      : %v\n", account.Username)
+	fmt.Fprintf(c.App.Writer, "Acct          : %v\n", account.Acct)
+	fmt.Fprintf(c.App.Writer, "DisplayName   : %v\n", account.DisplayName)
+	fmt.Fprintf(c.App.Writer, "Locked        : %v\n", account.Locked)
+	fmt.Fprintf(c.App.Writer, "CreatedAt     : %v\n", account.CreatedAt.Local())
+	fmt.Fprintf(c.App.Writer, "FollowersCount: %v\n", account.FollowersCount)
+	fmt.Fprintf(c.App.Writer, "FollowingCount: %v\n", account.FollowingCount)
+	fmt.Fprintf(c.App.Writer, "StatusesCount : %v\n", account.StatusesCount)
+	fmt.Fprintf(c.App.Writer, "Note          : %v\n", account.Note)
+	fmt.Fprintf(c.App.Writer, "URL           : %v\n", account.URL)
 	return nil
 }

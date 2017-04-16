@@ -29,12 +29,12 @@ func cmdStream(c *cli.Context) error {
 		switch t := e.(type) {
 		case *mastodon.UpdateEvent:
 			color.Set(color.FgHiRed)
-			fmt.Println(t.Status.Account.Username)
+			fmt.Fprintln(c.App.Writer, t.Status.Account.Username)
 			color.Set(color.Reset)
-			fmt.Println(textContent(t.Status.Content))
+			fmt.Fprintln(c.App.Writer, textContent(t.Status.Content))
 		case *mastodon.ErrorEvent:
 			color.Set(color.FgYellow)
-			fmt.Println(t.Error())
+			fmt.Fprintln(c.App.Writer, t.Error())
 			color.Set(color.Reset)
 		}
 	}

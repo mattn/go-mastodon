@@ -18,7 +18,7 @@ func cmdFollowers(c *cli.Context) error {
 		return err
 	}
 	for _, follower := range followers {
-		fmt.Printf("%v,%v\n", follower.ID, follower.Username)
+		fmt.Fprintf(c.App.Writer, "%v,%v\n", follower.ID, follower.Username)
 	}
 	return nil
 }

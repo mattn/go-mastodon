@@ -19,13 +19,13 @@ func cmdSearch(c *cli.Context) error {
 		return err
 	}
 	for _, result := range results.Accounts {
-		fmt.Println(result)
+		fmt.Fprintln(c.App.Writer, result)
 	}
 	for _, result := range results.Statuses {
-		fmt.Println(result)
+		fmt.Fprintln(c.App.Writer, result)
 	}
 	for _, result := range results.Hashtags {
-		fmt.Println(result)
+		fmt.Fprintln(c.App.Writer, result)
 	}
 	return nil
 }

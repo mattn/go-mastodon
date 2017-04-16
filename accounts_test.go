@@ -7,6 +7,33 @@ import (
 	"testing"
 )
 
+func TestAccountUpdate(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, `{"Username": "zzz"}`)
+		return
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+		AccessToken:  "zoo",
+	})
+	a, err := client.AccountUpdate(&Profile{
+		DisplayName: String("display_name"),
+		Note:        String("note"),
+		Avatar:      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUoAAADrCAYAAAA...",
+		Header:      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUoAAADrCAYAAAA...",
+	})
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	if a.Username != "zzz" {
+		t.Fatalf("want %q but %q", "zzz", a.Username)
+	}
+}
+
 func TestGetBlocks(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, `[{"Username": "foo"}, {"Username": "bar"}]`)

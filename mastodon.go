@@ -36,6 +36,9 @@ func (c *Client) doAPI(method string, uri string, params url.Values, res interfa
 		return err
 	}
 	req.Header.Set("Authorization", "Bearer "+c.config.AccessToken)
+	if params != nil {
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	}
 	resp, err = c.Do(req)
 	if err != nil {
 		return err

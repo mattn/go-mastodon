@@ -44,12 +44,11 @@ func (c *Client) doAPI(method string, uri string, params url.Values, res interfa
 		return err
 	}
 	defer resp.Body.Close()
-	if res == nil {
-		return nil
-	}
 
-	if method == http.MethodGet && resp.StatusCode != http.StatusOK {
+	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("bad request: %v", resp.Status)
+	} else if res == nil {
+		return nil
 	}
 
 	return json.NewDecoder(resp.Body).Decode(&res)

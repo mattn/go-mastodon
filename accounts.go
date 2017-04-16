@@ -241,3 +241,13 @@ func (c *Client) GetFollowRequests() ([]*Account, error) {
 	}
 	return accounts, nil
 }
+
+// FollowRequestAuthorize is authorize the follow request of user with id.
+func (c *Client) FollowRequestAuthorize(id int64) error {
+	return c.doAPI(http.MethodPost, fmt.Sprintf("/api/v1/follow_requests/%d/authorize", id), nil, nil)
+}
+
+// FollowRequestReject is rejects the follow request of user with id.
+func (c *Client) FollowRequestReject(id int64) error {
+	return c.doAPI(http.MethodPost, fmt.Sprintf("/api/v1/follow_requests/%d/reject", id), nil, nil)
+}

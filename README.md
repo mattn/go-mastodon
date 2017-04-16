@@ -42,8 +42,8 @@ if err != nil {
 * [x] GET /api/v1/blocks
 * [x] GET /api/v1/favourites
 * [x] GET /api/v1/follow_requests
-* [ ] POST /api/v1/follow_requests/authorize
-* [ ] POST /api/v1/follow_requests/reject
+* [ ] POST /api/v1/follow_requests/:id/authorize
+* [ ] POST /api/v1/follow_requests/:id/reject
 * [x] POST /api/v1/follows
 * [x] GET /api/v1/instance
 * [ ] POST /api/v1/media

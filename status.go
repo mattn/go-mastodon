@@ -125,6 +125,26 @@ func (c *Client) Unreblog(id int64) (*Status, error) {
 	return &status, nil
 }
 
+// Favourite is favourite the toot of id and return status of the favourite toot.
+func (c *Client) Favourite(id int64) (*Status, error) {
+	var status Status
+	err := c.doAPI(http.MethodPost, fmt.Sprintf("/api/v1/statuses/%d/favourite", id), nil, &status)
+	if err != nil {
+		return nil, err
+	}
+	return &status, nil
+}
+
+// Unfavourite is unfavourite the toot of id and return status of the unfavourite toot.
+func (c *Client) Unfavourite(id int64) (*Status, error) {
+	var status Status
+	err := c.doAPI(http.MethodPost, fmt.Sprintf("/api/v1/statuses/%d/unfavourite", id), nil, &status)
+	if err != nil {
+		return nil, err
+	}
+	return &status, nil
+}
+
 // GetTimelineHome return statuses from home timeline.
 func (c *Client) GetTimelineHome() ([]*Status, error) {
 	var statuses []*Status

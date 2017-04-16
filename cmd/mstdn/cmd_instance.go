@@ -13,9 +13,9 @@ func cmdInstance(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("URI        : %s\n", instance.URI)
-	fmt.Printf("Title      : %s\n", instance.Title)
-	fmt.Printf("Description: %s\n", instance.Description)
-	fmt.Printf("EMail      : %s\n", instance.EMail)
+	fmt.Fprintf(c.App.Writer, "URI        : %s\n", instance.URI)
+	fmt.Fprintf(c.App.Writer, "Title      : %s\n", instance.Title)
+	fmt.Fprintf(c.App.Writer, "Description: %s\n", instance.Description)
+	fmt.Fprintf(c.App.Writer, "EMail      : %s\n", instance.EMail)
 	return nil
 }

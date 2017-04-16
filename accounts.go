@@ -219,7 +219,7 @@ func (c *Client) AccountsSearch(q string, limit int64) ([]*Account, error) {
 	return accounts, nil
 }
 
-// Follow send follow-request.
+// FollowRemoteUser send follow-request.
 func (c *Client) FollowRemoteUser(uri string) (*Account, error) {
 	params := url.Values{}
 	params.Set("uri", uri)

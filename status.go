@@ -33,8 +33,8 @@ type Status struct {
 
 // Context hold information for mastodon context.
 type Context struct {
-	Ancestors   []*Status `ancestors`
-	Descendants []*Status `descendants`
+	Ancestors   []*Status `json:"ancestors"`
+	Descendants []*Status `json:"descendants"`
 }
 
 // Card hold information for mastodon card.

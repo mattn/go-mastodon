@@ -54,7 +54,7 @@ func textContent(s string) string {
 }
 
 var (
-	readUsername func() (string, error) = func() (string, error) {
+	readUsername = func() (string, error) {
 		b, _, err := bufio.NewReader(os.Stdin).ReadLine()
 		if err != nil {
 			return "", err
@@ -134,11 +134,11 @@ func authenticate(client *mastodon.Client, config *mastodon.Config, file string)
 	}
 	b, err := json.MarshalIndent(config, "", "  ")
 	if err != nil {
-		return fmt.Errorf("failed to store file:", err)
+		return fmt.Errorf("failed to store file: %v", err)
 	}
 	err = ioutil.WriteFile(file, b, 0700)
 	if err != nil {
-		return fmt.Errorf("failed to store file:", err)
+		return fmt.Errorf("failed to store file: %v", err)
 	}
 	return nil
 }

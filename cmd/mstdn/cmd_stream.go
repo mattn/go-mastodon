@@ -14,6 +14,7 @@ import (
 func cmdStream(c *cli.Context) error {
 	client := c.App.Metadata["client"].(*mastodon.Client)
 	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, os.Interrupt)
 	q, err := client.StreamingPublic(ctx)

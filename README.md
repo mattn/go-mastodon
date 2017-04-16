@@ -26,7 +26,7 @@ if err != nil {
 
 * [x] GET /api/v1/accounts/:id
 * [x] GET /api/v1/accounts/verify_credentials
-* [ ] PATCH /api/v1/accounts/update_credentials
+* [x] PATCH /api/v1/accounts/update_credentials
 * [x] GET /api/v1/accounts/:id/followers
 * [x] GET /api/v1/accounts/:id/following
 * [ ] GET /api/v1/accounts/:id/statuses
@@ -57,14 +57,14 @@ if err != nil {
 * [x] GET /api/v1/statuses/:id
 * [x] GET /api/v1/statuses/:id/context
 * [x] GET /api/v1/statuses/:id/card
-* [ ] GET /api/v1/statuses/:id/reblogged_by
-* [ ] GET /api/v1/statuses/:id/favourited_by
-* [ ] POST /api/v1/statuses
+* [x] GET /api/v1/statuses/:id/reblogged_by
+* [x] GET /api/v1/statuses/:id/favourited_by
+* [x] POST /api/v1/statuses
 * [x] DELETE /api/v1/statuses/:id
-* [ ] POST /api/v1/statuses/:id/reblog
-* [ ] POST /api/v1/statuses/:id/unreblog
-* [ ] POST /api/v1/statuses/:id/favourite
-* [ ] POST /api/v1/statuses/:id/unfavourite
+* [x] POST /api/v1/statuses/:id/reblog
+* [x] POST /api/v1/statuses/:id/unreblog
+* [x] POST /api/v1/statuses/:id/favourite
+* [x] POST /api/v1/statuses/:id/unfavourite
 * [x] GET /api/v1/timelines/home
 * [x] GET /api/v1/timelines/public
 * [x] GET /api/v1/timelines/tag/:hashtag

@@ -159,21 +159,8 @@ func fatalIf(err error) {
 	os.Exit(1)
 }
 
-func run() int {
-	file, config, err := getConfig()
-	fatalIf(err)
-
-	client := mastodon.NewClient(config)
-	if config.AccessToken == "" {
-		err = authenticate(client, config, file)
-		fatalIf(err)
-	}
-
+func makeApp() *cli.App {
 	app := cli.NewApp()
-	app.Metadata = map[string]interface{}{
-		"client": client,
-		"config": config,
-	}
 	app.Name = "mstdn"
 	app.Usage = "mastodon client"
 	app.Version = "0.0.1"
@@ -220,7 +207,31 @@ func run() int {
 			Usage:  "search content",
 			Action: cmdSearch,
 		},
+		{
+			Name:   "followers",
+			Usage:  "show followers",
+			Action: cmdFollowers,
+		},
 	}
+	return app
+}
+
+func run() int {
+	app := makeApp()
+
+	file, config, err := getConfig()
+	fatalIf(err)
+
+	client := mastodon.NewClient(config)
+	if config.AccessToken == "" {
+		err = authenticate(client, config, file)
+		fatalIf(err)
+	}
+	app.Metadata = map[string]interface{}{
+		"client": client,
+		"config": config,
+	}
+
 	app.Run(os.Args)
 	return 0
 }

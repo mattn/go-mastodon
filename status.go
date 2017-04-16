@@ -85,6 +85,16 @@ func (c *Client) GetStatusCard(id string) (*Card, error) {
 	return &card, nil
 }
 
+// GetRebloggedBy returns the account of the user who re-blogged.
+func (c *Client) GetRebloggedBy(id int64) ([]*Account, error) {
+	var accounts []*Account
+	err := c.doAPI(http.MethodGet, fmt.Sprintf("/api/v1/statuses/%d/reblogged_by", id), nil, &accounts)
+	if err != nil {
+		return nil, err
+	}
+	return accounts, nil
+}
+
 // GetTimelineHome return statuses from home timeline.
 func (c *Client) GetTimelineHome() ([]*Status, error) {
 	var statuses []*Status

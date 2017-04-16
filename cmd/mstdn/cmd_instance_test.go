@@ -16,7 +16,7 @@ func TestCmdInstance(t *testing.T) {
 				http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 				return
 			}
-			fmt.Fprintln(w, `{"Title": "zzz"}`)
+			fmt.Fprintln(w, `{"title": "zzz"}`)
 			return
 		},
 		func(app *cli.App) {

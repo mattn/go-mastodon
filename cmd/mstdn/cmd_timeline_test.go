@@ -12,11 +12,12 @@ import (
 func TestCmdTimeline(t *testing.T) {
 	out := testWithServer(
 		func(w http.ResponseWriter, r *http.Request) {
-			if r.URL.Path != "/api/v1/timelines/home" {
-				http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			switch r.URL.Path {
+			case "/api/v1/timelines/home":
+				fmt.Fprintln(w, `[{"content": "zzz"}]`)
 				return
 			}
-			fmt.Fprintln(w, `[{"content": "zzz"}]`)
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		},
 		func(app *cli.App) {

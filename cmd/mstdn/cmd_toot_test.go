@@ -12,12 +12,13 @@ func TestCmdToot(t *testing.T) {
 	toot := ""
 	testWithServer(
 		func(w http.ResponseWriter, r *http.Request) {
-			if r.URL.Path != "/api/v1/statuses" {
-				http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			switch r.URL.Path {
+			case "/api/v1/statuses":
+				toot = r.FormValue("status")
+				fmt.Fprintln(w, `{"ID": 2345}`)
 				return
 			}
-			toot = r.FormValue("status")
-			fmt.Fprintln(w, `{"ID": 2345}`)
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		},
 		func(app *cli.App) {

@@ -12,11 +12,12 @@ import (
 func TestCmdInstance(t *testing.T) {
 	out := testWithServer(
 		func(w http.ResponseWriter, r *http.Request) {
-			if r.URL.Path != "/api/v1/instance" {
-				http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			switch r.URL.Path {
+			case "/api/v1/instance":
+				fmt.Fprintln(w, `{"title": "zzz"}`)
 				return
 			}
-			fmt.Fprintln(w, `{"title": "zzz"}`)
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		},
 		func(app *cli.App) {

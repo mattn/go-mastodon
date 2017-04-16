@@ -12,11 +12,12 @@ import (
 func TestCmdNotification(t *testing.T) {
 	out := testWithServer(
 		func(w http.ResponseWriter, r *http.Request) {
-			if r.URL.Path != "/api/v1/notifications" {
-				http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			switch r.URL.Path {
+			case "/api/v1/notifications":
+				fmt.Fprintln(w, `[{"type": "rebloged", "status": {"content": "foo"}}]`)
 				return
 			}
-			fmt.Fprintln(w, `[{"type": "rebloged", "status": {"content": "foo"}}]`)
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		},
 		func(app *cli.App) {

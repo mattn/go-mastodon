@@ -1,6 +1,7 @@
 package mastodon
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -34,7 +35,7 @@ type Application struct {
 }
 
 // RegisterApp returns the mastodon application.
-func RegisterApp(appConfig *AppConfig) (*Application, error) {
+func RegisterApp(ctx context.Context, appConfig *AppConfig) (*Application, error) {
 	params := url.Values{}
 	params.Set("client_name", appConfig.ClientName)
 	if appConfig.RedirectURIs == "" {

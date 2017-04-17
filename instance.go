@@ -1,6 +1,9 @@
 package mastodon
 
-import "net/http"
+import (
+	"context"
+	"net/http"
+)
 
 // Instance hold information for mastodon instance.
 type Instance struct {
@@ -11,9 +14,9 @@ type Instance struct {
 }
 
 // GetInstance return Instance.
-func (c *Client) GetInstance() (*Instance, error) {
+func (c *Client) GetInstance(ctx context.Context) (*Instance, error) {
 	var instance Instance
-	err := c.doAPI(http.MethodGet, "/api/v1/instance", nil, &instance)
+	err := c.doAPI(ctx, http.MethodGet, "/api/v1/instance", nil, &instance)
 	if err != nil {
 		return nil, err
 	}

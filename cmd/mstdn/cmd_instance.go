@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/mattn/go-mastodon"
@@ -9,7 +10,7 @@ import (
 
 func cmdInstance(c *cli.Context) error {
 	client := c.App.Metadata["client"].(*mastodon.Client)
-	instance, err := client.GetInstance()
+	instance, err := client.GetInstance(context.Background())
 	if err != nil {
 		return err
 	}

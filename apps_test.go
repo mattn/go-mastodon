@@ -1,6 +1,7 @@
 package mastodon
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -26,7 +27,7 @@ func TestRegisterApp(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	app, err := RegisterApp(&AppConfig{
+	app, err := RegisterApp(context.Background(), &AppConfig{
 		Server: ts.URL,
 		Scopes: "read write follow",
 	})

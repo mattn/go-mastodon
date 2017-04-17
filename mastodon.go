@@ -1,6 +1,7 @@
 package mastodon
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -23,23 +24,24 @@ type Client struct {
 	config *Config
 }
 
-func (c *Client) doAPI(method string, uri string, params url.Values, res interface{}) error {
+func (c *Client) doAPI(ctx context.Context, method string, uri string, params url.Values, res interface{}) error {
 	u, err := url.Parse(c.config.Server)
 	if err != nil {
 		return err
 	}
 	u.Path = path.Join(u.Path, uri)
 
-	var resp *http.Response
 	req, err := http.NewRequest(method, u.String(), strings.NewReader(params.Encode()))
 	if err != nil {
 		return err
 	}
+	req.WithContext(ctx)
 	req.Header.Set("Authorization", "Bearer "+c.config.AccessToken)
 	if params != nil {
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	}
-	resp, err = c.Do(req)
+
+	resp, err := c.Do(req)
 	if err != nil {
 		return err
 	}
@@ -50,7 +52,6 @@ func (c *Client) doAPI(method string, uri string, params url.Values, res interfa
 	} else if res == nil {
 		return nil
 	}
-
 	return json.NewDecoder(resp.Body).Decode(&res)
 }
 
@@ -63,7 +64,7 @@ func NewClient(config *Config) *Client {
 }
 
 // Authenticate get access-token to the API.
-func (c *Client) Authenticate(username, password string) error {
+func (c *Client) Authenticate(ctx context.Context, username, password string) error {
 	params := url.Values{}
 	params.Set("client_id", c.config.ClientID)
 	params.Set("client_secret", c.config.ClientSecret)

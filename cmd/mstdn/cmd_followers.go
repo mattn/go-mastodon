@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/mattn/go-mastodon"
@@ -9,11 +10,11 @@ import (
 
 func cmdFollowers(c *cli.Context) error {
 	client := c.App.Metadata["client"].(*mastodon.Client)
-	account, err := client.GetAccountCurrentUser()
+	account, err := client.GetAccountCurrentUser(context.Background())
 	if err != nil {
 		return err
 	}
-	followers, err := client.GetAccountFollowers(account.ID)
+	followers, err := client.GetAccountFollowers(context.Background(), account.ID)
 	if err != nil {
 		return err
 	}

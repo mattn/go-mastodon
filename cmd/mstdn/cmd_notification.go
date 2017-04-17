@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/fatih/color"
@@ -10,7 +11,7 @@ import (
 
 func cmdNotification(c *cli.Context) error {
 	client := c.App.Metadata["client"].(*mastodon.Client)
-	notifications, err := client.GetNotifications()
+	notifications, err := client.GetNotifications(context.Background())
 	if err != nil {
 		return err
 	}

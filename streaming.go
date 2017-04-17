@@ -14,7 +14,9 @@ import (
 )
 
 // UpdateEvent is struct for passing status event to app.
-type UpdateEvent struct{ Status *Status }
+type UpdateEvent struct {
+	Status *Status `json:"status"`
+}
 
 func (e *UpdateEvent) event() {}
 

@@ -178,8 +178,14 @@ func makeApp() *cli.App {
 			Action: cmdToot,
 		},
 		{
-			Name:   "stream",
-			Usage:  "stream statuses",
+			Name:  "stream",
+			Usage: "stream statuses",
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "json",
+					Usage: "output JSON",
+				},
+			},
 			Action: cmdStream,
 		},
 		{

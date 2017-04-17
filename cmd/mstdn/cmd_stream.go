@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/signal"
@@ -12,6 +13,7 @@ import (
 )
 
 func cmdStream(c *cli.Context) error {
+	asJSON := c.Bool("json")
 	client := c.App.Metadata["client"].(*mastodon.Client)
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -27,16 +29,20 @@ func cmdStream(c *cli.Context) error {
 		close(q)
 	}()
 	for e := range q {
-		switch t := e.(type) {
-		case *mastodon.UpdateEvent:
-			color.Set(color.FgHiRed)
-			fmt.Fprintln(c.App.Writer, t.Status.Account.Username)
-			color.Set(color.Reset)
-			fmt.Fprintln(c.App.Writer, textContent(t.Status.Content))
-		case *mastodon.ErrorEvent:
-			color.Set(color.FgYellow)
-			fmt.Fprintln(c.App.Writer, t.Error())
-			color.Set(color.Reset)
+		if asJSON {
+			json.NewEncoder(c.App.Writer).Encode(e)
+		} else {
+			switch t := e.(type) {
+			case *mastodon.UpdateEvent:
+				color.Set(color.FgHiRed)
+				fmt.Fprintln(c.App.Writer, t.Status.Account.Username)
+				color.Set(color.Reset)
+				fmt.Fprintln(c.App.Writer, textContent(t.Status.Content))
+			case *mastodon.ErrorEvent:
+				color.Set(color.FgYellow)
+				fmt.Fprintln(c.App.Writer, t.Error())
+				color.Set(color.Reset)
+			}
 		}
 	}
 	return nil

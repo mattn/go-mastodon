@@ -382,6 +382,72 @@ func TestAccountUnblock(t *testing.T) {
 	}
 }
 
+func TestAccountMute(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/api/v1/accounts/1234567/mute" {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+		fmt.Fprintln(w, `{"id":1234567,"muting":true}`)
+		return
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+		AccessToken:  "zoo",
+	})
+	_, err := client.AccountMute(context.Background(), 123)
+	if err == nil {
+		t.Fatalf("should be fail: %v", err)
+	}
+	rel, err := client.AccountMute(context.Background(), 1234567)
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	if rel.ID != 1234567 {
+		t.Fatalf("want %d but %d", 1234567, rel.ID)
+	}
+	if !rel.Muting {
+		t.Fatalf("want %t but %t", true, rel.Muting)
+	}
+}
+
+func TestAccountUnmute(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/api/v1/accounts/1234567/unmute" {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+		fmt.Fprintln(w, `{"id":1234567,"muting":false}`)
+		return
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+		AccessToken:  "zoo",
+	})
+	_, err := client.AccountUnmute(context.Background(), 123)
+	if err == nil {
+		t.Fatalf("should be fail: %v", err)
+	}
+	rel, err := client.AccountUnmute(context.Background(), 1234567)
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	if rel.ID != 1234567 {
+		t.Fatalf("want %d but %d", 1234567, rel.ID)
+	}
+	if rel.Muting {
+		t.Fatalf("want %t but %t", false, rel.Muting)
+	}
+}
+
 func TestGetFollowRequests(t *testing.T) {
 	canErr := true
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

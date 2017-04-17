@@ -11,14 +11,14 @@ type Report struct {
 	ActionTaken bool  `json:"action_taken"`
 }
 
-// GetReport return report of the current user.
-func (c *Client) GetReport(ctx context.Context) (*Report, error) {
-	var reports Report
+// GetReports return report of the current user.
+func (c *Client) GetReports(ctx context.Context) ([]*Report, error) {
+	var reports []*Report
 	err := c.doAPI(ctx, http.MethodGet, "/api/v1/reports", nil, &reports)
 	if err != nil {
 		return nil, err
 	}
-	return &reports, nil
+	return reports, nil
 }
 
 //  Report reports the report

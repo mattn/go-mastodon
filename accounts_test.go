@@ -163,7 +163,7 @@ func TestGetFollowRequests(t *testing.T) {
 		t.Fatalf("want %q but %q", "foo", fReqs[0].Username)
 	}
 	if fReqs[1].Username != "bar" {
-		t.Fatalf("want %q but %q", "bar", fReqs[0].Username)
+		t.Fatalf("want %q but %q", "bar", fReqs[1].Username)
 	}
 }
 

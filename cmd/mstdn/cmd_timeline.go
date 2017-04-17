@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/fatih/color"
@@ -10,7 +11,7 @@ import (
 
 func cmdTimeline(c *cli.Context) error {
 	client := c.App.Metadata["client"].(*mastodon.Client)
-	timeline, err := client.GetTimelineHome()
+	timeline, err := client.GetTimelineHome(context.Background())
 	if err != nil {
 		return err
 	}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"log"
 
@@ -24,7 +25,7 @@ func cmdToot(c *cli.Context) error {
 		toot = argstr(c)
 	}
 	client := c.App.Metadata["client"].(*mastodon.Client)
-	_, err := client.PostStatus(&mastodon.Toot{
+	_, err := client.PostStatus(context.Background(), &mastodon.Toot{
 		Status: toot,
 	})
 	return err

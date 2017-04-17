@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -128,7 +129,7 @@ func authenticate(client *mastodon.Client, config *mastodon.Config, file string)
 	if err != nil {
 		return err
 	}
-	err = client.Authenticate(email, password)
+	err = client.Authenticate(context.Background(), email, password)
 	if err != nil {
 		return err
 	}

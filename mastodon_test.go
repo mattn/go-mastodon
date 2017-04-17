@@ -1,6 +1,7 @@
 package mastodon
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -24,7 +25,7 @@ func TestAuthenticate(t *testing.T) {
 		ClientID:     "foo",
 		ClientSecret: "bar",
 	})
-	err := client.Authenticate("invalid", "user")
+	err := client.Authenticate(context.Background(), "invalid", "user")
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
@@ -34,7 +35,7 @@ func TestAuthenticate(t *testing.T) {
 		ClientID:     "foo",
 		ClientSecret: "bar",
 	})
-	err = client.Authenticate("valid", "user")
+	err = client.Authenticate(context.Background(), "valid", "user")
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -56,7 +57,7 @@ func TestPostStatus(t *testing.T) {
 		ClientID:     "foo",
 		ClientSecret: "bar",
 	})
-	_, err := client.PostStatus(&Toot{
+	_, err := client.PostStatus(context.Background(), &Toot{
 		Status: "foobar",
 	})
 	if err == nil {
@@ -69,7 +70,7 @@ func TestPostStatus(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	_, err = client.PostStatus(&Toot{
+	_, err = client.PostStatus(context.Background(), &Toot{
 		Status: "foobar",
 	})
 	if err != nil {
@@ -89,7 +90,7 @@ func TestGetTimelineHome(t *testing.T) {
 		ClientID:     "foo",
 		ClientSecret: "bar",
 	})
-	_, err := client.PostStatus(&Toot{
+	_, err := client.PostStatus(context.Background(), &Toot{
 		Status: "foobar",
 	})
 	if err == nil {
@@ -102,7 +103,7 @@ func TestGetTimelineHome(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	tl, err := client.GetTimelineHome()
+	tl, err := client.GetTimelineHome(context.Background())
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -142,11 +143,11 @@ func TestGetAccount(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	a, err := client.GetAccount(1)
+	a, err := client.GetAccount(context.Background(), 1)
 	if err == nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
-	a, err = client.GetAccount(1234567)
+	a, err = client.GetAccount(context.Background(), 1234567)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -172,11 +173,11 @@ func TestGetAccountFollowing(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	fl, err := client.GetAccountFollowing(123)
+	fl, err := client.GetAccountFollowing(context.Background(), 123)
 	if err == nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
-	fl, err = client.GetAccountFollowing(1234567)
+	fl, err = client.GetAccountFollowing(context.Background(), 1234567)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}

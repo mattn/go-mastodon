@@ -1,6 +1,7 @@
 package mastodon
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -23,14 +24,30 @@ type Client struct {
 	config *Config
 }
 
-func (c *Client) doAPI(method string, uri string, params url.Values, res interface{}) error {
+func httpDo(ctx context.Context, req *http.Request, f func(*http.Response, error) error) error {
+	tr := &http.Transport{}
+	client := &http.Client{Transport: tr}
+	c := make(chan error, 1)
+	go func() {
+		c <- f(client.Do(req))
+	}()
+	select {
+	case <-ctx.Done():
+		tr.CancelRequest(req)
+		<-c
+		return ctx.Err()
+	case err := <-c:
+		return err
+	}
+}
+
+func (c *Client) doAPI(ctx context.Context, method string, uri string, params url.Values, res interface{}) error {
 	u, err := url.Parse(c.config.Server)
 	if err != nil {
 		return err
 	}
 	u.Path = path.Join(u.Path, uri)
 
-	var resp *http.Response
 	req, err := http.NewRequest(method, u.String(), strings.NewReader(params.Encode()))
 	if err != nil {
 		return err
@@ -39,19 +56,20 @@ func (c *Client) doAPI(method string, uri string, params url.Values, res interfa
 	if params != nil {
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	}
-	resp, err = c.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("bad request: %v", resp.Status)
-	} else if res == nil {
-		return nil
-	}
+	return httpDo(ctx, req, func(resp *http.Response, err error) error {
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
 
-	return json.NewDecoder(resp.Body).Decode(&res)
+		if resp.StatusCode != http.StatusOK {
+			return fmt.Errorf("bad request: %v", resp.Status)
+		} else if res == nil {
+			return nil
+		}
+		return json.NewDecoder(resp.Body).Decode(&res)
+	})
 }
 
 // NewClient return new mastodon API client.
@@ -63,7 +81,7 @@ func NewClient(config *Config) *Client {
 }
 
 // Authenticate get access-token to the API.
-func (c *Client) Authenticate(username, password string) error {
+func (c *Client) Authenticate(ctx context.Context, username, password string) error {
 	params := url.Values{}
 	params.Set("client_id", c.config.ClientID)
 	params.Set("client_secret", c.config.ClientSecret)

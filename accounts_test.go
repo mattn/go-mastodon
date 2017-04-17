@@ -1,6 +1,7 @@
 package mastodon
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -20,7 +21,7 @@ func TestAccountUpdate(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	a, err := client.AccountUpdate(&Profile{
+	a, err := client.AccountUpdate(context.Background(), &Profile{
 		DisplayName: String("display_name"),
 		Note:        String("note"),
 		Avatar:      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUoAAADrCAYAAAA...",
@@ -47,7 +48,7 @@ func TestGetBlocks(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	bl, err := client.GetBlocks()
+	bl, err := client.GetBlocks(context.Background())
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -79,11 +80,11 @@ func TestAccountFollow(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	rel, err := client.AccountFollow(123)
+	rel, err := client.AccountFollow(context.Background(), 123)
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	rel, err = client.AccountFollow(1234567)
+	rel, err = client.AccountFollow(context.Background(), 1234567)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -112,11 +113,11 @@ func TestAccountUnfollow(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	rel, err := client.AccountUnfollow(123)
+	rel, err := client.AccountUnfollow(context.Background(), 123)
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	rel, err = client.AccountUnfollow(1234567)
+	rel, err = client.AccountUnfollow(context.Background(), 1234567)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -147,11 +148,11 @@ func TestGetFollowRequests(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	_, err := client.GetFollowRequests()
+	_, err := client.GetFollowRequests(context.Background())
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	fReqs, err := client.GetFollowRequests()
+	fReqs, err := client.GetFollowRequests(context.Background())
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -180,11 +181,11 @@ func TestFollowRequestAuthorize(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	err := client.FollowRequestAuthorize(123)
+	err := client.FollowRequestAuthorize(context.Background(), 123)
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	err = client.FollowRequestAuthorize(1234567)
+	err = client.FollowRequestAuthorize(context.Background(), 1234567)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -204,11 +205,11 @@ func TestFollowRequestReject(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	err := client.FollowRequestReject(123)
+	err := client.FollowRequestReject(context.Background(), 123)
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	err = client.FollowRequestReject(1234567)
+	err = client.FollowRequestReject(context.Background(), 1234567)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}

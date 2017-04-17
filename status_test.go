@@ -1,6 +1,7 @@
 package mastodon
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -20,7 +21,7 @@ func TestGetFavourites(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	favs, err := client.GetFavourites()
+	favs, err := client.GetFavourites(context.Background())
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -52,11 +53,11 @@ func TestGetStatus(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	_, err := client.GetStatus(123)
+	_, err := client.GetStatus(context.Background(), 123)
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	status, err := client.GetStatus(1234567)
+	status, err := client.GetStatus(context.Background(), 1234567)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -82,11 +83,11 @@ func TestGetRebloggedBy(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	_, err := client.GetRebloggedBy(123)
+	_, err := client.GetRebloggedBy(context.Background(), 123)
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	rbs, err := client.GetRebloggedBy(1234567)
+	rbs, err := client.GetRebloggedBy(context.Background(), 1234567)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -118,11 +119,11 @@ func TestGetFavouritedBy(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	_, err := client.GetFavouritedBy(123)
+	_, err := client.GetFavouritedBy(context.Background(), 123)
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	fbs, err := client.GetFavouritedBy(1234567)
+	fbs, err := client.GetFavouritedBy(context.Background(), 1234567)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -154,11 +155,11 @@ func TestReblog(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	_, err := client.Reblog(123)
+	_, err := client.Reblog(context.Background(), 123)
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	status, err := client.Reblog(1234567)
+	status, err := client.Reblog(context.Background(), 1234567)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -184,11 +185,11 @@ func TestUnreblog(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	_, err := client.Unreblog(123)
+	_, err := client.Unreblog(context.Background(), 123)
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	status, err := client.Unreblog(1234567)
+	status, err := client.Unreblog(context.Background(), 1234567)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -214,11 +215,11 @@ func TestFavourite(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	_, err := client.Favourite(123)
+	_, err := client.Favourite(context.Background(), 123)
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	status, err := client.Favourite(1234567)
+	status, err := client.Favourite(context.Background(), 1234567)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -244,11 +245,11 @@ func TestUnfavourite(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	_, err := client.Unfavourite(123)
+	_, err := client.Unfavourite(context.Background(), 123)
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	status, err := client.Unfavourite(1234567)
+	status, err := client.Unfavourite(context.Background(), 1234567)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}

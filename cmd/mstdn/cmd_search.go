@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -14,7 +15,7 @@ func cmdSearch(c *cli.Context) error {
 	}
 
 	client := c.App.Metadata["client"].(*mastodon.Client)
-	results, err := client.Search(argstr(c), false)
+	results, err := client.Search(context.Background(), argstr(c), false)
 	if err != nil {
 		return err
 	}

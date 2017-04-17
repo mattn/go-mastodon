@@ -1,6 +1,7 @@
 package mastodon
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -34,7 +35,7 @@ type Application struct {
 }
 
 // RegisterApp returns the mastodon application.
-func RegisterApp(appConfig *AppConfig) (*Application, error) {
+func RegisterApp(ctx context.Context, appConfig *AppConfig) (*Application, error) {
 	params := url.Values{}
 	params.Set("client_name", appConfig.ClientName)
 	if appConfig.RedirectURIs == "" {
@@ -45,13 +46,13 @@ func RegisterApp(appConfig *AppConfig) (*Application, error) {
 	params.Set("scopes", appConfig.Scopes)
 	params.Set("website", appConfig.Website)
 
-	url, err := url.Parse(appConfig.Server)
+	u, err := url.Parse(appConfig.Server)
 	if err != nil {
 		return nil, err
 	}
-	url.Path = path.Join(url.Path, "/api/v1/apps")
+	u.Path = path.Join(u.Path, "/api/v1/apps")
 
-	req, err := http.NewRequest(http.MethodPost, url.String(), strings.NewReader(params.Encode()))
+	req, err := http.NewRequest(http.MethodPost, u.String(), strings.NewReader(params.Encode()))
 	if err != nil {
 		return nil, err
 	}

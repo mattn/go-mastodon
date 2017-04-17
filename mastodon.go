@@ -1,6 +1,7 @@
 package mastodon
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -23,32 +24,34 @@ type Client struct {
 	config *Config
 }
 
-func (c *Client) doAPI(method string, uri string, params url.Values, res interface{}) error {
-	url, err := url.Parse(c.config.Server)
+func (c *Client) doAPI(ctx context.Context, method string, uri string, params url.Values, res interface{}) error {
+	u, err := url.Parse(c.config.Server)
 	if err != nil {
 		return err
 	}
-	url.Path = path.Join(url.Path, uri)
+	u.Path = path.Join(u.Path, uri)
 
-	var resp *http.Response
-	req, err := http.NewRequest(method, url.String(), strings.NewReader(params.Encode()))
+	req, err := http.NewRequest(method, u.String(), strings.NewReader(params.Encode()))
 	if err != nil {
 		return err
 	}
+	req.WithContext(ctx)
 	req.Header.Set("Authorization", "Bearer "+c.config.AccessToken)
-	resp, err = c.Do(req)
+	if params != nil {
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	}
+
+	resp, err := c.Do(req)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
-	if res == nil {
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("bad request: %v", resp.Status)
+	} else if res == nil {
 		return nil
 	}
-
-	if method == http.MethodGet && resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("bad request: %v", resp.Status)
-	}
-
 	return json.NewDecoder(resp.Body).Decode(&res)
 }
 
@@ -61,7 +64,7 @@ func NewClient(config *Config) *Client {
 }
 
 // Authenticate get access-token to the API.
-func (c *Client) Authenticate(username, password string) error {
+func (c *Client) Authenticate(ctx context.Context, username, password string) error {
 	params := url.Values{}
 	params.Set("client_id", c.config.ClientID)
 	params.Set("client_secret", c.config.ClientSecret)
@@ -70,13 +73,13 @@ func (c *Client) Authenticate(username, password string) error {
 	params.Set("password", password)
 	params.Set("scope", "read write follow")
 
-	url, err := url.Parse(c.config.Server)
+	u, err := url.Parse(c.config.Server)
 	if err != nil {
 		return err
 	}
-	url.Path = path.Join(url.Path, "/oauth/token")
+	u.Path = path.Join(u.Path, "/oauth/token")
 
-	req, err := http.NewRequest(http.MethodPost, url.String(), strings.NewReader(params.Encode()))
+	req, err := http.NewRequest(http.MethodPost, u.String(), strings.NewReader(params.Encode()))
 	if err != nil {
 		return err
 	}
@@ -134,4 +137,11 @@ type Attachment struct {
 	RemoteURL  string `json:"remote_url"`
 	PreviewURL string `json:"preview_url"`
 	TextURL    string `json:"text_url"`
+}
+
+// Results hold information for search result.
+type Results struct {
+	Accounts []*Account `json:"accounts"`
+	Statuses []*Status  `json:"statuses"`
+	Hashtags []string   `json:"hashtags"`
 }

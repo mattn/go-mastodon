@@ -188,6 +188,6 @@ func TestGetAccountFollowing(t *testing.T) {
 		t.Fatalf("want %q but %q", "foo", fl[0].Username)
 	}
 	if fl[1].Username != "bar" {
-		t.Fatalf("want %q but %q", "bar", fl[0].Username)
+		t.Fatalf("want %q but %q", "bar", fl[1].Username)
 	}
 }

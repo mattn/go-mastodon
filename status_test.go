@@ -98,7 +98,7 @@ func TestGetRebloggedBy(t *testing.T) {
 		t.Fatalf("want %q but %q", "foo", rbs[0].Username)
 	}
 	if rbs[1].Username != "bar" {
-		t.Fatalf("want %q but %q", "bar", rbs[0].Username)
+		t.Fatalf("want %q but %q", "bar", rbs[1].Username)
 	}
 }
 
@@ -134,7 +134,7 @@ func TestGetFavouritedBy(t *testing.T) {
 		t.Fatalf("want %q but %q", "foo", fbs[0].Username)
 	}
 	if fbs[1].Username != "bar" {
-		t.Fatalf("want %q but %q", "bar", fbs[0].Username)
+		t.Fatalf("want %q but %q", "bar", fbs[1].Username)
 	}
 }
 

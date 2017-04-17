@@ -214,3 +214,41 @@ func TestFollowRequestReject(t *testing.T) {
 		t.Fatalf("should not be fail: %v", err)
 	}
 }
+
+func TestGetMutes(t *testing.T) {
+	canErr := true
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if canErr {
+			canErr = false
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+		fmt.Fprintln(w, `[{"Username": "foo"}, {"Username": "bar"}]`)
+		return
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+		AccessToken:  "zoo",
+	})
+	_, err := client.GetMutes(context.Background())
+	if err == nil {
+		t.Fatalf("should be fail: %v", err)
+	}
+	mutes, err := client.GetMutes(context.Background())
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	if len(mutes) != 2 {
+		t.Fatalf("result should be two: %d", len(mutes))
+	}
+	if mutes[0].Username != "foo" {
+		t.Fatalf("want %q but %q", "foo", mutes[0].Username)
+	}
+	if mutes[1].Username != "bar" {
+		t.Fatalf("want %q but %q", "bar", mutes[1].Username)
+	}
+}

@@ -47,7 +47,7 @@ if err != nil {
 * [x] POST /api/v1/follows
 * [x] GET /api/v1/instance
 * [ ] POST /api/v1/media
-* [ ] GET /api/v1/mutes
+* [x] GET /api/v1/mutes
 * [x] GET /api/v1/notifications
 * [x] GET /api/v1/notifications/:id
 * [x] POST /api/v1/notifications/clear

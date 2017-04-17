@@ -252,3 +252,13 @@ func (c *Client) FollowRequestAuthorize(ctx context.Context, id int64) error {
 func (c *Client) FollowRequestReject(ctx context.Context, id int64) error {
 	return c.doAPI(ctx, http.MethodPost, fmt.Sprintf("/api/v1/follow_requests/%d/reject", id), nil, nil)
 }
+
+// GetMutes returns the list of users muted by the current user.
+func (c *Client) GetMutes(ctx context.Context) ([]*Account, error) {
+	var accounts []*Account
+	err := c.doAPI(ctx, http.MethodGet, "/api/v1/mutes", nil, &accounts)
+	if err != nil {
+		return nil, err
+	}
+	return accounts, nil
+}

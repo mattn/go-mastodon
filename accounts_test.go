@@ -316,6 +316,72 @@ func TestAccountUnfollow(t *testing.T) {
 	}
 }
 
+func TestAccountBlock(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/api/v1/accounts/1234567/block" {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+		fmt.Fprintln(w, `{"id":1234567,"blocking":true}`)
+		return
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+		AccessToken:  "zoo",
+	})
+	_, err := client.AccountBlock(context.Background(), 123)
+	if err == nil {
+		t.Fatalf("should be fail: %v", err)
+	}
+	rel, err := client.AccountBlock(context.Background(), 1234567)
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	if rel.ID != 1234567 {
+		t.Fatalf("want %d but %d", 1234567, rel.ID)
+	}
+	if !rel.Blocking {
+		t.Fatalf("want %t but %t", true, rel.Blocking)
+	}
+}
+
+func TestAccountUnblock(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/api/v1/accounts/1234567/unblock" {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+		fmt.Fprintln(w, `{"id":1234567,"blocking":false}`)
+		return
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+		AccessToken:  "zoo",
+	})
+	_, err := client.AccountUnblock(context.Background(), 123)
+	if err == nil {
+		t.Fatalf("should be fail: %v", err)
+	}
+	rel, err := client.AccountUnblock(context.Background(), 1234567)
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	if rel.ID != 1234567 {
+		t.Fatalf("want %d but %d", 1234567, rel.ID)
+	}
+	if rel.Blocking {
+		t.Fatalf("want %t but %t", false, rel.Blocking)
+	}
+}
+
 func TestGetFollowRequests(t *testing.T) {
 	canErr := true
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

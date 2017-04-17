@@ -448,6 +448,37 @@ func TestAccountUnmute(t *testing.T) {
 	}
 }
 
+func TestGetAccountRelationship(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println(r.URL.String())
+		if r.URL.Query().Get("id") != "1234567" {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+		fmt.Fprintln(w, `[{"id":1234567}]`)
+		return
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+		AccessToken:  "zoo",
+	})
+	_, err := client.GetAccountRelationship(context.Background(), 123)
+	if err == nil {
+		t.Fatalf("should be fail: %v", err)
+	}
+	rels, err := client.GetAccountRelationship(context.Background(), 1234567)
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	if rels[0].ID != 1234567 {
+		t.Fatalf("want %d but %d", 1234567, rels[0].ID)
+	}
+}
+
 func TestGetFollowRequests(t *testing.T) {
 	canErr := true
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

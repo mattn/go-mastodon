@@ -5,26 +5,17 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
-	"os/signal"
 	"path/filepath"
 	"runtime"
 	"strings"
 
-	"github.com/fatih/color"
 	"github.com/mattn/go-mastodon"
 	"github.com/mattn/go-tty"
+	"github.com/urfave/cli"
 	"golang.org/x/net/html"
-)
-
-var (
-	toot     = flag.String("t", "", "toot text")
-	stream   = flag.Bool("S", false, "streaming public")
-	fromfile = flag.String("ff", "", "post utf-8 string from a file(\"-\" means STDIN)")
 )
 
 func readFile(filename string) ([]byte, error) {
@@ -37,7 +28,7 @@ func readFile(filename string) ([]byte, error) {
 func textContent(s string) string {
 	doc, err := html.Parse(strings.NewReader(s))
 	if err != nil {
-		log.Fatal(err)
+		return s
 	}
 	var buf bytes.Buffer
 
@@ -64,7 +55,7 @@ func textContent(s string) string {
 }
 
 var (
-	readUsername func() (string, error) = func() (string, error) {
+	readUsername = func() (string, error) {
 		b, _, err := bufio.NewReader(os.Stdin).ReadLine()
 		if err != nil {
 			return "", err
@@ -121,8 +112,8 @@ func getConfig() (string, *mastodon.Config, error) {
 	}
 	config := &mastodon.Config{
 		Server:       "https://mstdn.jp",
-		ClientID:     "7d1873f3940af3e9128c81d5a2ddb3f235ccfa1cd11761efd3b8426f40898fe8",
-		ClientSecret: "3c8ea997c580f196453e97c1c58f6f5c131f668456bbe1ed37aaccac719397db",
+		ClientID:     "171d45f22068a5dddbd927b9d966f5b97971ed1d3256b03d489f5b3a83cdba59",
+		ClientSecret: "574a2cf4b3f28a5fa0cfd285fc80cfe9daa419945163ef18f5f3d0022f4add28",
 	}
 	if err == nil {
 		err = json.Unmarshal(b, &config)
@@ -133,109 +124,119 @@ func getConfig() (string, *mastodon.Config, error) {
 	return file, config, nil
 }
 
-func authenticate(client *mastodon.Client, config *mastodon.Config, file string) {
+func authenticate(client *mastodon.Client, config *mastodon.Config, file string) error {
 	email, password, err := prompt()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-	err = client.Authenticate(email, password)
+	err = client.Authenticate(context.Background(), email, password)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	b, err := json.MarshalIndent(config, "", "  ")
 	if err != nil {
-		log.Fatal("failed to store file:", err)
+		return fmt.Errorf("failed to store file: %v", err)
 	}
 	err = ioutil.WriteFile(file, b, 0700)
 	if err != nil {
-		log.Fatal("failed to store file:", err)
+		return fmt.Errorf("failed to store file: %v", err)
 	}
+	return nil
 }
 
-func streaming(client *mastodon.Client) {
-	ctx, cancel := context.WithCancel(context.Background())
-	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, os.Interrupt)
-	q, err := client.StreamingPublic(ctx)
-	if err != nil {
-		log.Fatal(err)
+func argstr(c *cli.Context) string {
+	a := []string{}
+	for i := 0; i < c.NArg(); i++ {
+		a = append(a, c.Args().Get(i))
 	}
-	go func() {
-		<-sc
-		cancel()
-		close(q)
-	}()
-	for e := range q {
-		switch t := e.(type) {
-		case *mastodon.UpdateEvent:
-			color.Set(color.FgHiRed)
-			fmt.Println(t.Status.Account.Username)
-			color.Set(color.Reset)
-			fmt.Println(textContent(t.Status.Content))
-		case *mastodon.ErrorEvent:
-			color.Set(color.FgYellow)
-			fmt.Println(t.Error())
-			color.Set(color.Reset)
-		}
-	}
+	return strings.Join(a, " ")
 }
 
-func init() {
-	flag.Parse()
-	if *fromfile != "" {
-		text, err := readFile(*fromfile)
-		if err != nil {
-			log.Fatal(err)
-		}
-		*toot = string(text)
+func fatalIf(err error) {
+	if err == nil {
+		return
 	}
+	fmt.Fprintf(os.Stderr, "%s: %v\n", os.Args[0], err)
+	os.Exit(1)
 }
 
-func post(client *mastodon.Client, text string) {
-	_, err := client.PostStatus(&mastodon.Toot{
-		Status: text,
-	})
-	if err != nil {
-		log.Fatal(err)
+func makeApp() *cli.App {
+	app := cli.NewApp()
+	app.Name = "mstdn"
+	app.Usage = "mastodon client"
+	app.Version = "0.0.1"
+	app.Commands = []cli.Command{
+		{
+			Name:  "toot",
+			Usage: "post toot",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "ff",
+					Usage: "post utf-8 string from a file(\"-\" means STDIN)",
+					Value: "",
+				},
+			},
+			Action: cmdToot,
+		},
+		{
+			Name:   "stream",
+			Usage:  "stream statuses",
+			Action: cmdStream,
+		},
+		{
+			Name:   "timeline",
+			Usage:  "show timeline",
+			Action: cmdTimeline,
+		},
+		{
+			Name:   "notification",
+			Usage:  "show notification",
+			Action: cmdNotification,
+		},
+		{
+			Name:   "instance",
+			Usage:  "show instance information",
+			Action: cmdInstance,
+		},
+		{
+			Name:   "account",
+			Usage:  "show account information",
+			Action: cmdAccount,
+		},
+		{
+			Name:   "search",
+			Usage:  "search content",
+			Action: cmdSearch,
+		},
+		{
+			Name:   "followers",
+			Usage:  "show followers",
+			Action: cmdFollowers,
+		},
 	}
+	return app
 }
 
-func timeline(client *mastodon.Client) {
-	timeline, err := client.GetTimelineHome()
-	if err != nil {
-		log.Fatal(err)
+func run() int {
+	app := makeApp()
+
+	file, config, err := getConfig()
+	fatalIf(err)
+
+	client := mastodon.NewClient(config)
+	if config.AccessToken == "" {
+		err = authenticate(client, config, file)
+		fatalIf(err)
 	}
-	for i := len(timeline) - 1; i >= 0; i-- {
-		t := timeline[i]
-		color.Set(color.FgHiRed)
-		fmt.Println(t.Account.Username)
-		color.Set(color.Reset)
-		fmt.Println(textContent(t.Content))
+	app.Metadata = map[string]interface{}{
+		"client": client,
+		"config": config,
 	}
+
+	app.Run(os.Args)
+	return 0
 }
 
 func main() {
-	file, config, err := getConfig()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	client := mastodon.NewClient(config)
-
-	if config.AccessToken == "" {
-		authenticate(client, config, file)
-		return
-	}
-
-	if *toot != "" {
-		post(client, *toot)
-		return
-	}
-
-	if *stream {
-		streaming(client)
-		return
-	}
-
-	timeline(client)
+	os.Exit(run())
 }

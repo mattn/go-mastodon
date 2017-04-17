@@ -5,12 +5,24 @@ command line tool for mstdn.jp
 ## Usage
 
 ```
-Usage of mstdn:
-  -S	streaming public
-  -ff string
-    	post utf-8 string from a file("-" means STDIN)
-  -t string
-    	toot text
+NAME:
+   mstdn - mastodon client
+
+USAGE:
+   mstdn [global options] command [command options] [arguments...]
+   
+VERSION:
+   0.0.1
+   
+COMMANDS:
+     toot      post toot
+     stream    stream statuses
+     timeline  show timeline
+     help, h   Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --help, -h     show help
+   --version, -v  print the version
 ```
 
 ## Installation

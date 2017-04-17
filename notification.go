@@ -1,6 +1,7 @@
 package mastodon
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"time"
@@ -16,9 +17,9 @@ type Notification struct {
 }
 
 // GetNotifications return notifications.
-func (c *Client) GetNotifications() ([]*Notification, error) {
+func (c *Client) GetNotifications(ctx context.Context) ([]*Notification, error) {
 	var notifications []*Notification
-	err := c.doAPI(http.MethodGet, "/api/v1/notifications", nil, &notifications)
+	err := c.doAPI(ctx, http.MethodGet, "/api/v1/notifications", nil, &notifications)
 	if err != nil {
 		return nil, err
 	}
@@ -26,9 +27,9 @@ func (c *Client) GetNotifications() ([]*Notification, error) {
 }
 
 // GetNotifications return notification.
-func (c *Client) GetNotification(id int64) (*Notification, error) {
+func (c *Client) GetNotification(ctx context.Context, id int64) (*Notification, error) {
 	var notification Notification
-	err := c.doAPI(http.MethodGet, fmt.Sprintf("/api/v1/notifications/%d", id), nil, &notification)
+	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/notifications/%d", id), nil, &notification)
 	if err != nil {
 		return nil, err
 	}
@@ -36,6 +37,6 @@ func (c *Client) GetNotification(id int64) (*Notification, error) {
 }
 
 // ClearNotifications clear notifications.
-func (c *Client) ClearNotifications() error {
-	return c.doAPI(http.MethodPost, "/api/v1/notifications/clear", nil, nil)
+func (c *Client) ClearNotifications(ctx context.Context) error {
+	return c.doAPI(ctx, http.MethodPost, "/api/v1/notifications/clear", nil, nil)
 }

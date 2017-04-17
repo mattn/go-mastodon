@@ -1,6 +1,6 @@
 # go-mastodon
 
-[![Build Status](https://travis-ci.org/mattn/go-mastodon.png?branch=master)](https://travis-ci.org/mattn/go-mastodon)
+[![Build Status](https://travis-ci.org/mattn/go-mastodon.svg?branch=master)](https://travis-ci.org/mattn/go-mastodon)
 [![Coverage Status](https://coveralls.io/repos/github/mattn/go-mastodon/badge.svg?branch=master)](https://coveralls.io/github/mattn/go-mastodon?branch=master)
 [![GoDoc](https://godoc.org/github.com/mattn/go-mastodon?status.svg)](http://godoc.org/github.com/mattn/go-mastodon)
 [![Go Report Card](https://goreportcard.com/badge/github.com/mattn/go-mastodon)](https://goreportcard.com/report/github.com/mattn/go-mastodon)
@@ -26,9 +26,10 @@ if err != nil {
 
 * [x] GET /api/v1/accounts/:id
 * [x] GET /api/v1/accounts/verify_credentials
+* [x] PATCH /api/v1/accounts/update_credentials
 * [x] GET /api/v1/accounts/:id/followers
 * [x] GET /api/v1/accounts/:id/following
-* [ ] GET /api/v1/accounts/:id/statuses
+* [x] GET /api/v1/accounts/:id/statuses
 * [x] POST /api/v1/accounts/:id/follow
 * [x] POST /api/v1/accounts/:id/unfollow
 * [x] GET /api/v1/accounts/:id/block
@@ -38,11 +39,11 @@ if err != nil {
 * [x] GET /api/v1/accounts/relationships
 * [x] GET /api/v1/accounts/search
 * [x] POST /api/v1/apps
-* [ ] GET /api/v1/blocks
-* [ ] GET /api/v1/favourites
-* [ ] GET /api/v1/follow_requests
-* [ ] POST /api/v1/follow_requests/authorize
-* [ ] POST /api/v1/follow_requests/reject
+* [x] GET /api/v1/blocks
+* [x] GET /api/v1/favourites
+* [x] GET /api/v1/follow_requests
+* [x] POST /api/v1/follow_requests/:id/authorize
+* [x] POST /api/v1/follow_requests/:id/reject
 * [x] POST /api/v1/follows
 * [x] GET /api/v1/instance
 * [ ] POST /api/v1/media
@@ -52,21 +53,21 @@ if err != nil {
 * [x] POST /api/v1/notifications/clear
 * [ ] GET /api/v1/reports
 * [ ] POST /api/v1/reports
-* [ ] GET /api/v1/search
+* [x] GET /api/v1/search
 * [x] GET /api/v1/statuses/:id
 * [x] GET /api/v1/statuses/:id/context
 * [x] GET /api/v1/statuses/:id/card
-* [ ] GET /api/v1/statuses/:id/reblogged_by
-* [ ] GET /api/v1/statuses/:id/favourited_by
-* [ ] POST /api/v1/statuses
-* [ ] DELETE /api/v1/statuses/:id
-* [ ] POST /api/v1/statuses/:id/reblog
-* [ ] POST /api/v1/statuses/:id/unreblog
-* [ ] POST /api/v1/statuses/:id/favourite
-* [ ] POST /api/v1/statuses/:id/unfavourite
+* [x] GET /api/v1/statuses/:id/reblogged_by
+* [x] GET /api/v1/statuses/:id/favourited_by
+* [x] POST /api/v1/statuses
+* [x] DELETE /api/v1/statuses/:id
+* [x] POST /api/v1/statuses/:id/reblog
+* [x] POST /api/v1/statuses/:id/unreblog
+* [x] POST /api/v1/statuses/:id/favourite
+* [x] POST /api/v1/statuses/:id/unfavourite
 * [x] GET /api/v1/timelines/home
-* [ ] GET /api/v1/timelines/public
-* [ ] GET /api/v1/timelines/tag/:hashtag
+* [x] GET /api/v1/timelines/public
+* [x] GET /api/v1/timelines/tag/:hashtag
 
 ## Installation
 

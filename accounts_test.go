@@ -59,7 +59,7 @@ func TestGetBlocks(t *testing.T) {
 		t.Fatalf("want %q but %q", "foo", bl[0].Username)
 	}
 	if bl[1].Username != "bar" {
-		t.Fatalf("want %q but %q", "bar", bl[0].Username)
+		t.Fatalf("want %q but %q", "bar", bl[1].Username)
 	}
 }
 

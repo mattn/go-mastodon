@@ -1,6 +1,9 @@
 package mastodon
 
-import "net/http"
+import (
+	"context"
+	"net/http"
+)
 
 // Report hold information for mastodon report.
 type Report struct {
@@ -9,21 +12,21 @@ type Report struct {
 }
 
 // GetReport return report of the current user.
-func (c *Client) GetReport() (*Report, error) {
+func (c *Client) GetReport(ctx context.Context) (*Report, error) {
 	var reports Report
-	err := c.doAPI(http.MethodGet, "/api/v1/reports", nil, &reports)
+	err := c.doAPI(ctx, http.MethodGet, "/api/v1/reports", nil, &reports)
 	if err != nil {
 		return nil, err
 	}
-	return reports, nil
+	return &reports, nil
 }
 
 //  Report reports the report
-func (c *Client) Report(id int64) (*Report, error) {
+func (c *Client) Report(ctx context.Context, id int64) (*Report, error) {
 	var report Report
-	err := c.doAPI(http.MethodPost, "/api/v1/reports", nil, &report)
+	err := c.doAPI(ctx, http.MethodPost, "/api/v1/reports", nil, &report)
 	if err != nil {
 		return nil, err
 	}
-	return &relationship, nil
+	return &report, nil
 }

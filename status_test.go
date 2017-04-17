@@ -257,3 +257,33 @@ func TestUnfavourite(t *testing.T) {
 		t.Fatalf("want %q but %q", "zzz", status.Content)
 	}
 }
+
+func TestUploadMedia(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/api/v1/media" {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+		if r.Method != "POST" {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+		fmt.Fprintln(w, `{"ID": 123}`)
+		return
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+		AccessToken:  "zoo",
+	})
+	attachment, err := client.UploadMedia(context.Background(), "testdata/logo.png")
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	if attachment.ID != 123 {
+		t.Fatalf("want %q but %q", 123, attachment.ID)
+	}
+}

@@ -1,12 +1,17 @@
 package mastodon
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"mime/multipart"
 	"net/http"
 	"net/url"
+	"os"
 	"path"
+	"path/filepath"
 	"strings"
 )
 
@@ -24,21 +29,53 @@ type Client struct {
 	config *Config
 }
 
-func (c *Client) doAPI(ctx context.Context, method string, uri string, params url.Values, res interface{}) error {
+func (c *Client) doAPI(ctx context.Context, method string, uri string, params interface{}, res interface{}) error {
 	u, err := url.Parse(c.config.Server)
 	if err != nil {
 		return err
 	}
 	u.Path = path.Join(u.Path, uri)
 
-	req, err := http.NewRequest(method, u.String(), strings.NewReader(params.Encode()))
-	if err != nil {
-		return err
+	var req *http.Request
+	ct := "application/x-www-form-urlencoded"
+	if values, ok := params.(url.Values); ok {
+		req, err = http.NewRequest(method, u.String(), strings.NewReader(values.Encode()))
+		if err != nil {
+			return err
+		}
+	} else if file, ok := params.(string); ok {
+		f, err := os.Open(file)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+
+		var buf bytes.Buffer
+		mw := multipart.NewWriter(&buf)
+		part, err := mw.CreateFormFile("file", filepath.Base(file))
+		if err != nil {
+			return err
+		}
+		_, err = io.Copy(part, f)
+		if err != nil {
+			return err
+		}
+		err = mw.Close()
+		if err != nil {
+			return err
+		}
+		req, err = http.NewRequest(method, u.String(), &buf)
+		if err != nil {
+			return err
+		}
+		ct = mw.FormDataContentType()
+	} else {
+		req, err = http.NewRequest(method, u.String(), nil)
 	}
 	req.WithContext(ctx)
 	req.Header.Set("Authorization", "Bearer "+c.config.AccessToken)
 	if params != nil {
-		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		req.Header.Set("Content-Type", ct)
 	}
 
 	resp, err := c.Do(req)

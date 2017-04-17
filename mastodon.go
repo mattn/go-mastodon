@@ -24,23 +24,6 @@ type Client struct {
 	config *Config
 }
 
-func httpDo(ctx context.Context, req *http.Request, f func(*http.Response, error) error) error {
-	tr := &http.Transport{}
-	client := &http.Client{Transport: tr}
-	c := make(chan error, 1)
-	go func() {
-		c <- f(client.Do(req))
-	}()
-	select {
-	case <-ctx.Done():
-		tr.CancelRequest(req)
-		<-c
-		return ctx.Err()
-	case err := <-c:
-		return err
-	}
-}
-
 func (c *Client) doAPI(ctx context.Context, method string, uri string, params url.Values, res interface{}) error {
 	u, err := url.Parse(c.config.Server)
 	if err != nil {
@@ -52,24 +35,24 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params ur
 	if err != nil {
 		return err
 	}
+	req.WithContext(ctx)
 	req.Header.Set("Authorization", "Bearer "+c.config.AccessToken)
 	if params != nil {
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	}
 
-	return httpDo(ctx, req, func(resp *http.Response, err error) error {
-		if err != nil {
-			return err
-		}
-		defer resp.Body.Close()
+	resp, err := c.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
 
-		if resp.StatusCode != http.StatusOK {
-			return fmt.Errorf("bad request: %v", resp.Status)
-		} else if res == nil {
-			return nil
-		}
-		return json.NewDecoder(resp.Body).Decode(&res)
-	})
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("bad request: %v", resp.Status)
+	} else if res == nil {
+		return nil
+	}
+	return json.NewDecoder(resp.Body).Decode(&res)
 }
 
 // NewClient return new mastodon API client.

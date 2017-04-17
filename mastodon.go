@@ -39,7 +39,13 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params in
 	var req *http.Request
 	ct := "application/x-www-form-urlencoded"
 	if values, ok := params.(url.Values); ok {
-		req, err = http.NewRequest(method, u.String(), strings.NewReader(values.Encode()))
+		var body io.Reader
+		if method == http.MethodGet {
+			u.RawQuery = values.Encode()
+		} else {
+			body = strings.NewReader(values.Encode())
+		}
+		req, err = http.NewRequest(method, u.String(), body)
 		if err != nil {
 			return err
 		}

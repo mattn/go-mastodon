@@ -26,7 +26,7 @@ func (c *Client) GetNotifications(ctx context.Context) ([]*Notification, error) 
 	return notifications, nil
 }
 
-// GetNotification return notifications.
+// GetNotifications return notification.
 func (c *Client) GetNotification(ctx context.Context, id int64) (*Notification, error) {
 	var notification Notification
 	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/notifications/%d", id), nil, &notification)

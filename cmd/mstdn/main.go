@@ -185,6 +185,10 @@ func makeApp() *cli.App {
 					Name:  "json",
 					Usage: "output JSON",
 				},
+				cli.BoolFlag{
+					Name:  "simplejson",
+					Usage: "output simple JSON",
+				},
 			},
 			Action: cmdStream,
 		},

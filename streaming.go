@@ -14,7 +14,9 @@ import (
 )
 
 // UpdateEvent is struct for passing status event to app.
-type UpdateEvent struct{ Status *Status }
+type UpdateEvent struct {
+	Status *Status `json:"status"`
+}
 
 func (e *UpdateEvent) event() {}
 
@@ -92,7 +94,7 @@ func (c *Client) streaming(ctx context.Context, p string, tag string) (chan Even
 			if err == nil {
 				req.Header.Set("Authorization", "Bearer "+c.config.AccessToken)
 				resp, err = c.Do(req)
-				if resp.StatusCode != 200 {
+				if resp != nil && resp.StatusCode != 200 {
 					err = fmt.Errorf("bad request: %v", resp.Status)
 				}
 			}

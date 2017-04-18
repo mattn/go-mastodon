@@ -206,13 +206,15 @@ func (c *Client) AccountUnmute(ctx context.Context, id int64) (*Relationship, er
 	return &relationship, nil
 }
 
-// GetAccountRelationship return relationship for the account.
-func (c *Client) GetAccountRelationship(ctx context.Context, id int64) ([]*Relationship, error) {
+// GetAccountRelationships return relationship for the account.
+func (c *Client) GetAccountRelationships(ctx context.Context, ids []int64) ([]*Relationship, error) {
 	params := url.Values{}
-	params.Set("id", fmt.Sprint(id))
+	for _, id := range ids {
+		params.Add("id[]", fmt.Sprint(id))
+	}
 
 	var relationships []*Relationship
-	err := c.doAPI(ctx, http.MethodGet, "/api/v1/accounts/relationship", params, &relationships, nil)
+	err := c.doAPI(ctx, http.MethodGet, "/api/v1/accounts/relationships", params, &relationships, nil)
 	if err != nil {
 		return nil, err
 	}

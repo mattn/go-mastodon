@@ -66,12 +66,6 @@ var (
 )
 
 func prompt() (string, string, error) {
-	t, err := tty.Open()
-	if err != nil {
-		return "", "", err
-	}
-	defer t.Close()
-
 	fmt.Print("E-Mail: ")
 	email, err := readUsername()
 	if err != nil {
@@ -81,6 +75,11 @@ func prompt() (string, string, error) {
 	fmt.Print("Password: ")
 	var password string
 	if readPassword == nil {
+		t, err := tty.Open()
+		if err != nil {
+			return "", "", err
+		}
+		defer t.Close()
 		password, err = t.ReadPassword()
 	} else {
 		password, err = readPassword()
@@ -179,8 +178,18 @@ func makeApp() *cli.App {
 			Action: cmdToot,
 		},
 		{
-			Name:   "stream",
-			Usage:  "stream statuses",
+			Name:  "stream",
+			Usage: "stream statuses",
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "json",
+					Usage: "output JSON",
+				},
+				cli.BoolFlag{
+					Name:  "simplejson",
+					Usage: "output simple JSON",
+				},
+			},
 			Action: cmdStream,
 		},
 		{

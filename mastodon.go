@@ -29,7 +29,32 @@ type Client struct {
 	config *Config
 }
 
-func (c *Client) doAPI(ctx context.Context, method string, uri string, params interface{}, res interface{}) error {
+type page struct {
+	next string
+}
+
+func linkHeader(h http.Header, rel string) []string {
+	var links []string
+	for _, v := range h["Link"] {
+		parts := strings.Split(v, ";")
+		for _, p := range parts {
+			p = strings.TrimSpace(p)
+			if !strings.HasPrefix(p, "rel=") {
+				continue
+			}
+			pos := strings.Index(p[4:], `,`)
+			if pos > 0 {
+				p = p[4 : 4+pos]
+			}
+			if v := strings.Trim(p, `"`); v == rel {
+				links = append(links, strings.Trim(parts[0], "<>"))
+			}
+		}
+	}
+	return links
+}
+
+func (c *Client) doAPI(ctx context.Context, method string, uri string, params interface{}, res interface{}, next *bool) error {
 	u, err := url.Parse(c.config.Server)
 	if err != nil {
 		return err
@@ -84,6 +109,19 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params in
 	}
 	defer resp.Body.Close()
 
+	if next != nil && params != nil {
+		nl := linkHeader(resp.Header, "next")
+		*next = false
+		if len(nl) > 0 {
+			u, err = url.Parse(nl[0])
+			if err == nil {
+				for k, v := range u.Query() {
+					params.(url.Values)[k] = v
+				}
+			}
+			*next = true
+		}
+	}
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("bad request: %v", resp.Status)
 	} else if res == nil {

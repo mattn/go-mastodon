@@ -14,7 +14,7 @@ type Report struct {
 // GetReports return report of the current user.
 func (c *Client) GetReports(ctx context.Context) ([]*Report, error) {
 	var reports []*Report
-	err := c.doAPI(ctx, http.MethodGet, "/api/v1/reports", nil, &reports)
+	err := c.doAPI(ctx, http.MethodGet, "/api/v1/reports", nil, &reports, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -24,7 +24,7 @@ func (c *Client) GetReports(ctx context.Context) ([]*Report, error) {
 //  Report reports the report
 func (c *Client) Report(ctx context.Context, id int64) (*Report, error) {
 	var report Report
-	err := c.doAPI(ctx, http.MethodPost, "/api/v1/reports", nil, &report)
+	err := c.doAPI(ctx, http.MethodPost, "/api/v1/reports", nil, &report, nil)
 	if err != nil {
 		return nil, err
 	}

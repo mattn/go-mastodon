@@ -111,7 +111,7 @@ func (c *Client) GetAccountFollowers(ctx context.Context, id int64) ([]*Account,
 		if !next {
 			break
 		}
-		time.Sleep(10 * time.Second)
+		time.Sleep(c.interval)
 	}
 	return total, nil
 }

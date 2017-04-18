@@ -13,6 +13,7 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 // Config is a setting for access mastodon APIs.
@@ -26,7 +27,8 @@ type Config struct {
 // Client is a API client for mastodon.
 type Client struct {
 	http.Client
-	config *Config
+	config   *Config
+	interval time.Duration
 }
 
 type page struct {
@@ -133,8 +135,9 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params in
 // NewClient return new mastodon API client.
 func NewClient(config *Config) *Client {
 	return &Client{
-		Client: *http.DefaultClient,
-		config: config,
+		Client:   *http.DefaultClient,
+		config:   config,
+		interval: 10 * time.Second,
 	}
 }
 

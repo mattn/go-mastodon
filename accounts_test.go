@@ -450,12 +450,44 @@ func TestAccountUnmute(t *testing.T) {
 
 func TestGetAccountRelationship(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println(r.URL.String())
-		if r.URL.Query().Get("id") != "1234567" {
-			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		ids := r.URL.Query()["id[]"]
+		if ids[0] == "1234567" && ids[1] == "8901234" {
+			fmt.Fprintln(w, `[{"id":1234567},{"id":8901234}]`)
 			return
 		}
-		fmt.Fprintln(w, `[{"id":1234567}]`)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+		AccessToken:  "zoo",
+	})
+	_, err := client.GetAccountRelationships(context.Background(), []int64{123, 456})
+	if err == nil {
+		t.Fatalf("should be fail: %v", err)
+	}
+	rels, err := client.GetAccountRelationships(context.Background(), []int64{1234567, 8901234})
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	if rels[0].ID != 1234567 {
+		t.Fatalf("want %d but %d", 1234567, rels[0].ID)
+	}
+	if rels[1].ID != 8901234 {
+		t.Fatalf("want %d but %d", 8901234, rels[1].ID)
+	}
+}
+
+func TestAccountsSearch(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Query()["q"][0] != "foo" {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+		fmt.Fprintln(w, `[{"Username": "foobar"}, {"Username": "barfoo"}]`)
 		return
 	}))
 	defer ts.Close()
@@ -466,16 +498,52 @@ func TestGetAccountRelationship(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	_, err := client.GetAccountRelationship(context.Background(), 123)
+	_, err := client.AccountsSearch(context.Background(), "zzz", 2)
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	rels, err := client.GetAccountRelationship(context.Background(), 1234567)
+	res, err := client.AccountsSearch(context.Background(), "foo", 2)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
-	if rels[0].ID != 1234567 {
-		t.Fatalf("want %d but %d", 1234567, rels[0].ID)
+	if len(res) != 2 {
+		t.Fatalf("result should be two: %d", len(res))
+	}
+	if res[0].Username != "foobar" {
+		t.Fatalf("want %q but %q", "foobar", res[0].Username)
+	}
+	if res[1].Username != "barfoo" {
+		t.Fatalf("want %q but %q", "barfoo", res[1].Username)
+	}
+}
+
+func TestFollowRemoteUser(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.PostFormValue("uri") != "foo@success.social" {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+		fmt.Fprintln(w, `{"Username": "zzz"}`)
+		return
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+		AccessToken:  "zoo",
+	})
+	_, err := client.FollowRemoteUser(context.Background(), "foo@fail.social")
+	if err == nil {
+		t.Fatalf("should be fail: %v", err)
+	}
+	ru, err := client.FollowRemoteUser(context.Background(), "foo@success.social")
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	if ru.Username != "zzz" {
+		t.Fatalf("want %q but %q", "zzz", ru.Username)
 	}
 }
 

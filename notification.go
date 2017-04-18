@@ -19,7 +19,7 @@ type Notification struct {
 // GetNotifications return notifications.
 func (c *Client) GetNotifications(ctx context.Context) ([]*Notification, error) {
 	var notifications []*Notification
-	err := c.doAPI(ctx, http.MethodGet, "/api/v1/notifications", nil, &notifications)
+	err := c.doAPI(ctx, http.MethodGet, "/api/v1/notifications", nil, &notifications, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +29,7 @@ func (c *Client) GetNotifications(ctx context.Context) ([]*Notification, error) 
 // GetNotifications return notification.
 func (c *Client) GetNotification(ctx context.Context, id int64) (*Notification, error) {
 	var notification Notification
-	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/notifications/%d", id), nil, &notification)
+	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/notifications/%d", id), nil, &notification, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -38,5 +38,5 @@ func (c *Client) GetNotification(ctx context.Context, id int64) (*Notification, 
 
 // ClearNotifications clear notifications.
 func (c *Client) ClearNotifications(ctx context.Context) error {
-	return c.doAPI(ctx, http.MethodPost, "/api/v1/notifications/clear", nil, nil)
+	return c.doAPI(ctx, http.MethodPost, "/api/v1/notifications/clear", nil, nil, nil)
 }

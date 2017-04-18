@@ -104,9 +104,6 @@ func (c *Client) GetAccountFollowers(ctx context.Context, id int64) ([]*Account,
 		if err != nil {
 			return nil, err
 		}
-		for _, a := range accounts {
-			println(a.Username)
-		}
 		total = append(total, accounts...)
 		if !next {
 			break

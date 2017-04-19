@@ -93,7 +93,7 @@ func (c *Client) streaming(ctx context.Context, p string, tag string) (chan Even
 			if err == nil {
 				req.Header.Set("Authorization", "Bearer "+c.config.AccessToken)
 				resp, err = c.Do(req)
-				if resp != nil && resp.StatusCode != 200 {
+				if resp != nil && resp.StatusCode != http.StatusOK {
 					err = parseAPIError("bad request", resp)
 				}
 			}

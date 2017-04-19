@@ -172,7 +172,7 @@ func makeApp() *cli.App {
 	app.Version = "0.0.1"
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name:  "a",
+			Name:  "profile",
 			Usage: "profile name",
 			Value: "",
 		},

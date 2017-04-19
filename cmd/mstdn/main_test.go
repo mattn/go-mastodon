@@ -2,10 +2,13 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"io/ioutil"
 	"log"
 	"os"
 	"testing"
+
+	"github.com/urfave/cli"
 )
 
 func TestReadFileFile(t *testing.T) {
@@ -72,7 +75,11 @@ func TestGetConfig(t *testing.T) {
 		os.Setenv("APPDATA", appdata)
 	}()
 
-	file, config, err := getConfig()
+	app := makeApp()
+	set := flag.NewFlagSet("test", 0)
+	set.Parse([]string{"mstdn", "-profile", ""})
+	c := cli.NewContext(app, set, nil)
+	file, config, err := getConfig(c)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -97,7 +104,7 @@ func TestGetConfig(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	file, config, err = getConfig()
+	file, config, err = getConfig(c)
 	if err != nil {
 		t.Fatal(err)
 	}

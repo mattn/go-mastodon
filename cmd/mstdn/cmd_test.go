@@ -25,6 +25,9 @@ func testWithServer(h http.HandlerFunc, testFunc func(*cli.App)) string {
 	app.Writer = &buf
 	app.Metadata = map[string]interface{}{
 		"client": client,
+		"config": &mastodon.Config{
+			Server: "example.com",
+		},
 	}
 	testFunc(app)
 	return buf.String()

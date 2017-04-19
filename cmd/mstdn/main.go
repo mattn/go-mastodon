@@ -6,12 +6,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
+	"net/url"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/mattn/go-mastodon"
 	"github.com/mattn/go-tty"
 	"github.com/urfave/cli"
@@ -257,6 +260,50 @@ func makeApp() *cli.App {
 	}
 	app.Setup()
 	return app
+}
+
+func acct(acct, host string) string {
+	if !strings.Contains(acct, "@") {
+		acct += "@" + host
+	}
+	return acct
+}
+
+type screen struct {
+	host string
+}
+
+func newScreen(config *mastodon.Config) *screen {
+	var host string
+	u, err := url.Parse(config.Server)
+	if err == nil {
+		host = u.Host
+	}
+	return &screen{host}
+}
+
+func (s *screen) displayError(w io.Writer, e error) {
+	color.Set(color.FgYellow)
+	fmt.Fprintln(w, e.Error())
+	color.Set(color.Reset)
+}
+
+func (s *screen) displayStatus(w io.Writer, t *mastodon.Status) {
+	if t.Reblog != nil {
+		color.Set(color.FgHiRed)
+		fmt.Fprint(w, acct(t.Account.Acct, s.host))
+		color.Set(color.Reset)
+		fmt.Fprint(w, " reblogged ")
+		color.Set(color.FgHiBlue)
+		fmt.Fprintln(w, acct(t.Reblog.Account.Acct, s.host))
+		fmt.Fprintln(w, textContent(t.Reblog.Content))
+		color.Set(color.Reset)
+	} else {
+		color.Set(color.FgHiRed)
+		fmt.Fprintln(w, acct(t.Account.Acct, s.host))
+		color.Set(color.Reset)
+		fmt.Fprintln(w, textContent(t.Content))
+	}
 }
 
 func run() int {

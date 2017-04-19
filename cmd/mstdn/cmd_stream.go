@@ -4,12 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"os"
 	"os/signal"
 	"strings"
 
-	"github.com/fatih/color"
 	"github.com/mattn/go-mastodon"
 	"github.com/urfave/cli"
 )
@@ -25,7 +23,10 @@ type SimpleJSON struct {
 func cmdStream(c *cli.Context) error {
 	asJSON := c.Bool("json")
 	asSimpleJSON := c.Bool("simplejson")
+
 	client := c.App.Metadata["client"].(*mastodon.Client)
+	config := c.App.Metadata["config"].(*mastodon.Config)
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	sc := make(chan os.Signal, 1)
@@ -54,6 +55,8 @@ func cmdStream(c *cli.Context) error {
 		cancel()
 		close(q)
 	}()
+
+	s := newScreen(config)
 	for e := range q {
 		if asJSON {
 			json.NewEncoder(c.App.Writer).Encode(e)
@@ -70,14 +73,11 @@ func cmdStream(c *cli.Context) error {
 		} else {
 			switch t := e.(type) {
 			case *mastodon.UpdateEvent:
-				color.Set(color.FgHiRed)
-				fmt.Fprintln(c.App.Writer, t.Status.Account.Username)
-				color.Set(color.Reset)
-				fmt.Fprintln(c.App.Writer, textContent(t.Status.Content))
+				s.displayStatus(c.App.Writer, t.Status)
+			case *mastodon.NotificationEvent:
+				s.displayStatus(c.App.Writer, t.Notification.Status)
 			case *mastodon.ErrorEvent:
-				color.Set(color.FgYellow)
-				fmt.Fprintln(c.App.Writer, t.Error())
-				color.Set(color.Reset)
+				s.displayError(c.App.Writer, t)
 			}
 		}
 	}

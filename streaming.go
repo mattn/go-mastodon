@@ -20,7 +20,9 @@ type UpdateEvent struct {
 func (e *UpdateEvent) event() {}
 
 // NotificationEvent is struct for passing notification event to app.
-type NotificationEvent struct{}
+type NotificationEvent struct {
+	Notification *Notification `json:"notification"`
+}
 
 func (e *NotificationEvent) event() {}
 
@@ -61,7 +63,17 @@ func handleReader(ctx context.Context, q chan Event, r io.Reader) error {
 					q <- &UpdateEvent{&status}
 				}
 			case "notification":
+				var notification Notification
+				err := json.Unmarshal([]byte(token[1]), &notification)
+				if err == nil {
+					q <- &NotificationEvent{&notification}
+				}
 			case "delete":
+				var id int64
+				err := json.Unmarshal([]byte(token[1]), &id)
+				if err == nil {
+					q <- &DeleteEvent{id}
+				}
 			}
 		default:
 		}

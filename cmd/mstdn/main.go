@@ -262,13 +262,6 @@ func makeApp() *cli.App {
 	return app
 }
 
-func acct(acct, host string) string {
-	if !strings.Contains(acct, "@") {
-		acct += "@" + host
-	}
-	return acct
-}
-
 type screen struct {
 	host string
 }
@@ -282,6 +275,13 @@ func newScreen(config *mastodon.Config) *screen {
 	return &screen{host}
 }
 
+func (s *screen) acct(a string) string {
+	if !strings.Contains(a, "@") {
+		a += "@" + s.host
+	}
+	return a
+}
+
 func (s *screen) displayError(w io.Writer, e error) {
 	color.Set(color.FgYellow)
 	fmt.Fprintln(w, e.Error())
@@ -291,16 +291,16 @@ func (s *screen) displayError(w io.Writer, e error) {
 func (s *screen) displayStatus(w io.Writer, t *mastodon.Status) {
 	if t.Reblog != nil {
 		color.Set(color.FgHiRed)
-		fmt.Fprint(w, acct(t.Account.Acct, s.host))
+		fmt.Fprint(w, s.acct(t.Account.Acct))
 		color.Set(color.Reset)
 		fmt.Fprint(w, " reblogged ")
 		color.Set(color.FgHiBlue)
-		fmt.Fprintln(w, acct(t.Reblog.Account.Acct, s.host))
+		fmt.Fprintln(w, s.acct(t.Reblog.Account.Acct))
 		fmt.Fprintln(w, textContent(t.Reblog.Content))
 		color.Set(color.Reset)
 	} else {
 		color.Set(color.FgHiRed)
-		fmt.Fprintln(w, acct(t.Account.Acct, s.host))
+		fmt.Fprintln(w, s.acct(t.Account.Acct))
 		color.Set(color.Reset)
 		fmt.Fprintln(w, textContent(t.Content))
 	}

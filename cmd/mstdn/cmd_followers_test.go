@@ -17,7 +17,7 @@ func TestCmdFollowers(t *testing.T) {
 				fmt.Fprintln(w, `{"id": 123}`)
 				return
 			case "/api/v1/accounts/123/followers":
-				fmt.Fprintln(w, `[{"id": 234, "username": "zzz"}]`)
+				fmt.Fprintln(w, `[{"id": 234, "username": "ZZZ", "acct": "zzz"}]`)
 				return
 			}
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)

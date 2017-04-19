@@ -10,6 +10,8 @@ import (
 
 func cmdFollowers(c *cli.Context) error {
 	client := c.App.Metadata["client"].(*mastodon.Client)
+	config := c.App.Metadata["config"].(*mastodon.Config)
+
 	account, err := client.GetAccountCurrentUser(context.Background())
 	if err != nil {
 		return err
@@ -18,8 +20,9 @@ func cmdFollowers(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
+	s := newScreen(config)
 	for _, follower := range followers {
-		fmt.Fprintf(c.App.Writer, "%v,%v\n", follower.ID, follower.Acct)
+		fmt.Fprintf(c.App.Writer, "%v,%v\n", follower.ID, s.acct(follower.Acct))
 	}
 	return nil
 }

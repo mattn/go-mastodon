@@ -3,9 +3,11 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"os/signal"
+	"strings"
 
 	"github.com/fatih/color"
 	"github.com/mattn/go-mastodon"
@@ -27,7 +29,22 @@ func cmdStream(c *cli.Context) error {
 	defer cancel()
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, os.Interrupt)
-	q, err := client.StreamingPublic(ctx)
+
+	var q chan mastodon.Event
+	var err error
+
+	t := c.String("type")
+	if t == "public" {
+		q, err = client.StreamingPublic(ctx)
+	} else if t == "" || t == "public/local" {
+		q, err = client.StreamingPublicLocal(ctx)
+	} else if strings.HasPrefix(t, "user:") {
+		q, err = client.StreamingUser(ctx, t[5:])
+	} else if strings.HasPrefix(t, "hashtag:") {
+		q, err = client.StreamingHashtag(ctx, t[8:])
+	} else {
+		return errors.New("invalid type")
+	}
 	if err != nil {
 		return err
 	}

@@ -69,15 +69,13 @@ func handleReader(ctx context.Context, q chan Event, r io.Reader) error {
 	return ctx.Err()
 }
 
-func (c *Client) streaming(ctx context.Context, p string, tag string) (chan Event, error) {
+func (c *Client) streaming(ctx context.Context, p string, params url.Values) (chan Event, error) {
 	u, err := url.Parse(c.config.Server)
 	if err != nil {
 		return nil, err
 	}
 	u.Path = path.Join(u.Path, "/api/v1/streaming/"+p)
 
-	params := url.Values{}
-	params.Set("tag", tag)
 	var resp *http.Response
 
 	q := make(chan Event, 10)
@@ -86,7 +84,7 @@ func (c *Client) streaming(ctx context.Context, p string, tag string) (chan Even
 
 		for {
 			var in io.Reader
-			if tag != "" {
+			if params != nil {
 				in = strings.NewReader(params.Encode())
 			}
 			req, err := http.NewRequest(http.MethodGet, u.String(), in)
@@ -121,15 +119,26 @@ func (c *Client) streaming(ctx context.Context, p string, tag string) (chan Even
 
 // StreamingPublic return channel to read events on public.
 func (c *Client) StreamingPublic(ctx context.Context) (chan Event, error) {
-	return c.streaming(ctx, "public", "")
+	params := url.Values{}
+	return c.streaming(ctx, "public", params)
 }
 
-// StreamingHome return channel to read events on home.
-func (c *Client) StreamingHome(ctx context.Context) (chan Event, error) {
-	return c.streaming(ctx, "home", "")
+// StreamingPublicLocal return channel to read events on public.
+func (c *Client) StreamingPublicLocal(ctx context.Context) (chan Event, error) {
+	params := url.Values{}
+	return c.streaming(ctx, "public/local", params)
+}
+
+// StreamingUser return channel to read events on home.
+func (c *Client) StreamingUser(ctx context.Context, user string) (chan Event, error) {
+	params := url.Values{}
+	params.Set("user", user)
+	return c.streaming(ctx, "user", params)
 }
 
 // StreamingHashtag return channel to read events on tagged timeline.
 func (c *Client) StreamingHashtag(ctx context.Context, tag string) (chan Event, error) {
-	return c.streaming(ctx, "hashtag", tag)
+	params := url.Values{}
+	params.Set("tag", tag)
+	return c.streaming(ctx, "hashtag", params)
 }

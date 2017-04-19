@@ -190,6 +190,10 @@ func makeApp() *cli.App {
 					Name:  "json",
 					Usage: "output JSON",
 				},
+				cli.StringFlag{
+					Name:  "type",
+					Usage: "straem type (public,public/local,user:NAME,hashtag:TAG)",
+				},
 				cli.BoolFlag{
 					Name:  "simplejson",
 					Usage: "output simple JSON",

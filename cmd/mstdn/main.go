@@ -289,6 +289,9 @@ func (s *screen) displayError(w io.Writer, e error) {
 }
 
 func (s *screen) displayStatus(w io.Writer, t *mastodon.Status) {
+	if t == nil {
+		return
+	}
 	if t.Reblog != nil {
 		color.Set(color.FgHiRed)
 		fmt.Fprint(w, s.acct(t.Account.Acct))

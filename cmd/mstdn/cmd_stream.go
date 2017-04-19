@@ -75,7 +75,7 @@ func cmdStream(c *cli.Context) error {
 			case *mastodon.UpdateEvent:
 				s.displayStatus(c.App.Writer, t.Status)
 			case *mastodon.NotificationEvent:
-				s.displayStatus(c.App.Writer, t.Notification.Status)
+				// TODO s.displayStatus(c.App.Writer, t.Notification.Status)
 			case *mastodon.ErrorEvent:
 				s.displayError(c.App.Writer, t)
 			}

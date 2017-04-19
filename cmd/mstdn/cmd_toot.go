@@ -26,7 +26,8 @@ func cmdToot(c *cli.Context) error {
 	}
 	client := c.App.Metadata["client"].(*mastodon.Client)
 	_, err := client.PostStatus(context.Background(), &mastodon.Toot{
-		Status: toot,
+		Status:      toot,
+		InReplyToID: c.Int64("i"),
 	})
 	return err
 }

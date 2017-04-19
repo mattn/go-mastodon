@@ -13,6 +13,7 @@ import (
 )
 
 type SimpleJSON struct {
+	ID       int64  `json:"id"`
 	Username string `json:"username"`
 	Avatar   string `json:"avatar"`
 	Content  string `json:"content"`
@@ -41,6 +42,7 @@ func cmdStream(c *cli.Context) error {
 		} else if asSimpleJSON {
 			if t, ok := e.(*mastodon.UpdateEvent); ok {
 				json.NewEncoder(c.App.Writer).Encode(&SimpleJSON{
+					ID:       t.Status.ID,
 					Username: t.Status.Account.Username,
 					Avatar:   t.Status.Account.AvatarStatic,
 					Content:  textContent(t.Status.Content),

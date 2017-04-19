@@ -223,6 +223,11 @@ func makeApp() *cli.App {
 			Action: cmdFollowers,
 		},
 		{
+			Name:   "follow",
+			Usage:  "follow account",
+			Action: cmdFollow,
+		},
+		{
 			Name:   "upload",
 			Usage:  "upload file",
 			Action: cmdUpload,

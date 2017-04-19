@@ -89,6 +89,7 @@ func (c *Client) streaming(ctx context.Context, p string, params url.Values) (ch
 			}
 			req, err := http.NewRequest(http.MethodGet, u.String(), in)
 			if err == nil {
+				req = req.WithContext(ctx)
 				req.Header.Set("Authorization", "Bearer "+c.config.AccessToken)
 				resp, err = c.Do(req)
 				if resp != nil && resp.StatusCode != http.StatusOK {
@@ -114,7 +115,6 @@ func (c *Client) streaming(ctx context.Context, p string, params url.Values) (ch
 		}
 	}()
 	return q, nil
-
 }
 
 // StreamingPublic return channel to read events on public.

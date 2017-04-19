@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"reflect"
 	"testing"
+	"time"
 )
 
 func TestAuthenticate(t *testing.T) {
@@ -39,6 +40,29 @@ func TestAuthenticate(t *testing.T) {
 	err = client.Authenticate(context.Background(), "valid", "user")
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
+	}
+}
+
+func TestAuthenticateWithCancel(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		time.Sleep(3 * time.Second)
+		return
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+	})
+	ctx, cancel := context.WithCancel(context.Background())
+	go cancel()
+	err := client.Authenticate(ctx, "invalid", "user")
+	if err == nil {
+		t.Fatalf("should be fail: %v", err)
+	}
+	if want := "Post " + ts.URL + "/oauth/token: context canceled"; want != err.Error() {
+		t.Fatalf("want %q but %q", want, err.Error())
 	}
 }
 
@@ -79,6 +103,31 @@ func TestPostStatus(t *testing.T) {
 	}
 }
 
+func TestPostStatusWithCancel(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		time.Sleep(3 * time.Second)
+		return
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+	})
+	ctx, cancel := context.WithCancel(context.Background())
+	go cancel()
+	_, err := client.PostStatus(ctx, &Toot{
+		Status: "foobar",
+	})
+	if err == nil {
+		t.Fatalf("should be fail: %v", err)
+	}
+	if want := "Post " + ts.URL + "/api/v1/statuses: context canceled"; want != err.Error() {
+		t.Fatalf("want %q but %q", want, err.Error())
+	}
+}
+
 func TestGetTimelineHome(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, `[{"Content": "foo"}, {"Content": "bar"}]`)
@@ -116,6 +165,30 @@ func TestGetTimelineHome(t *testing.T) {
 	}
 	if tl[1].Content != "bar" {
 		t.Fatalf("want %q but %q", "bar", tl[1].Content)
+	}
+}
+
+func TestGetTimelineHomeWithCancel(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		time.Sleep(3 * time.Second)
+		return
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+		AccessToken:  "zoo",
+	})
+	ctx, cancel := context.WithCancel(context.Background())
+	go cancel()
+	_, err := client.GetTimelineHome(ctx)
+	if err == nil {
+		t.Fatalf("should be fail: %v", err)
+	}
+	if want := "Get " + ts.URL + "/api/v1/timelines/home: context canceled"; want != err.Error() {
+		t.Fatalf("want %q but %q", want, err.Error())
 	}
 }
 

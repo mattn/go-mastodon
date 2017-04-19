@@ -2,7 +2,9 @@ package mastodon
 
 import (
 	"context"
+	"fmt"
 	"net/http"
+	"net/url"
 )
 
 // Report hold information for mastodon report.
@@ -22,9 +24,15 @@ func (c *Client) GetReports(ctx context.Context) ([]*Report, error) {
 }
 
 //  Report reports the report
-func (c *Client) Report(ctx context.Context, id int64) (*Report, error) {
+func (c *Client) Report(ctx context.Context, accountId int64, ids []int64, comment string) (*Report, error) {
+	params := url.Values{}
+	params.Set("account_id", fmt.Sprint(accountId))
+	for _, id := range ids {
+		params.Add("status_ids[]", fmt.Sprint(id))
+	}
+	params.Set("comment", comment)
 	var report Report
-	err := c.doAPI(ctx, http.MethodPost, "/api/v1/reports", nil, &report, nil)
+	err := c.doAPI(ctx, http.MethodPost, "/api/v1/reports", params, &report, nil)
 	if err != nil {
 		return nil, err
 	}

@@ -129,7 +129,7 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params in
 	} else {
 		req, err = http.NewRequest(method, u.String(), nil)
 	}
-	req.WithContext(ctx)
+	req = req.WithContext(ctx)
 	req.Header.Set("Authorization", "Bearer "+c.config.AccessToken)
 	if params != nil {
 		req.Header.Set("Content-Type", ct)
@@ -191,6 +191,7 @@ func (c *Client) Authenticate(ctx context.Context, username, password string) er
 	if err != nil {
 		return err
 	}
+	req = req.WithContext(ctx)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	resp, err := c.Do(req)
 	if err != nil {

@@ -90,7 +90,7 @@ func prompt() (string, string, error) {
 	return email, password, nil
 }
 
-func getConfig() (string, *mastodon.Config, error) {
+func getConfig(c *cli.Context) (string, *mastodon.Config, error) {
 	dir := os.Getenv("HOME")
 	if runtime.GOOS == "windows" {
 		dir = os.Getenv("APPDATA")
@@ -104,7 +104,13 @@ func getConfig() (string, *mastodon.Config, error) {
 	if err := os.MkdirAll(dir, 0700); err != nil {
 		return "", nil, err
 	}
-	file := filepath.Join(dir, "settings.json")
+	var file string
+	profile := c.String("profile")
+	if profile != "" {
+		file = filepath.Join(dir, "settings"+profile+".json")
+	} else {
+		file = filepath.Join(dir, "settings.json")
+	}
 	b, err := ioutil.ReadFile(file)
 	if err != nil && !os.IsNotExist(err) {
 		return "", nil, err
@@ -164,6 +170,13 @@ func makeApp() *cli.App {
 	app.Name = "mstdn"
 	app.Usage = "mastodon client"
 	app.Version = "0.0.1"
+	app.Flags = []cli.Flag{
+		cli.StringFlag{
+			Name:  "a",
+			Usage: "profile name",
+			Value: "",
+		},
+	}
 	app.Commands = []cli.Command{
 		{
 			Name:  "toot",
@@ -242,23 +255,28 @@ func makeApp() *cli.App {
 			Action: cmdUpload,
 		},
 	}
+	app.Setup()
 	return app
 }
 
 func run() int {
 	app := makeApp()
 
-	file, config, err := getConfig()
-	fatalIf(err)
+	app.Before = func(c *cli.Context) error {
+		file, config, err := getConfig(c)
+		if err != nil {
+			return err
+		}
 
-	client := mastodon.NewClient(config)
-	if config.AccessToken == "" {
-		err = authenticate(client, config, file)
-		fatalIf(err)
-	}
-	app.Metadata = map[string]interface{}{
-		"client": client,
-		"config": config,
+		client := mastodon.NewClient(config)
+		if config.AccessToken == "" {
+			return authenticate(client, config, file)
+		}
+		app.Metadata = map[string]interface{}{
+			"client": client,
+			"config": config,
+		}
+		return nil
 	}
 
 	app.Run(os.Args)

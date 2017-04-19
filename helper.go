@@ -2,6 +2,9 @@ package mastodon
 
 import (
 	"encoding/base64"
+	"encoding/json"
+	"errors"
+	"fmt"
 	"net/http"
 	"os"
 )
@@ -36,3 +39,17 @@ func Base64Encode(file *os.File) (string, error) {
 
 // String is a helper function to get the pointer value of a string.
 func String(v string) *string { return &v }
+
+func parseAPIError(prefix string, resp *http.Response) error {
+	errMsg := fmt.Sprintf("%s: %s", prefix, resp.Status)
+	var e struct {
+		Error string `json:"error"`
+	}
+
+	json.NewDecoder(resp.Body).Decode(&e)
+	if e.Error != "" {
+		errMsg = fmt.Sprintf("%s: %s", errMsg, e.Error)
+	}
+
+	return errors.New(errMsg)
+}

@@ -257,6 +257,11 @@ func makeApp() *cli.App {
 			Usage:  "upload file",
 			Action: cmdUpload,
 		},
+		{
+			Name:   "delete",
+			Usage:  "delete status",
+			Action: cmdDelete,
+		},
 	}
 	app.Setup()
 	return app

@@ -13,6 +13,8 @@ func testWithServer(h http.HandlerFunc, testFunc func(*cli.App)) string {
 	ts := httptest.NewServer(h)
 	defer ts.Close()
 
+	cli.OsExiter = func(n int) {}
+
 	client := mastodon.NewClient(&mastodon.Config{
 		Server:       ts.URL,
 		ClientID:     "foo",

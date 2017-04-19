@@ -18,7 +18,7 @@ func cmdNotification(c *cli.Context) error {
 	for _, n := range notifications {
 		if n.Status != nil {
 			color.Set(color.FgHiRed)
-			fmt.Fprint(c.App.Writer, n.Account.Username)
+			fmt.Fprint(c.App.Writer, n.Account.Acct)
 			color.Set(color.Reset)
 			fmt.Fprintln(c.App.Writer, " "+n.Type)
 			s := n.Status

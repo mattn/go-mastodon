@@ -240,14 +240,14 @@ func makeApp() *cli.App {
 			Action: cmdSearch,
 		},
 		{
-			Name:   "followers",
-			Usage:  "show followers",
-			Action: cmdFollowers,
-		},
-		{
 			Name:   "follow",
 			Usage:  "follow account",
 			Action: cmdFollow,
+		},
+		{
+			Name:   "followers",
+			Usage:  "show followers",
+			Action: cmdFollowers,
 		},
 		{
 			Name:   "upload",

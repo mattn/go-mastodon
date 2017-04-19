@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 )
 
@@ -124,4 +125,49 @@ func TestForTheCoverages(t *testing.T) {
 	(*DeleteEvent)(nil).event()
 	(*ErrorEvent)(nil).event()
 	_ = (&ErrorEvent{io.EOF}).Error()
+}
+
+func TestLinkHeader(t *testing.T) {
+	tests := []struct {
+		header []string
+		rel    string
+		want   []string
+	}{
+		{
+			header: []string{`<http://example.com/?max_id=3>; rel="foo"`},
+			rel:    "boo",
+			want:   nil,
+		},
+		{
+			header: []string{`<http://example.com/?max_id=3>; rel="foo"`},
+			rel:    "foo",
+			want:   []string{"http://example.com/?max_id=3"},
+		},
+		{
+			header: []string{`<http://example.com/?max_id=3>; rel="foo1"`},
+			rel:    "foo",
+			want:   nil,
+		},
+		{
+			header: []string{`<http://example.com/?max_id=3>; rel="foo", <http://example.com/?max_id=4>; rel="bar"`},
+			rel:    "foo",
+			want:   []string{"http://example.com/?max_id=3"},
+		},
+		{
+			header: []string{`<http://example.com/?max_id=3>; rel="foo", <http://example.com/?max_id=4>; rel="bar"`},
+			rel:    "bar",
+			want:   []string{"http://example.com/?max_id=4"},
+		},
+	}
+
+	for _, test := range tests {
+		h := make(http.Header)
+		for _, he := range test.header {
+			h.Add("Link", he)
+		}
+		got := linkHeader(h, test.rel)
+		if !reflect.DeepEqual(got, test.want) {
+			t.Fatalf("want %v but %v", test.want, got)
+		}
+	}
 }

@@ -3,7 +3,6 @@ package mastodon
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/url"
 	"path"
@@ -64,7 +63,7 @@ func RegisterApp(ctx context.Context, appConfig *AppConfig) (*Application, error
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("bad request: %v", resp.Status)
+		return nil, parseAPIError("bad request", resp)
 	}
 
 	var app Application

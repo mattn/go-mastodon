@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -131,7 +130,7 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params in
 		}
 	}
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("bad request: %v", resp.Status)
+		return parseAPIError("bad request", resp)
 	} else if res == nil {
 		return nil
 	}
@@ -175,7 +174,7 @@ func (c *Client) Authenticate(ctx context.Context, username, password string) er
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("bad authorization: %v", resp.Status)
+		return parseAPIError("bad authorization", resp)
 	}
 
 	res := struct {

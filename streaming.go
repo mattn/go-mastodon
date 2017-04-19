@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -95,7 +94,7 @@ func (c *Client) streaming(ctx context.Context, p string, tag string) (chan Even
 				req.Header.Set("Authorization", "Bearer "+c.config.AccessToken)
 				resp, err = c.Do(req)
 				if resp != nil && resp.StatusCode != 200 {
-					err = fmt.Errorf("bad request: %v", resp.Status)
+					err = parseAPIError("bad request", resp)
 				}
 			}
 			if err == nil {

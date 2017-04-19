@@ -52,7 +52,7 @@ func TestRegisterAppWithCancel(t *testing.T) {
 	defer ts.Close()
 
 	ctx, cancel := context.WithCancel(context.Background())
-	go cancel()
+	cancel()
 	_, err := RegisterApp(ctx, &AppConfig{
 		Server: ts.URL,
 		Scopes: "read write follow",

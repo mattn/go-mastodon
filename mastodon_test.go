@@ -56,7 +56,7 @@ func TestAuthenticateWithCancel(t *testing.T) {
 		ClientSecret: "bar",
 	})
 	ctx, cancel := context.WithCancel(context.Background())
-	go cancel()
+	cancel()
 	err := client.Authenticate(ctx, "invalid", "user")
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
@@ -116,7 +116,7 @@ func TestPostStatusWithCancel(t *testing.T) {
 		ClientSecret: "bar",
 	})
 	ctx, cancel := context.WithCancel(context.Background())
-	go cancel()
+	cancel()
 	_, err := client.PostStatus(ctx, &Toot{
 		Status: "foobar",
 	})
@@ -182,7 +182,7 @@ func TestGetTimelineHomeWithCancel(t *testing.T) {
 		AccessToken:  "zoo",
 	})
 	ctx, cancel := context.WithCancel(context.Background())
-	go cancel()
+	cancel()
 	_, err := client.GetTimelineHome(ctx)
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)

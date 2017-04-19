@@ -37,19 +37,44 @@ type page struct {
 func linkHeader(h http.Header, rel string) []string {
 	var links []string
 	for _, v := range h["Link"] {
-		parts := strings.Split(v, ";")
-		for _, p := range parts {
-			p = strings.TrimSpace(p)
-			if !strings.HasPrefix(p, "rel=") {
-				continue
+		var p string
+		for len(v) > 0 {
+			i := strings.Index(v, ";")
+			if i < 0 {
+				break
 			}
+			e := i
+			i++
+			for i < len(v) {
+				if v[i] != ' ' {
+					break
+				}
+				i++
+			}
+			p = strings.TrimSpace(v[i:])
+			if !strings.HasPrefix(p, "rel=") {
+				break
+			}
+			i += 4
 			pos := strings.Index(p[4:], `,`)
 			if pos > 0 {
 				p = p[4 : 4+pos]
+				i += pos
+			} else {
+				p = p[4:]
+				i = len(v) - 1
 			}
-			if v := strings.Trim(p, `"`); v == rel {
-				links = append(links, strings.Trim(parts[0], "<>"))
+			if k := strings.Trim(p, `"`); k == rel {
+				links = append(links, strings.Trim(v[:e], "<>"))
 			}
+			i++
+			for i < len(v) {
+				if v[i] != ' ' {
+					break
+				}
+				i++
+			}
+			v = v[i:]
 		}
 	}
 	return links

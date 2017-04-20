@@ -202,17 +202,21 @@ func makeApp() *cli.App {
 			Name:  "stream",
 			Usage: "stream statuses",
 			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "type",
+					Usage: "stream type (public,public/local,user:NAME,hashtag:TAG)",
+				},
 				cli.BoolFlag{
 					Name:  "json",
 					Usage: "output JSON",
 				},
-				cli.StringFlag{
-					Name:  "type",
-					Usage: "straem type (public,public/local,user:NAME,hashtag:TAG)",
-				},
 				cli.BoolFlag{
 					Name:  "simplejson",
 					Usage: "output simple JSON",
+				},
+				cli.StringFlag{
+					Name:  "template",
+					Usage: "output with tamplate format",
 				},
 			},
 			Action: cmdStream,

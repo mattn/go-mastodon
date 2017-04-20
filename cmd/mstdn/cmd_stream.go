@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/signal"
 	"strings"
+	"text/template"
 
 	"github.com/mattn/go-mastodon"
 	"github.com/urfave/cli"
@@ -20,9 +21,35 @@ type SimpleJSON struct {
 	Content  string `json:"content"`
 }
 
+func checkFlag(f ...bool) bool {
+	n := 0
+	for _, on := range f {
+		if on {
+			n++
+		}
+	}
+	return n > 1
+}
+
 func cmdStream(c *cli.Context) error {
 	asJSON := c.Bool("json")
 	asSimpleJSON := c.Bool("simplejson")
+	asFormat := c.String("template")
+
+	if checkFlag(asJSON, asSimpleJSON, asFormat != "") {
+		return errors.New("cannot speicify two or three options in --json/--simplejson/--template")
+	}
+	tx, err := template.New("mstdn").Funcs(template.FuncMap{
+		"nl": func(s string) string {
+			return s + "\n"
+		},
+		"text": func(s string) string {
+			return textContent(s)
+		},
+	}).Parse(asFormat)
+	if err != nil {
+		return err
+	}
 
 	client := c.App.Metadata["client"].(*mastodon.Client)
 	config := c.App.Metadata["config"].(*mastodon.Config)
@@ -33,7 +60,6 @@ func cmdStream(c *cli.Context) error {
 	signal.Notify(sc, os.Interrupt)
 
 	var q chan mastodon.Event
-	var err error
 
 	t := c.String("type")
 	if t == "public" {
@@ -72,6 +98,8 @@ func cmdStream(c *cli.Context) error {
 					Content:  textContent(t.Status.Content),
 				})
 			}
+		} else if asFormat != "" {
+			tx.ExecuteTemplate(c.App.Writer, "mstdn", e)
 		} else {
 			switch t := e.(type) {
 			case *mastodon.UpdateEvent:

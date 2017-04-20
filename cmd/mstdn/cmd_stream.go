@@ -56,6 +56,8 @@ func cmdStream(c *cli.Context) error {
 		close(q)
 	}()
 
+	c.App.Metadata["signal"] = sc
+
 	s := newScreen(config)
 	for e := range q {
 		if asJSON {

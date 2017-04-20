@@ -28,7 +28,7 @@ func testWithServer(h http.HandlerFunc, testFunc func(*cli.App)) string {
 	app.Metadata = map[string]interface{}{
 		"client": client,
 		"config": &mastodon.Config{
-			Server: "example.com",
+			Server: "https://example.com",
 		},
 	}
 	testFunc(app)

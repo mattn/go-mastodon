@@ -14,7 +14,7 @@ func TestCmdSearch(t *testing.T) {
 		func(w http.ResponseWriter, r *http.Request) {
 			switch r.URL.Path {
 			case "/api/v1/search":
-				fmt.Fprintln(w, `{"accounts": [{"id": 234, "username": "zzz"}], "contents":[], "hashtags": []}`)
+				fmt.Fprintln(w, `{"accounts": [{"id": 234, "acct": "zzz"}], "statuses":[{"id": 345, "content": "yyy"}], "hashtags": ["www", "わろす"]}`)
 				return
 			}
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
@@ -24,7 +24,9 @@ func TestCmdSearch(t *testing.T) {
 			app.Run([]string{"mstdn", "search", "zzz"})
 		},
 	)
-	if !strings.Contains(out, "zzz") {
-		t.Fatalf("%q should be contained in output of command: %v", "zzz", out)
+	for _, s := range []string{"zzz", "yyy", "www", "わろす"} {
+		if !strings.Contains(out, s) {
+			t.Fatalf("%q should be contained in output of command: %v", s, out)
+		}
 	}
 }

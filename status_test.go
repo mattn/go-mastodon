@@ -10,7 +10,7 @@ import (
 
 func TestGetFavourites(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, `[{"Content": "foo"}, {"Content": "bar"}]`)
+		fmt.Fprintln(w, `[{"content": "foo"}, {"content": "bar"}]`)
 		return
 	}))
 	defer ts.Close()
@@ -42,7 +42,7 @@ func TestGetStatus(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
-		fmt.Fprintln(w, `{"Content": "zzz"}`)
+		fmt.Fprintln(w, `{"content": "zzz"}`)
 		return
 	}))
 	defer ts.Close()
@@ -72,7 +72,7 @@ func TestGetStatusCard(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
-		fmt.Fprintln(w, `{"Title": "zzz"}`)
+		fmt.Fprintln(w, `{"title": "zzz"}`)
 		return
 	}))
 	defer ts.Close()
@@ -102,7 +102,7 @@ func TestGetStatusContext(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
-		fmt.Fprintln(w, `{"ancestors": [{"Content": "zzz"},{"Content": "bbb"}]}`)
+		fmt.Fprintln(w, `{"ancestors": [{"content": "zzz"},{"content": "bbb"}]}`)
 		return
 	}))
 	defer ts.Close()
@@ -141,7 +141,7 @@ func TestGetRebloggedBy(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
-		fmt.Fprintln(w, `[{"Username": "foo"}, {"Username": "bar"}]`)
+		fmt.Fprintln(w, `[{"username": "foo"}, {"username": "bar"}]`)
 		return
 	}))
 	defer ts.Close()
@@ -177,7 +177,7 @@ func TestGetFavouritedBy(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
-		fmt.Fprintln(w, `[{"Username": "foo"}, {"Username": "bar"}]`)
+		fmt.Fprintln(w, `[{"username": "foo"}, {"username": "bar"}]`)
 		return
 	}))
 	defer ts.Close()
@@ -213,7 +213,7 @@ func TestReblog(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
-		fmt.Fprintln(w, `{"Content": "zzz"}`)
+		fmt.Fprintln(w, `{"content": "zzz"}`)
 		return
 	}))
 	defer ts.Close()
@@ -243,7 +243,7 @@ func TestUnreblog(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
-		fmt.Fprintln(w, `{"Content": "zzz"}`)
+		fmt.Fprintln(w, `{"content": "zzz"}`)
 		return
 	}))
 	defer ts.Close()
@@ -273,7 +273,7 @@ func TestFavourite(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
-		fmt.Fprintln(w, `{"Content": "zzz"}`)
+		fmt.Fprintln(w, `{"content": "zzz"}`)
 		return
 	}))
 	defer ts.Close()
@@ -303,7 +303,7 @@ func TestUnfavourite(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
-		fmt.Fprintln(w, `{"Content": "zzz"}`)
+		fmt.Fprintln(w, `{"content": "zzz"}`)
 		return
 	}))
 	defer ts.Close()
@@ -333,7 +333,7 @@ func TestGetTimelineHashtag(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
-		fmt.Fprintln(w, `[{"Content": "zzz"},{"Content": "yyy"}]`)
+		fmt.Fprintln(w, `[{"content": "zzz"},{"content": "yyy"}]`)
 		return
 	}))
 	defer ts.Close()
@@ -405,8 +405,8 @@ func TestSearch(t *testing.T) {
 		}
 
 		fmt.Fprintln(w, `
-			{"accounts":[{"Username": "zzz"},{"Username": "yyy"}],
-			"statuses":[{"Content": "aaa"}],
+			{"accounts":[{"username": "zzz"},{"username": "yyy"}],
+			"statuses":[{"content": "aaa"}],
 			"hashtags":["tag","tag2","tag3"]
 		}`)
 		return
@@ -453,7 +453,7 @@ func TestUploadMedia(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
-		fmt.Fprintln(w, `{"ID": 123}`)
+		fmt.Fprintln(w, `{"id": 123}`)
 		return
 	}))
 	defer ts.Close()

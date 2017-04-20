@@ -17,7 +17,7 @@ func TestAuthenticate(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
-		fmt.Fprintln(w, `{"AccessToken": "zoo"}`)
+		fmt.Fprintln(w, `{"access_token": "zoo"}`)
 		return
 	}))
 	defer ts.Close()
@@ -72,7 +72,7 @@ func TestPostStatus(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
-		fmt.Fprintln(w, `{"AccessToken": "zoo"}`)
+		fmt.Fprintln(w, `{"access_token": "zoo"}`)
 		return
 	}))
 	defer ts.Close()
@@ -130,7 +130,7 @@ func TestPostStatusWithCancel(t *testing.T) {
 
 func TestGetTimelineHome(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, `[{"Content": "foo"}, {"Content": "bar"}]`)
+		fmt.Fprintln(w, `[{"content": "foo"}, {"content": "bar"}]`)
 		return
 	}))
 	defer ts.Close()

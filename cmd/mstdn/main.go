@@ -78,7 +78,8 @@ func prompt() (string, string, error) {
 	fmt.Print("Password: ")
 	var password string
 	if readPassword == nil {
-		t, err := tty.Open()
+		var t *tty.TTY
+		t, err = tty.Open()
 		if err != nil {
 			return "", "", err
 		}

@@ -13,6 +13,7 @@ import (
 	"github.com/urfave/cli"
 )
 
+// SimpleJSON is a struct for output JSON for data to be simple used
 type SimpleJSON struct {
 	ID       int64  `json:"id"`
 	Username string `json:"username"`

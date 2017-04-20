@@ -23,10 +23,10 @@ func (c *Client) GetReports(ctx context.Context) ([]*Report, error) {
 	return reports, nil
 }
 
-//  Report reports the report
-func (c *Client) Report(ctx context.Context, accountId int64, ids []int64, comment string) (*Report, error) {
+// Report reports the report
+func (c *Client) Report(ctx context.Context, accountID int64, ids []int64, comment string) (*Report, error) {
 	params := url.Values{}
-	params.Set("account_id", fmt.Sprint(accountId))
+	params.Set("account_id", fmt.Sprint(accountID))
 	for _, id := range ids {
 		params.Add("status_ids[]", fmt.Sprint(id))
 	}

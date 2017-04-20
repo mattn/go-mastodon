@@ -52,18 +52,30 @@ data: {"content": "bar", "account":{"acct":"BAR"}}
 		"config": config,
 	}
 
-	go func() {
+	stop := func() {
 		time.Sleep(5 * time.Second)
 		if sig, ok := app.Metadata["signal"]; ok {
 			sig.(chan os.Signal) <- os.Interrupt
 			return
 		}
 		panic("timeout")
-	}()
+	}
 
+	var out string
+
+	go stop()
 	app.Run([]string{"mstdn", "stream"})
+	out = buf.String()
+	if !strings.Contains(out, "FOO@") {
+		t.Fatalf("%q should be contained in output of command: %v", "FOO@", out)
+	}
+	if !strings.Contains(out, "foo") {
+		t.Fatalf("%q should be contained in output of command: %v", "foo", out)
+	}
 
-	out := buf.String()
+	go stop()
+	app.Run([]string{"mstdn", "stream", "--simplejson"})
+	out = buf.String()
 	if !strings.Contains(out, "FOO@") {
 		t.Fatalf("%q should be contained in output of command: %v", "FOO@", out)
 	}

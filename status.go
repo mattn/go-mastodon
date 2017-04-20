@@ -202,7 +202,7 @@ func (c *Client) Search(ctx context.Context, q string, resolve bool) (*Results, 
 	return &results, nil
 }
 
-// PostMedia upload a media attachment.
+// UploadMedia upload a media attachment.
 func (c *Client) UploadMedia(ctx context.Context, file string) (*Attachment, error) {
 	var attachment Attachment
 	err := c.doAPI(ctx, http.MethodPost, "/api/v1/media", file, &attachment, nil)

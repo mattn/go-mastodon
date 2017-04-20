@@ -15,7 +15,7 @@ func TestCmdToot(t *testing.T) {
 			switch r.URL.Path {
 			case "/api/v1/statuses":
 				toot = r.FormValue("status")
-				fmt.Fprintln(w, `{"ID": 2345}`)
+				fmt.Fprintln(w, `{"id": 2345}`)
 				return
 			}
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)

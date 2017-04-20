@@ -128,6 +128,9 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params in
 		ct = mw.FormDataContentType()
 	} else {
 		req, err = http.NewRequest(method, u.String(), nil)
+		if err != nil {
+			return err
+		}
 	}
 	req = req.WithContext(ctx)
 	req.Header.Set("Authorization", "Bearer "+c.config.AccessToken)

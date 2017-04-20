@@ -193,11 +193,11 @@ func TestGetAccountFollowing(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	fl, err := client.GetAccountFollowing(context.Background(), 123)
+	_, err := client.GetAccountFollowing(context.Background(), 123)
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	fl, err = client.GetAccountFollowing(context.Background(), 1234567)
+	fl, err := client.GetAccountFollowing(context.Background(), 1234567)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}

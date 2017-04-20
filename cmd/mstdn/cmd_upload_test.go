@@ -14,7 +14,7 @@ func TestCmdUpload(t *testing.T) {
 		func(w http.ResponseWriter, r *http.Request) {
 			switch r.URL.Path {
 			case "/api/v1/media":
-				fmt.Fprintln(w, `{"ID": 123}`)
+				fmt.Fprintln(w, `{"id": 123}`)
 				return
 			}
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)

@@ -14,7 +14,7 @@ func TestGetAccount(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
-		fmt.Fprintln(w, `{"Username": "zzz"}`)
+		fmt.Fprintln(w, `{"username": "zzz"}`)
 		return
 	}))
 	defer ts.Close()
@@ -46,7 +46,7 @@ func TestGetAccountCurrentUser(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
-		fmt.Fprintln(w, `{"Username": "zzz"}`)
+		fmt.Fprintln(w, `{"username": "zzz"}`)
 		return
 	}))
 	defer ts.Close()
@@ -78,7 +78,7 @@ func TestAccountUpdate(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
-		fmt.Fprintln(w, `{"Username": "zzz"}`)
+		fmt.Fprintln(w, `{"username": "zzz"}`)
 		return
 	}))
 	defer ts.Close()
@@ -113,7 +113,7 @@ func TestGetAccountStatuses(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
-		fmt.Fprintln(w, `[{"Content": "foo"}, {"Content": "bar"}]`)
+		fmt.Fprintln(w, `[{"content": "foo"}, {"content": "bar"}]`)
 		return
 	}))
 	defer ts.Close()
@@ -146,7 +146,7 @@ func TestGetAccountFollowers(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
-		fmt.Fprintln(w, `[{"Username": "foo"}, {"Username": "bar"}]`)
+		fmt.Fprintln(w, `[{"username": "foo"}, {"username": "bar"}]`)
 		return
 	}))
 	defer ts.Close()
@@ -182,7 +182,7 @@ func TestGetAccountFollowing(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
-		fmt.Fprintln(w, `[{"Username": "foo"}, {"Username": "bar"}]`)
+		fmt.Fprintln(w, `[{"username": "foo"}, {"username": "bar"}]`)
 		return
 	}))
 	defer ts.Close()
@@ -220,7 +220,7 @@ func TestGetBlocks(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
-		fmt.Fprintln(w, `[{"Username": "foo"}, {"Username": "bar"}]`)
+		fmt.Fprintln(w, `[{"username": "foo"}, {"username": "bar"}]`)
 		return
 	}))
 	defer ts.Close()
@@ -487,7 +487,7 @@ func TestAccountsSearch(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
-		fmt.Fprintln(w, `[{"Username": "foobar"}, {"Username": "barfoo"}]`)
+		fmt.Fprintln(w, `[{"username": "foobar"}, {"username": "barfoo"}]`)
 		return
 	}))
 	defer ts.Close()
@@ -523,7 +523,7 @@ func TestFollowRemoteUser(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
-		fmt.Fprintln(w, `{"Username": "zzz"}`)
+		fmt.Fprintln(w, `{"username": "zzz"}`)
 		return
 	}))
 	defer ts.Close()
@@ -555,7 +555,7 @@ func TestGetFollowRequests(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
-		fmt.Fprintln(w, `[{"Username": "foo"}, {"Username": "bar"}]`)
+		fmt.Fprintln(w, `[{"username": "foo"}, {"username": "bar"}]`)
 		return
 	}))
 	defer ts.Close()
@@ -641,7 +641,7 @@ func TestGetMutes(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
-		fmt.Fprintln(w, `[{"Username": "foo"}, {"Username": "bar"}]`)
+		fmt.Fprintln(w, `[{"username": "foo"}, {"username": "bar"}]`)
 		return
 	}))
 	defer ts.Close()

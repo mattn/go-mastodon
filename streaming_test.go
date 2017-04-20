@@ -18,13 +18,13 @@ func TestStreamingPublic(t *testing.T) {
 		f, _ := w.(http.Flusher)
 		fmt.Fprintln(w, `
 event: update
-data: {"Content": "foo"}
+data: {"content": "foo"}
 		`)
 		f.Flush()
 
 		fmt.Fprintln(w, `
 event: update
-data: {"Content": "bar"}
+data: {"content": "bar"}
 		`)
 		f.Flush()
 		return

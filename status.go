@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"time"
+	"strconv"
 )
 
 // Status is struct to hold status.
@@ -173,8 +174,20 @@ func (c *Client) PostStatus(ctx context.Context, toot *Toot) (*Status, error) {
 	if toot.InReplyToID > 0 {
 		params.Set("in_reply_to_id", fmt.Sprint(toot.InReplyToID))
 	}
-	// TODO: media_ids, senstitive, spoiler_text, visibility
-	//params.Set("visibility", "public")
+	if toot.MediaIDs != nil {
+		for _, media := range toot.MediaIDs {
+			params.Add("media_ids[]", strconv.FormatInt(media, 10))
+		}
+	}
+	if toot.Visibility != "" {
+		params.Set("visibility", fmt.Sprint(toot.Visibility))
+	}
+	if toot.Sensitive {
+		params.Set("senstitive", "true")
+	}
+	if toot.SpoilerText != "" {
+		params.Set("spoiler_text", toot.SpoilerText)
+	}
 
 	var status Status
 	err := c.doAPI(ctx, http.MethodPost, "/api/v1/statuses", params, &status, nil)

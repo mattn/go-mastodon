@@ -26,7 +26,7 @@ func (c *Client) StreamingWSPublicLocal(ctx context.Context) (chan Event, error)
 }
 
 // StreamingWSUser return channel to read events on home using WebSocket.
-func (c *Client) StreamingWSUser(ctx context.Context, user string) (chan Event, error) {
+func (c *Client) StreamingWSUser(ctx context.Context) (chan Event, error) {
 	return c.streamingWS(ctx, "user", "")
 }
 

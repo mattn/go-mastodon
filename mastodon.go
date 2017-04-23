@@ -13,6 +13,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/gorilla/websocket"
 )
 
 // Config is a setting for access mastodon APIs.
@@ -26,6 +28,7 @@ type Config struct {
 // Client is a API client for mastodon.
 type Client struct {
 	http.Client
+	websocket.Dialer
 	config   *Config
 	interval time.Duration
 }

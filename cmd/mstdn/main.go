@@ -329,12 +329,12 @@ func run() int {
 		}
 
 		client := mastodon.NewClient(config)
-		if config.AccessToken == "" {
-			return authenticate(client, config, file)
-		}
 		app.Metadata = map[string]interface{}{
 			"client": client,
 			"config": config,
+		}
+		if config.AccessToken == "" {
+			return authenticate(client, config, file)
 		}
 		return nil
 	}

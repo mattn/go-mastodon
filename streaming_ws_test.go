@@ -156,6 +156,14 @@ func wsTest(t *testing.T, q chan Event, cancel func()) {
 	}
 }
 
+func TestDialRedirect(t *testing.T) {
+	client := NewClient(&Config{})
+	_, err := client.dialRedirect(":")
+	if err == nil {
+		t.Fatalf("should be fail: %v", err)
+	}
+}
+
 func TestDial(t *testing.T) {
 	canErr := true
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

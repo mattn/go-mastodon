@@ -14,12 +14,7 @@ func TestStreamingWSPublic(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(wsMock))
 	defer ts.Close()
 
-	client := NewClient(&Config{
-		Server:       ts.URL,
-		ClientID:     "foo",
-		ClientSecret: "bar",
-		AccessToken:  "zoo",
-	})
+	client := NewClient(&Config{Server: ts.URL})
 	ctx, cancel := context.WithCancel(context.Background())
 	q, err := client.StreamingWSPublic(ctx)
 	if err != nil {
@@ -33,12 +28,7 @@ func TestStreamingWSPublicLocal(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(wsMock))
 	defer ts.Close()
 
-	client := NewClient(&Config{
-		Server:       ts.URL,
-		ClientID:     "foo",
-		ClientSecret: "bar",
-		AccessToken:  "zoo",
-	})
+	client := NewClient(&Config{Server: ts.URL})
 	ctx, cancel := context.WithCancel(context.Background())
 	q, err := client.StreamingWSPublicLocal(ctx)
 	if err != nil {
@@ -52,12 +42,7 @@ func TestStreamingWSUser(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(wsMock))
 	defer ts.Close()
 
-	client := NewClient(&Config{
-		Server:       ts.URL,
-		ClientID:     "foo",
-		ClientSecret: "bar",
-		AccessToken:  "zoo",
-	})
+	client := NewClient(&Config{Server: ts.URL})
 	ctx, cancel := context.WithCancel(context.Background())
 	q, err := client.StreamingWSUser(ctx)
 	if err != nil {
@@ -71,12 +56,7 @@ func TestStreamingWSHashtag(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(wsMock))
 	defer ts.Close()
 
-	client := NewClient(&Config{
-		Server:       ts.URL,
-		ClientID:     "foo",
-		ClientSecret: "bar",
-		AccessToken:  "zoo",
-	})
+	client := NewClient(&Config{Server: ts.URL})
 	ctx, cancel := context.WithCancel(context.Background())
 	q, err := client.StreamingWSHashtag(ctx, "zzz")
 	if err != nil {
@@ -90,12 +70,7 @@ func TestStreamingWSHashtagLocal(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(wsMock))
 	defer ts.Close()
 
-	client := NewClient(&Config{
-		Server:       ts.URL,
-		ClientID:     "foo",
-		ClientSecret: "bar",
-		AccessToken:  "zoo",
-	})
+	client := NewClient(&Config{Server: ts.URL})
 	ctx, cancel := context.WithCancel(context.Background())
 	q, err := client.StreamingWSHashtagLocal(ctx, "zzz")
 	if err != nil {
@@ -127,7 +102,21 @@ func wsMock(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = conn.WriteMessage(websocket.TextMessage,
-		[]byte(`{"event":"update","payload":"{\"content\":\"bar\"}"}`))
+		[]byte(`{"event":"notification","payload":"{\"id\":123}"}`))
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	err = conn.WriteMessage(websocket.TextMessage,
+		[]byte(`{"event":"delete","payload":1234567}`))
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	err = conn.WriteMessage(websocket.TextMessage,
+		[]byte(`{"event":"update","payload":"<html></html>"}`))
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
@@ -145,15 +134,78 @@ func wsTest(t *testing.T, q chan Event, cancel func()) {
 	for e := range q {
 		events = append(events, e)
 	}
-	if len(events) != 2 {
+	if len(events) != 4 {
 		t.Fatalf("result should be two: %d", len(events))
 	}
 	if events[0].(*UpdateEvent).Status.Content != "foo" {
 		t.Fatalf("want %q but %q", "foo", events[0].(*UpdateEvent).Status.Content)
 	}
-	if events[1].(*UpdateEvent).Status.Content != "bar" {
-		t.Fatalf("want %q but %q", "bar", events[1].(*UpdateEvent).Status.Content)
+	if events[1].(*NotificationEvent).Notification.ID != 123 {
+		t.Fatalf("want %d but %d", 123, events[1].(*NotificationEvent).Notification.ID)
 	}
+	if events[2].(*DeleteEvent).ID != 1234567 {
+		t.Fatalf("want %d but %d", 1234567, events[2].(*DeleteEvent).ID)
+	}
+	if errorEvent, ok := events[3].(*ErrorEvent); !ok {
+		t.Fatalf("should be fail: %v", errorEvent.err)
+	}
+}
+
+func TestHandleWS(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		u := websocket.Upgrader{}
+		conn, err := u.Upgrade(w, r, nil)
+		if err != nil {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+		defer conn.Close()
+
+		err = conn.WriteMessage(websocket.TextMessage,
+			[]byte(`<html></html>`))
+		if err != nil {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+
+		time.Sleep(10 * time.Second)
+	}))
+	defer ts.Close()
+
+	q := make(chan Event)
+	client := NewClient(&Config{})
+
+	go func() {
+		e := <-q
+		if errorEvent, ok := e.(*ErrorEvent); !ok {
+			t.Fatalf("should be fail: %v", errorEvent.err)
+		}
+	}()
+	err := client.handleWS(context.Background(), ":", q)
+	if err == nil {
+		t.Fatalf("should be fail: %v", err)
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	go func() {
+		e := <-q
+		if errorEvent, ok := e.(*ErrorEvent); !ok {
+			t.Fatalf("should be fail: %v", errorEvent.err)
+		}
+	}()
+	err = client.handleWS(ctx, "ws://"+ts.Listener.Addr().String(), q)
+	if err == nil {
+		t.Fatalf("should be fail: %v", err)
+	}
+
+	go func() {
+		e := <-q
+		if errorEvent, ok := e.(*ErrorEvent); !ok {
+			t.Fatalf("should be fail: %v", errorEvent.err)
+		}
+	}()
+	client.handleWS(context.Background(), "ws://"+ts.Listener.Addr().String(), q)
 }
 
 func TestDialRedirect(t *testing.T) {

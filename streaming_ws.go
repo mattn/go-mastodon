@@ -112,9 +112,7 @@ func (c *Client) handleWS(ctx context.Context, rawurl string, q chan Event) erro
 				q <- &NotificationEvent{Notification: &notification}
 			}
 		case "delete":
-			if err == nil {
-				q <- &DeleteEvent{ID: int64(s.Payload.(float64))}
-			}
+			q <- &DeleteEvent{ID: int64(s.Payload.(float64))}
 		}
 		if err != nil {
 			q <- &ErrorEvent{err}

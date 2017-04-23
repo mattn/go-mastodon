@@ -151,6 +151,31 @@ func wsTest(t *testing.T, q chan Event, cancel func()) {
 	}
 }
 
+func TestStreamingWS(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(wsMock))
+	defer ts.Close()
+
+	client := NewClient(&Config{Server: ":"})
+	_, err := client.StreamingWSPublicLocal(context.Background())
+	if err == nil {
+		t.Fatalf("should be fail: %v", err)
+	}
+
+	client = NewClient(&Config{Server: ts.URL})
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	q, err := client.StreamingWSPublicLocal(ctx)
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	go func() {
+		e := <-q
+		if errorEvent, ok := e.(*ErrorEvent); !ok {
+			t.Fatalf("should be fail: %v", errorEvent.err)
+		}
+	}()
+}
+
 func TestHandleWS(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		u := websocket.Upgrader{}

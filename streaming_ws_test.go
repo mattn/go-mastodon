@@ -66,6 +66,7 @@ func TestStreamingWSUser(t *testing.T) {
 
 	wsTest(t, q, cancel)
 }
+
 func TestStreamingWSHashtag(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(wsMock))
 	defer ts.Close()
@@ -84,6 +85,7 @@ func TestStreamingWSHashtag(t *testing.T) {
 
 	wsTest(t, q, cancel)
 }
+
 func TestStreamingWSHashtagLocal(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(wsMock))
 	defer ts.Close()
@@ -151,6 +153,39 @@ func wsTest(t *testing.T, q chan Event, cancel func()) {
 	}
 	if events[1].(*UpdateEvent).Status.Content != "bar" {
 		t.Fatalf("want %q but %q", "bar", events[1].(*UpdateEvent).Status.Content)
+	}
+}
+
+func TestDial(t *testing.T) {
+	canErr := true
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if canErr {
+			canErr = false
+			http.Redirect(w, r, ":", http.StatusMovedPermanently)
+			return
+		}
+
+		http.Redirect(w, r, "http://www.example.com/", http.StatusMovedPermanently)
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{})
+	_, _, err := client.dial(":")
+	if err == nil {
+		t.Fatalf("should be fail: %v", err)
+	}
+
+	_, rawurl, err := client.dial("ws://" + ts.Listener.Addr().String())
+	if err == nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+
+	_, rawurl, err = client.dial("ws://" + ts.Listener.Addr().String())
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	if rawurl != "ws://www.example.com/" {
+		t.Fatalf("want %q but %q", "ws://www.example.com/", rawurl)
 	}
 }
 

@@ -27,7 +27,7 @@ func TestGetAccount(t *testing.T) {
 	})
 	a, err := client.GetAccount(context.Background(), 1)
 	if err == nil {
-		t.Fatalf("should not be fail: %v", err)
+		t.Fatalf("should be fail: %v", err)
 	}
 	a, err = client.GetAccount(context.Background(), 1234567)
 	if err != nil {

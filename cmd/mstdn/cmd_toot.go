@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"errors"
-	"log"
 
 	"github.com/mattn/go-mastodon"
 	"github.com/urfave/cli"
@@ -15,7 +14,7 @@ func cmdToot(c *cli.Context) error {
 	if ff != "" {
 		text, err := readFile(ff)
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 		toot = string(text)
 	} else {

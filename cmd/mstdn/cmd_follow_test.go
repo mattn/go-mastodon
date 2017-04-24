@@ -60,7 +60,7 @@ func TestCmdFollow(t *testing.T) {
 		func(app *cli.App) {
 			err := app.Run([]string{"mstdn", "follow", "different_id"})
 			if err == nil {
-				t.Fatalf("should not be fail: %v", err)
+				t.Fatalf("should be fail: %v", err)
 			}
 		},
 	)

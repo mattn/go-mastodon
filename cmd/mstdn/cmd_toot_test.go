@@ -29,3 +29,24 @@ func TestCmdToot(t *testing.T) {
 		t.Fatalf("want %q, got %q", "foo", toot)
 	}
 }
+
+func TestCmdTootFileNotFound(t *testing.T) {
+	var err error
+	testWithServer(
+		func(w http.ResponseWriter, r *http.Request) {
+			switch r.URL.Path {
+			case "/api/v1/statuses":
+				fmt.Fprintln(w, `{"id": 2345}`)
+				return
+			}
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		},
+		func(app *cli.App) {
+			err = app.Run([]string{"mstdn", "toot", "-ff", "not-found"})
+		},
+	)
+	if err == nil {
+		t.Fatal("should be fail")
+	}
+}

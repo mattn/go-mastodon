@@ -111,7 +111,7 @@ func getConfig(c *cli.Context) (string, *mastodon.Config, error) {
 	var file string
 	profile := c.String("profile")
 	if profile != "" {
-		file = filepath.Join(dir, "settings"+profile+".json")
+		file = filepath.Join(dir, "settings-"+profile+".json")
 	} else {
 		file = filepath.Join(dir, "settings.json")
 	}

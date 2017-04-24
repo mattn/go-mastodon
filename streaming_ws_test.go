@@ -262,7 +262,7 @@ func TestDial(t *testing.T) {
 
 	_, rawurl, err := client.dial("ws://" + ts.Listener.Addr().String())
 	if err == nil {
-		t.Fatalf("should not be fail: %v", err)
+		t.Fatalf("should be fail: %v", err)
 	}
 
 	_, rawurl, err = client.dial("ws://" + ts.Listener.Addr().String())

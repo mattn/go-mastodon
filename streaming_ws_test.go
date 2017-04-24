@@ -14,7 +14,7 @@ func TestStreamingWSPublic(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(wsMock))
 	defer ts.Close()
 
-	client := NewClient(&Config{Server: ts.URL})
+	client := NewClient(&Config{Server: ts.URL}).NewWSClient()
 	ctx, cancel := context.WithCancel(context.Background())
 	q, err := client.StreamingWSPublic(ctx)
 	if err != nil {
@@ -28,7 +28,7 @@ func TestStreamingWSPublicLocal(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(wsMock))
 	defer ts.Close()
 
-	client := NewClient(&Config{Server: ts.URL})
+	client := NewClient(&Config{Server: ts.URL}).NewWSClient()
 	ctx, cancel := context.WithCancel(context.Background())
 	q, err := client.StreamingWSPublicLocal(ctx)
 	if err != nil {
@@ -42,7 +42,7 @@ func TestStreamingWSUser(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(wsMock))
 	defer ts.Close()
 
-	client := NewClient(&Config{Server: ts.URL})
+	client := NewClient(&Config{Server: ts.URL}).NewWSClient()
 	ctx, cancel := context.WithCancel(context.Background())
 	q, err := client.StreamingWSUser(ctx)
 	if err != nil {
@@ -56,7 +56,7 @@ func TestStreamingWSHashtag(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(wsMock))
 	defer ts.Close()
 
-	client := NewClient(&Config{Server: ts.URL})
+	client := NewClient(&Config{Server: ts.URL}).NewWSClient()
 	ctx, cancel := context.WithCancel(context.Background())
 	q, err := client.StreamingWSHashtag(ctx, "zzz")
 	if err != nil {
@@ -70,7 +70,7 @@ func TestStreamingWSHashtagLocal(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(wsMock))
 	defer ts.Close()
 
-	client := NewClient(&Config{Server: ts.URL})
+	client := NewClient(&Config{Server: ts.URL}).NewWSClient()
 	ctx, cancel := context.WithCancel(context.Background())
 	q, err := client.StreamingWSHashtagLocal(ctx, "zzz")
 	if err != nil {
@@ -155,13 +155,13 @@ func TestStreamingWS(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(wsMock))
 	defer ts.Close()
 
-	client := NewClient(&Config{Server: ":"})
+	client := NewClient(&Config{Server: ":"}).NewWSClient()
 	_, err := client.StreamingWSPublicLocal(context.Background())
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
 
-	client = NewClient(&Config{Server: ts.URL})
+	client = NewClient(&Config{Server: ts.URL}).NewWSClient()
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 	q, err := client.StreamingWSPublicLocal(ctx)
@@ -198,7 +198,7 @@ func TestHandleWS(t *testing.T) {
 	defer ts.Close()
 
 	q := make(chan Event)
-	client := NewClient(&Config{})
+	client := NewClient(&Config{}).NewWSClient()
 
 	go func() {
 		e := <-q
@@ -234,7 +234,7 @@ func TestHandleWS(t *testing.T) {
 }
 
 func TestDialRedirect(t *testing.T) {
-	client := NewClient(&Config{})
+	client := NewClient(&Config{}).NewWSClient()
 	_, err := client.dialRedirect(":")
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
@@ -254,7 +254,7 @@ func TestDial(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	client := NewClient(&Config{})
+	client := NewClient(&Config{}).NewWSClient()
 	_, _, err := client.dial(":")
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)

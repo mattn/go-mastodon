@@ -9,6 +9,15 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+// WSClient is a WebSocket client.
+type WSClient struct {
+	websocket.Dialer
+	client *Client
+}
+
+// NewWSClient return WebSocket client.
+func (c *Client) NewWSClient() *WSClient { return &WSClient{client: c} }
+
 // Stream is a struct of data that flows in streaming.
 type Stream struct {
 	Event   string      `json:"event"`
@@ -16,39 +25,39 @@ type Stream struct {
 }
 
 // StreamingWSPublic return channel to read events on public using WebSocket.
-func (c *Client) StreamingWSPublic(ctx context.Context) (chan Event, error) {
+func (c *WSClient) StreamingWSPublic(ctx context.Context) (chan Event, error) {
 	return c.streamingWS(ctx, "public", "")
 }
 
 // StreamingWSPublicLocal return channel to read events on public local using WebSocket.
-func (c *Client) StreamingWSPublicLocal(ctx context.Context) (chan Event, error) {
+func (c *WSClient) StreamingWSPublicLocal(ctx context.Context) (chan Event, error) {
 	return c.streamingWS(ctx, "public:local", "")
 }
 
 // StreamingWSUser return channel to read events on home using WebSocket.
-func (c *Client) StreamingWSUser(ctx context.Context) (chan Event, error) {
+func (c *WSClient) StreamingWSUser(ctx context.Context) (chan Event, error) {
 	return c.streamingWS(ctx, "user", "")
 }
 
 // StreamingWSHashtag return channel to read events on tagged timeline using WebSocket.
-func (c *Client) StreamingWSHashtag(ctx context.Context, tag string) (chan Event, error) {
+func (c *WSClient) StreamingWSHashtag(ctx context.Context, tag string) (chan Event, error) {
 	return c.streamingWS(ctx, "hashtag", tag)
 }
 
 // StreamingWSHashtagLocal return channel to read events on tagged local timeline using WebSocket.
-func (c *Client) StreamingWSHashtagLocal(ctx context.Context, tag string) (chan Event, error) {
+func (c *WSClient) StreamingWSHashtagLocal(ctx context.Context, tag string) (chan Event, error) {
 	return c.streamingWS(ctx, "hashtag:local", tag)
 }
 
-func (c *Client) streamingWS(ctx context.Context, stream, tag string) (chan Event, error) {
+func (c *WSClient) streamingWS(ctx context.Context, stream, tag string) (chan Event, error) {
 	params := url.Values{}
-	params.Set("access_token", c.config.AccessToken)
+	params.Set("access_token", c.client.config.AccessToken)
 	params.Set("stream", stream)
 	if tag != "" {
 		params.Set("tag", tag)
 	}
 
-	u, err := changeWebSocketScheme(c.config.Server)
+	u, err := changeWebSocketScheme(c.client.config.Server)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +77,7 @@ func (c *Client) streamingWS(ctx context.Context, stream, tag string) (chan Even
 	return q, nil
 }
 
-func (c *Client) handleWS(ctx context.Context, rawurl string, q chan Event) error {
+func (c *WSClient) handleWS(ctx context.Context, rawurl string, q chan Event) error {
 	conn, err := c.dialRedirect(rawurl)
 	if err != nil {
 		q <- &ErrorEvent{err: err}
@@ -122,7 +131,7 @@ func (c *Client) handleWS(ctx context.Context, rawurl string, q chan Event) erro
 	return nil
 }
 
-func (c *Client) dialRedirect(rawurl string) (conn *websocket.Conn, err error) {
+func (c *WSClient) dialRedirect(rawurl string) (conn *websocket.Conn, err error) {
 	for {
 		conn, rawurl, err = c.dial(rawurl)
 		if err != nil {
@@ -133,7 +142,7 @@ func (c *Client) dialRedirect(rawurl string) (conn *websocket.Conn, err error) {
 	}
 }
 
-func (c *Client) dial(rawurl string) (*websocket.Conn, string, error) {
+func (c *WSClient) dial(rawurl string) (*websocket.Conn, string, error) {
 	conn, resp, err := c.Dial(rawurl, nil)
 	if err != nil && err != websocket.ErrBadHandshake {
 		return nil, "", err

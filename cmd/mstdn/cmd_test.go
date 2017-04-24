@@ -9,7 +9,7 @@ import (
 	"github.com/urfave/cli"
 )
 
-func testWithServer(h http.HandlerFunc, testFunc func(*cli.App)) string {
+func testWithServer(h http.HandlerFunc, testFuncs ...func(*cli.App)) string {
 	ts := httptest.NewServer(h)
 	defer ts.Close()
 
@@ -31,6 +31,10 @@ func testWithServer(h http.HandlerFunc, testFunc func(*cli.App)) string {
 			Server: "https://example.com",
 		},
 	}
-	testFunc(app)
+
+	for _, f := range testFuncs {
+		f(app)
+	}
+
 	return buf.String()
 }

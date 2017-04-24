@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"flag"
 	"io/ioutil"
-	"log"
 	"os"
 	"testing"
 
@@ -98,11 +97,11 @@ func TestGetConfig(t *testing.T) {
 	config.AccessToken = "foo"
 	b, err := json.MarshalIndent(config, "", "  ")
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	err = ioutil.WriteFile(file, b, 0700)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	file, config, err = getConfig(c)
 	if err != nil {

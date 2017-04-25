@@ -17,7 +17,7 @@ err := c.Authenticate("your-username", "your-password")
 if err != nil {
 	log.Fatal(err)
 }
-timeline, err := c.GetTimeline("/api/v1/timelines/home")
+timeline, err := c.GetTimelineHome(context.Background())
 if err != nil {
 	log.Fatal(err)
 }

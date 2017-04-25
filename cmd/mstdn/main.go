@@ -121,8 +121,8 @@ func getConfig(c *cli.Context) (string, *mastodon.Config, error) {
 	}
 	config := &mastodon.Config{
 		Server:       "https://mstdn.jp",
-		ClientID:     "171d45f22068a5dddbd927b9d966f5b97971ed1d3256b03d489f5b3a83cdba59",
-		ClientSecret: "574a2cf4b3f28a5fa0cfd285fc80cfe9daa419945163ef18f5f3d0022f4add28",
+		ClientID:     "1e463436008428a60ed14ff1f7bc0b4d923e14fc4a6827fa99560b0c0222612f",
+		ClientSecret: "72b63de5bc11111a5aa1a7b690672d78ad6a207ce32e16ea26115048ec5d234d",
 	}
 	if err == nil {
 		err = json.Unmarshal(b, &config)

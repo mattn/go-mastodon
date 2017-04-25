@@ -24,7 +24,7 @@ func cmdAccount(c *cli.Context) error {
 	fmt.Fprintf(c.App.Writer, "FollowersCount: %v\n", account.FollowersCount)
 	fmt.Fprintf(c.App.Writer, "FollowingCount: %v\n", account.FollowingCount)
 	fmt.Fprintf(c.App.Writer, "StatusesCount : %v\n", account.StatusesCount)
-	fmt.Fprintf(c.App.Writer, "Note          : %v\n", account.Note)
+	fmt.Fprintf(c.App.Writer, "Note          : %v\n", textContent(account.Note))
 	fmt.Fprintf(c.App.Writer, "URL           : %v\n", account.URL)
 	return nil
 }

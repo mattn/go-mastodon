@@ -339,7 +339,7 @@ func run() int {
 		return nil
 	}
 
-	app.Run(os.Args)
+	fatalIf(app.Run(os.Args))
 	return 0
 }
 

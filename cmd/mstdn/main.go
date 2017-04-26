@@ -94,7 +94,7 @@ func prompt() (string, string, error) {
 	return email, password, nil
 }
 
-func getConfig(c *cli.Context) (string, *mastodon.Config, error) {
+func configFile(c *cli.Context) (string, error) {
 	dir := os.Getenv("HOME")
 	if runtime.GOOS == "windows" {
 		dir = os.Getenv("APPDATA")
@@ -106,7 +106,7 @@ func getConfig(c *cli.Context) (string, *mastodon.Config, error) {
 		dir = filepath.Join(dir, ".config", "mstdn")
 	}
 	if err := os.MkdirAll(dir, 0700); err != nil {
-		return "", nil, err
+		return "", err
 	}
 	var file string
 	profile := c.String("profile")
@@ -114,6 +114,14 @@ func getConfig(c *cli.Context) (string, *mastodon.Config, error) {
 		file = filepath.Join(dir, "settings-"+profile+".json")
 	} else {
 		file = filepath.Join(dir, "settings.json")
+	}
+	return file, nil
+}
+
+func getConfig(c *cli.Context) (string, *mastodon.Config, error) {
+	file, err := configFile(c)
+	if err != nil {
+		return "", nil, err
 	}
 	b, err := ioutil.ReadFile(file)
 	if err != nil && !os.IsNotExist(err) {
@@ -267,6 +275,11 @@ func makeApp() *cli.App {
 			Usage:  "delete status",
 			Action: cmdDelete,
 		},
+		{
+			Name:   "init",
+			Usage:  "initialize profile",
+			Action: func(c *cli.Context) error { return nil },
+		},
 	}
 	app.Setup()
 	return app
@@ -323,6 +336,14 @@ func run() int {
 	app := makeApp()
 
 	app.Before = func(c *cli.Context) error {
+		if c.Args().Get(0) == "init" {
+			file, err := configFile(c)
+			if err != nil {
+				return err
+			}
+			os.Remove(file)
+		}
+
 		file, config, err := getConfig(c)
 		if err != nil {
 			return err

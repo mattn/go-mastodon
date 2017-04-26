@@ -327,6 +327,36 @@ func TestUnfavourite(t *testing.T) {
 	}
 }
 
+func TestGetTimelinePublic(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Query().Get("local") == "" {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+		fmt.Fprintln(w, `[{"content": "foo"}, {"content": "bar"}]`)
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{Server: ts.URL})
+	_, err := client.GetTimelinePublic(context.Background(), false)
+	if err == nil {
+		t.Fatalf("should be fail: %v", err)
+	}
+	tl, err := client.GetTimelinePublic(context.Background(), true)
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	if len(tl) != 2 {
+		t.Fatalf("result should be two: %d", len(tl))
+	}
+	if tl[0].Content != "foo" {
+		t.Fatalf("want %q but %q", "foo", tl[0].Content)
+	}
+	if tl[1].Content != "bar" {
+		t.Fatalf("want %q but %q", "bar", tl[1].Content)
+	}
+}
+
 func TestGetTimelineHashtag(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/api/v1/timelines/tag/zzz" {

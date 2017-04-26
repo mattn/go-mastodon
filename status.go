@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"time"
 	"strconv"
+	"time"
 )
 
 // Status is struct to hold status.
@@ -151,6 +151,21 @@ func (c *Client) Unfavourite(ctx context.Context, id int64) (*Status, error) {
 func (c *Client) GetTimelineHome(ctx context.Context) ([]*Status, error) {
 	var statuses []*Status
 	err := c.doAPI(ctx, http.MethodGet, "/api/v1/timelines/home", nil, &statuses, nil)
+	if err != nil {
+		return nil, err
+	}
+	return statuses, nil
+}
+
+// GetTimelinePublic return statuses from public timeline.
+func (c *Client) GetTimelinePublic(ctx context.Context, isLocal bool) ([]*Status, error) {
+	params := url.Values{}
+	if isLocal {
+		params.Set("local", "t")
+	}
+
+	var statuses []*Status
+	err := c.doAPI(ctx, http.MethodGet, "/api/v1/timelines/public", params, &statuses, nil)
 	if err != nil {
 		return nil, err
 	}

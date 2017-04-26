@@ -280,6 +280,11 @@ func makeApp() *cli.App {
 			Usage:  "initialize profile",
 			Action: func(c *cli.Context) error { return nil },
 		},
+		{
+			Name:   "mikami",
+			Usage:  "search mikami",
+			Action: cmdMikami,
+		},
 	}
 	app.Setup()
 	return app

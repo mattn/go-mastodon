@@ -7,14 +7,45 @@
 
 ## Usage
 
+### Application
+
 ```go
 package main
 
 import (
 	"context"
 	"fmt"
-	"github.com/mattn/go-mastodon"
 	"log"
+
+	"github.com/mattn/go-mastodon"
+)
+
+func main() {
+	app, err := mastodon.RegisterApp(context.Background(), &mastodon.AppConfig{
+		Server:     "https://mstdn.jp",
+		ClientName: "client-name",
+		Scopes:     "read write follow",
+		Website:    "https://github.com/mattn/go-mastodon",
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("client-id    : %s\n", app.ClientID)
+	fmt.Printf("client-secret: %s\n", app.ClientSecret)
+}
+```
+
+### Client
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"log"
+
+	"github.com/mattn/go-mastodon"
 )
 
 func main() {
@@ -36,6 +67,7 @@ func main() {
 	}
 }
 ```
+
 ## Status of implementations
 
 * [x] GET /api/v1/accounts/:id

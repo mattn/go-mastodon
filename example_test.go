@@ -8,7 +8,7 @@ import (
 	"github.com/mattn/go-mastodon"
 )
 
-func ExampleApplication_RegisterApp() {
+func ExampleRegisterApp() {
 	app, err := mastodon.RegisterApp(context.Background(), &mastodon.AppConfig{
 		Server:     "https://mstdn.jp",
 		ClientName: "client-name",

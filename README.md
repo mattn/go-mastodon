@@ -8,18 +8,32 @@
 ## Usage
 
 ```go
-c := mastodon.NewClient(&mastodon.Config{
-	Server:       "https://mstdn.jp",
-	ClientID:     "client-id",
-	ClientSecret: "client-secret",
-})
-err := c.Authenticate("your-username", "your-password")
-if err != nil {
-	log.Fatal(err)
-}
-timeline, err := c.GetTimelineHome(context.Background())
-if err != nil {
-	log.Fatal(err)
+package main
+
+import (
+	"context"
+	"fmt"
+	"github.com/mattn/go-mastodon"
+	"log"
+)
+
+func main() {
+	c := mastodon.NewClient(&mastodon.Config{
+		Server:       "https://mstdn.jp",
+		ClientID:     "client-id",
+		ClientSecret: "client-secret",
+	})
+	err := c.Authenticate(context.Background(), "your-email", "your-password")
+	if err != nil {
+		log.Fatal(err)
+	}
+	timeline, err := c.GetTimelineHome(context.Background())
+	if err != nil {
+		log.Fatal(err)
+	}
+	for i := len(timeline) - 1; i >= 0; i-- {
+		fmt.Println(timeline[i])
+	}
 }
 ```
 ## Status of implementations

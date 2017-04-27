@@ -173,9 +173,14 @@ func (c *Client) GetTimelinePublic(ctx context.Context, isLocal bool) ([]*Status
 }
 
 // GetTimelineHashtag return statuses from tagged timeline.
-func (c *Client) GetTimelineHashtag(ctx context.Context, tag string) ([]*Status, error) {
+func (c *Client) GetTimelineHashtag(ctx context.Context, tag string, isLocal bool) ([]*Status, error) {
+	params := url.Values{}
+	if isLocal {
+		params.Set("local", "t")
+	}
+
 	var statuses []*Status
-	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/timelines/tag/%s", (&url.URL{Path: tag}).EscapedPath()), nil, &statuses, nil)
+	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/timelines/tag/%s", url.PathEscape(tag)), params, &statuses, nil)
 	if err != nil {
 		return nil, err
 	}

@@ -64,13 +64,13 @@ func cmdStream(c *cli.Context) error {
 
 	t := c.String("type")
 	if t == "public" {
-		q, err = client.StreamingPublic(ctx)
+		q, err = client.StreamingPublic(ctx, false)
 	} else if t == "" || t == "public/local" {
-		q, err = client.StreamingPublicLocal(ctx)
+		q, err = client.StreamingPublic(ctx, true)
 	} else if strings.HasPrefix(t, "user:") {
-		q, err = client.StreamingUser(ctx, t[5:])
+		q, err = client.StreamingUser(ctx)
 	} else if strings.HasPrefix(t, "hashtag:") {
-		q, err = client.StreamingHashtag(ctx, t[8:])
+		q, err = client.StreamingHashtag(ctx, t[8:], false)
 	} else {
 		return errors.New("invalid type")
 	}

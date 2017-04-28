@@ -38,7 +38,7 @@ data: {"content": "bar"}
 		AccessToken:  "zoo",
 	})
 	ctx, cancel := context.WithCancel(context.Background())
-	q, err := client.StreamingPublic(ctx)
+	q, err := client.StreamingPublic(ctx, false)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}

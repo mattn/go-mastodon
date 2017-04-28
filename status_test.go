@@ -374,11 +374,11 @@ func TestGetTimelineHashtag(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	_, err := client.GetTimelineHashtag(context.Background(), "notfound")
+	_, err := client.GetTimelineHashtag(context.Background(), "notfound", false)
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	tags, err := client.GetTimelineHashtag(context.Background(), "zzz")
+	tags, err := client.GetTimelineHashtag(context.Background(), "zzz", true)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}

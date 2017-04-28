@@ -5,9 +5,54 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 )
+
+func TestHandleReader(t *testing.T) {
+	q := make(chan Event)
+	r := strings.NewReader(`
+event: update
+data: {"content": "foo"}
+event: notification
+data: {"type": "mention"}
+event: delete
+data: 1234567
+:thump
+	`)
+	go func() {
+		defer close(q)
+		err := handleReader(context.Background(), q, r)
+		if err != nil {
+			t.Fatalf("should not be fail: %v", err)
+		}
+	}()
+	var passUpdate, passNotification, passDelete bool
+	for e := range q {
+		switch event := e.(type) {
+		case *UpdateEvent:
+			passUpdate = true
+			if event.Status.Content != "foo" {
+				t.Fatalf("want %q but %q", "foo", event.Status.Content)
+			}
+		case *NotificationEvent:
+			passNotification = true
+			if event.Notification.Type != "mention" {
+				t.Fatalf("want %q but %q", "mention", event.Notification.Type)
+			}
+		case *DeleteEvent:
+			passDelete = true
+			if event.ID != 1234567 {
+				t.Fatalf("want %d but %d", 1234567, event.ID)
+			}
+		}
+	}
+	if !passUpdate || !passNotification || !passDelete {
+		t.Fatalf("have not passed through somewhere: update %t, notification %t, delete %t",
+			passUpdate, passNotification, passDelete)
+	}
+}
 
 func TestStreamingPublic(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

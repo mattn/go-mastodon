@@ -24,29 +24,29 @@ type Stream struct {
 	Payload interface{} `json:"payload"`
 }
 
-// StreamingWSPublic return channel to read events on public using WebSocket.
-func (c *WSClient) StreamingWSPublic(ctx context.Context) (chan Event, error) {
-	return c.streamingWS(ctx, "public", "")
-}
-
-// StreamingWSPublicLocal return channel to read events on public local using WebSocket.
-func (c *WSClient) StreamingWSPublicLocal(ctx context.Context) (chan Event, error) {
-	return c.streamingWS(ctx, "public:local", "")
-}
-
 // StreamingWSUser return channel to read events on home using WebSocket.
 func (c *WSClient) StreamingWSUser(ctx context.Context) (chan Event, error) {
 	return c.streamingWS(ctx, "user", "")
 }
 
-// StreamingWSHashtag return channel to read events on tagged timeline using WebSocket.
-func (c *WSClient) StreamingWSHashtag(ctx context.Context, tag string) (chan Event, error) {
-	return c.streamingWS(ctx, "hashtag", tag)
+// StreamingWSPublic return channel to read events on public using WebSocket.
+func (c *WSClient) StreamingWSPublic(ctx context.Context, isLocal bool) (chan Event, error) {
+	s := "public"
+	if isLocal {
+		s += ":local"
+	}
+
+	return c.streamingWS(ctx, s, "")
 }
 
-// StreamingWSHashtagLocal return channel to read events on tagged local timeline using WebSocket.
-func (c *WSClient) StreamingWSHashtagLocal(ctx context.Context, tag string) (chan Event, error) {
-	return c.streamingWS(ctx, "hashtag:local", tag)
+// StreamingWSHashtag return channel to read events on tagged timeline using WebSocket.
+func (c *WSClient) StreamingWSHashtag(ctx context.Context, tag string, isLocal bool) (chan Event, error) {
+	s := "hashtag"
+	if isLocal {
+		s += ":local"
+	}
+
+	return c.streamingWS(ctx, s, tag)
 }
 
 func (c *WSClient) streamingWS(ctx context.Context, stream, tag string) (chan Event, error) {

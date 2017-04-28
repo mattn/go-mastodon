@@ -16,21 +16,7 @@ func TestStreamingWSPublic(t *testing.T) {
 
 	client := NewClient(&Config{Server: ts.URL}).NewWSClient()
 	ctx, cancel := context.WithCancel(context.Background())
-	q, err := client.StreamingWSPublic(ctx)
-	if err != nil {
-		t.Fatalf("should not be fail: %v", err)
-	}
-
-	wsTest(t, q, cancel)
-}
-
-func TestStreamingWSPublicLocal(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(wsMock))
-	defer ts.Close()
-
-	client := NewClient(&Config{Server: ts.URL}).NewWSClient()
-	ctx, cancel := context.WithCancel(context.Background())
-	q, err := client.StreamingWSPublicLocal(ctx)
+	q, err := client.StreamingWSPublic(ctx, false)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -58,21 +44,7 @@ func TestStreamingWSHashtag(t *testing.T) {
 
 	client := NewClient(&Config{Server: ts.URL}).NewWSClient()
 	ctx, cancel := context.WithCancel(context.Background())
-	q, err := client.StreamingWSHashtag(ctx, "zzz")
-	if err != nil {
-		t.Fatalf("should not be fail: %v", err)
-	}
-
-	wsTest(t, q, cancel)
-}
-
-func TestStreamingWSHashtagLocal(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(wsMock))
-	defer ts.Close()
-
-	client := NewClient(&Config{Server: ts.URL}).NewWSClient()
-	ctx, cancel := context.WithCancel(context.Background())
-	q, err := client.StreamingWSHashtagLocal(ctx, "zzz")
+	q, err := client.StreamingWSHashtag(ctx, "zzz", false)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -156,7 +128,7 @@ func TestStreamingWS(t *testing.T) {
 	defer ts.Close()
 
 	client := NewClient(&Config{Server: ":"}).NewWSClient()
-	_, err := client.StreamingWSPublicLocal(context.Background())
+	_, err := client.StreamingWSPublic(context.Background(), true)
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
@@ -164,7 +136,7 @@ func TestStreamingWS(t *testing.T) {
 	client = NewClient(&Config{Server: ts.URL}).NewWSClient()
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
-	q, err := client.StreamingWSPublicLocal(ctx)
+	q, err := client.StreamingWSPublic(ctx, true)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}

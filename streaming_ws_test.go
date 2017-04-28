@@ -44,11 +44,17 @@ func TestStreamingWSHashtag(t *testing.T) {
 
 	client := NewClient(&Config{Server: ts.URL}).NewWSClient()
 	ctx, cancel := context.WithCancel(context.Background())
-	q, err := client.StreamingWSHashtag(ctx, "zzz", false)
+	q, err := client.StreamingWSHashtag(ctx, "zzz", true)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
+	wsTest(t, q, cancel)
 
+	ctx, cancel = context.WithCancel(context.Background())
+	q, err = client.StreamingWSHashtag(ctx, "zzz", false)
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
 	wsTest(t, q, cancel)
 }
 
@@ -107,7 +113,7 @@ func wsTest(t *testing.T, q chan Event, cancel func()) {
 		events = append(events, e)
 	}
 	if len(events) != 4 {
-		t.Fatalf("result should be two: %d", len(events))
+		t.Fatalf("result should be four: %d", len(events))
 	}
 	if events[0].(*UpdateEvent).Status.Content != "foo" {
 		t.Fatalf("want %q but %q", "foo", events[0].(*UpdateEvent).Status.Content)

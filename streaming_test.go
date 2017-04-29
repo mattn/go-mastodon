@@ -63,9 +63,12 @@ data: 1234567
 }
 
 func TestStreaming(t *testing.T) {
+	var isEnd bool
 	canErr := true
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if canErr {
+		if isEnd {
+			return
+		} else if canErr {
 			canErr = false
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
@@ -76,6 +79,7 @@ event: update
 data: {"content": "foo"}
 		`)
 		f.Flush()
+		isEnd = true
 	}))
 	defer ts.Close()
 
@@ -87,13 +91,12 @@ data: {"content": "foo"}
 
 	c = NewClient(&Config{Server: ts.URL})
 	ctx, cancel := context.WithCancel(context.Background())
-	time.AfterFunc(time.Second, func() {
-		cancel()
-	})
+	time.AfterFunc(time.Second, cancel)
 	q, err := c.streaming(ctx, "", nil)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
+	var cnt int
 	var passError, passUpdate bool
 	for e := range q {
 		switch event := e.(type) {
@@ -103,15 +106,61 @@ data: {"content": "foo"}
 				t.Fatalf("should be fail: %v", event.err)
 			}
 		case *UpdateEvent:
+			cnt++
 			passUpdate = true
 			if event.Status.Content != "foo" {
 				t.Fatalf("want %q but %q", "foo", event.Status.Content)
 			}
 		}
 	}
+	if cnt != 1 {
+		t.Fatalf("result should be one: %d", cnt)
+	}
 	if !passError || !passUpdate {
 		t.Fatalf("have not passed through somewhere: error %t, update %t", passError, passUpdate)
 	}
+}
+
+func TestDoStreaming(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.(http.Flusher).Flush()
+		time.Sleep(time.Second)
+	}))
+	defer ts.Close()
+
+	c := NewClient(&Config{Server: ts.URL})
+
+	req, err := http.NewRequest(http.MethodGet, ts.URL, nil)
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	time.AfterFunc(time.Millisecond, cancel)
+	req = req.WithContext(ctx)
+
+	q := make(chan Event)
+	go func() {
+		defer close(q)
+		c.doStreaming(req, q)
+		if err != nil {
+			t.Fatalf("should not be fail: %v", err)
+		}
+	}()
+	var passError bool
+	for e := range q {
+		if event, ok := e.(*ErrorEvent); ok {
+			passError = true
+			if event.err == nil {
+				t.Fatalf("should be fail: %v", event.err)
+			}
+		}
+	}
+	if !passError {
+		t.Fatalf("have not passed through: error %t", passError)
+	}
+}
+
+func TestStreamingUser(t *testing.T) {
 }
 
 func TestStreamingPublic(t *testing.T) {
@@ -150,9 +199,7 @@ data: {"content": "bar"}
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
-	time.AfterFunc(time.Second, func() {
-		cancel()
-	})
+	time.AfterFunc(time.Second, cancel)
 	events := []Event{}
 	for e := range q {
 		if _, ok := e.(*ErrorEvent); !ok {
@@ -168,4 +215,7 @@ data: {"content": "bar"}
 	if events[1].(*UpdateEvent).Status.Content != "bar" {
 		t.Fatalf("want %q but %q", "bar", events[1].(*UpdateEvent).Status.Content)
 	}
+}
+
+func TestStreamingHashtag(t *testing.T) {
 }

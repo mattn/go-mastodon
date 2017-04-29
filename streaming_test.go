@@ -23,7 +23,7 @@ data: 1234567
 	`)
 	go func() {
 		defer close(q)
-		err := handleReader(context.Background(), q, r)
+		err := handleReader(q, r)
 		if err != nil {
 			t.Fatalf("should not be fail: %v", err)
 		}
@@ -54,9 +54,64 @@ data: 1234567
 	}
 }
 
-func TestStreamingPublic(t *testing.T) {
+func TestStreaming(t *testing.T) {
+	canErr := true
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/api/v1/streaming/public" {
+		if canErr {
+			canErr = false
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+		f := w.(http.Flusher)
+		fmt.Fprintln(w, `
+event: update
+data: {"content": "foo"}
+		`)
+		f.Flush()
+	}))
+	defer ts.Close()
+
+	c := NewClient(&Config{Server: ":"})
+	_, err := c.streaming(context.Background(), "", nil)
+	if err == nil {
+		t.Fatalf("should be fail: %v", err)
+	}
+
+	c = NewClient(&Config{Server: ts.URL})
+	ctx, cancel := context.WithCancel(context.Background())
+	time.AfterFunc(time.Second, func() {
+		cancel()
+	})
+	q, err := c.streaming(ctx, "", nil)
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	var passError, passUpdate bool
+	for e := range q {
+		switch event := e.(type) {
+		case *ErrorEvent:
+			passError = true
+			if event.err == nil {
+				t.Fatalf("should be fail: %v", event.err)
+			}
+		case *UpdateEvent:
+			passUpdate = true
+			if event.Status.Content != "foo" {
+				t.Fatalf("want %q but %q", "foo", event.Status.Content)
+			}
+		}
+	}
+	if !passError || !passUpdate {
+		t.Fatalf("have not passed through somewhere: error %t, update %t", passError, passUpdate)
+	}
+}
+
+func TestStreamingPublic(t *testing.T) {
+	var isEnd bool
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if isEnd {
+			return
+		} else if r.URL.Path != "/api/v1/streaming/public" {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
@@ -72,7 +127,7 @@ event: update
 data: {"content": "bar"}
 		`)
 		f.Flush()
-		return
+		isEnd = true
 	}))
 	defer ts.Close()
 
@@ -87,13 +142,14 @@ data: {"content": "bar"}
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
-	time.AfterFunc(3*time.Second, func() {
+	time.AfterFunc(time.Second, func() {
 		cancel()
-		close(q)
 	})
 	events := []Event{}
 	for e := range q {
-		events = append(events, e)
+		if _, ok := e.(*ErrorEvent); !ok {
+			events = append(events, e)
+		}
 	}
 	if len(events) != 2 {
 		t.Fatalf("result should be two: %d", len(events))

@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"strconv"
 	"strings"
-	"time"
 )
 
 // UpdateEvent is struct for passing status event to app.
@@ -42,8 +42,8 @@ type Event interface {
 	event()
 }
 
-func handleReader(ctx context.Context, q chan Event, r io.Reader) error {
-	name := ""
+func handleReader(q chan Event, r io.Reader) error {
+	var name string
 	s := bufio.NewScanner(r)
 	for s.Scan() {
 		line := s.Text()
@@ -55,30 +55,33 @@ func handleReader(ctx context.Context, q chan Event, r io.Reader) error {
 		case "event":
 			name = strings.TrimSpace(token[1])
 		case "data":
+			var err error
 			switch name {
 			case "update":
 				var status Status
-				err := json.Unmarshal([]byte(token[1]), &status)
+				err = json.Unmarshal([]byte(token[1]), &status)
 				if err == nil {
 					q <- &UpdateEvent{&status}
 				}
 			case "notification":
 				var notification Notification
-				err := json.Unmarshal([]byte(token[1]), &notification)
+				err = json.Unmarshal([]byte(token[1]), &notification)
 				if err == nil {
 					q <- &NotificationEvent{&notification}
 				}
 			case "delete":
 				var id int64
-				err := json.Unmarshal([]byte(token[1]), &id)
+				id, err = strconv.ParseInt(strings.TrimSpace(token[1]), 10, 64)
 				if err == nil {
 					q <- &DeleteEvent{id}
 				}
 			}
-		default:
+			if err != nil {
+				q <- &ErrorEvent{err}
+			}
 		}
 	}
-	return ctx.Err()
+	return s.Err()
 }
 
 func (c *Client) streaming(ctx context.Context, p string, params url.Values) (chan Event, error) {
@@ -96,36 +99,40 @@ func (c *Client) streaming(ctx context.Context, p string, params url.Values) (ch
 	req = req.WithContext(ctx)
 	req.Header.Set("Authorization", "Bearer "+c.config.AccessToken)
 
-	var resp *http.Response
-
-	q := make(chan Event, 10)
+	q := make(chan Event)
 	go func() {
-		defer ctx.Done()
-
+		defer close(q)
 		for {
-			resp, err = c.Do(req)
-			if resp != nil && resp.StatusCode != http.StatusOK {
-				err = parseAPIError("bad request", resp)
+			select {
+			case <-ctx.Done():
+				q <- &ErrorEvent{ctx.Err()}
+				return
+			default:
 			}
-			if err == nil {
-				err = handleReader(ctx, q, resp.Body)
-				if err == nil {
-					break
-				}
-			} else {
-				q <- &ErrorEvent{err}
-			}
-			resp.Body.Close()
-			time.Sleep(3 * time.Second)
-		}
-	}()
-	go func() {
-		<-ctx.Done()
-		if resp != nil && resp.Body != nil {
-			resp.Body.Close()
+
+			c.doStreaming(req, q)
 		}
 	}()
 	return q, nil
+}
+
+func (c *Client) doStreaming(req *http.Request, q chan Event) {
+	resp, err := c.Do(req)
+	if err != nil {
+		q <- &ErrorEvent{err}
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		q <- &ErrorEvent{parseAPIError("bad request", resp)}
+		return
+	}
+
+	err = handleReader(q, resp.Body)
+	if err != nil {
+		q <- &ErrorEvent{err}
+	}
 }
 
 // StreamingUser return channel to read events on home.

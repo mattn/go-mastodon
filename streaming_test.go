@@ -161,6 +161,40 @@ func TestDoStreaming(t *testing.T) {
 }
 
 func TestStreamingUser(t *testing.T) {
+	var isEnd bool
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if isEnd {
+			return
+		}
+		f, _ := w.(http.Flusher)
+		fmt.Fprintln(w, `
+event: update
+data: {"content": "foo"}
+		`)
+		f.Flush()
+		isEnd = true
+	}))
+	defer ts.Close()
+
+	c := NewClient(&Config{Server: ts.URL})
+	ctx, cancel := context.WithCancel(context.Background())
+	time.AfterFunc(time.Second, cancel)
+	q, err := c.StreamingUser(ctx)
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	events := []Event{}
+	for e := range q {
+		if _, ok := e.(*ErrorEvent); !ok {
+			events = append(events, e)
+		}
+	}
+	if len(events) != 1 {
+		t.Fatalf("result should be one: %d", len(events))
+	}
+	if events[0].(*UpdateEvent).Status.Content != "foo" {
+		t.Fatalf("want %q but %q", "foo", events[0].(*UpdateEvent).Status.Content)
+	}
 }
 
 func TestStreamingPublic(t *testing.T) {

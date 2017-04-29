@@ -14,6 +14,8 @@ func TestHandleReader(t *testing.T) {
 	q := make(chan Event)
 	r := strings.NewReader(`
 event: update
+data: {content: error}
+event: update
 data: {"content": "foo"}
 event: notification
 data: {"type": "mention"}
@@ -28,7 +30,7 @@ data: 1234567
 			t.Fatalf("should not be fail: %v", err)
 		}
 	}()
-	var passUpdate, passNotification, passDelete bool
+	var passUpdate, passNotification, passDelete, passError bool
 	for e := range q {
 		switch event := e.(type) {
 		case *UpdateEvent:
@@ -46,11 +48,17 @@ data: 1234567
 			if event.ID != 1234567 {
 				t.Fatalf("want %d but %d", 1234567, event.ID)
 			}
+		case *ErrorEvent:
+			passError = true
+			if event.err == nil {
+				t.Fatalf("should be fail: %v", event.err)
+			}
 		}
 	}
-	if !passUpdate || !passNotification || !passDelete {
-		t.Fatalf("have not passed through somewhere: update %t, notification %t, delete %t",
-			passUpdate, passNotification, passDelete)
+	if !passUpdate || !passNotification || !passDelete || !passError {
+		t.Fatalf("have not passed through somewhere: "+
+			"update %t, notification %t, delete %t, error %t",
+			passUpdate, passNotification, passDelete, passError)
 	}
 }
 

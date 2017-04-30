@@ -106,13 +106,12 @@ func wsMock(w http.ResponseWriter, r *http.Request) {
 func wsTest(t *testing.T, q chan Event, cancel func()) {
 	time.AfterFunc(time.Second, func() {
 		cancel()
-		close(q)
 	})
 	events := []Event{}
 	for e := range q {
 		events = append(events, e)
 	}
-	if len(events) != 4 {
+	if len(events) != 6 {
 		t.Fatalf("result should be four: %d", len(events))
 	}
 	if events[0].(*UpdateEvent).Status.Content != "foo" {
@@ -125,6 +124,12 @@ func wsTest(t *testing.T, q chan Event, cancel func()) {
 		t.Fatalf("want %d but %d", 1234567, events[2].(*DeleteEvent).ID)
 	}
 	if errorEvent, ok := events[3].(*ErrorEvent); !ok {
+		t.Fatalf("should be fail: %v", errorEvent.err)
+	}
+	if errorEvent, ok := events[4].(*ErrorEvent); !ok {
+		t.Fatalf("should be fail: %v", errorEvent.err)
+	}
+	if errorEvent, ok := events[5].(*ErrorEvent); !ok {
 		t.Fatalf("should be fail: %v", errorEvent.err)
 	}
 }

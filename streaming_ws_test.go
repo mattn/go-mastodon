@@ -10,20 +10,6 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func TestStreamingWSPublic(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(wsMock))
-	defer ts.Close()
-
-	client := NewClient(&Config{Server: ts.URL}).NewWSClient()
-	ctx, cancel := context.WithCancel(context.Background())
-	q, err := client.StreamingWSPublic(ctx, false)
-	if err != nil {
-		t.Fatalf("should not be fail: %v", err)
-	}
-
-	wsTest(t, q, cancel)
-}
-
 func TestStreamingWSUser(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(wsMock))
 	defer ts.Close()
@@ -31,6 +17,20 @@ func TestStreamingWSUser(t *testing.T) {
 	client := NewClient(&Config{Server: ts.URL}).NewWSClient()
 	ctx, cancel := context.WithCancel(context.Background())
 	q, err := client.StreamingWSUser(ctx)
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+
+	wsTest(t, q, cancel)
+}
+
+func TestStreamingWSPublic(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(wsMock))
+	defer ts.Close()
+
+	client := NewClient(&Config{Server: ts.URL}).NewWSClient()
+	ctx, cancel := context.WithCancel(context.Background())
+	q, err := client.StreamingWSPublic(ctx, false)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}

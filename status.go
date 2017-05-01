@@ -187,6 +187,23 @@ func (c *Client) GetTimelineHashtag(ctx context.Context, tag string, isLocal boo
 	return statuses, nil
 }
 
+// GetTimelineMedia return statuses from media timeline.
+// NOTE: This is an experimental feature of pawoo.net.
+func (c *Client) GetTimelineMedia(ctx context.Context, isLocal bool) ([]*Status, error) {
+	params := url.Values{}
+	params.Set("media", "t")
+	if isLocal {
+		params.Set("local", "t")
+	}
+
+	var statuses []*Status
+	err := c.doAPI(ctx, http.MethodGet, "/api/v1/timelines/public", params, &statuses, nil)
+	if err != nil {
+		return nil, err
+	}
+	return statuses, nil
+}
+
 // PostStatus post the toot.
 func (c *Client) PostStatus(ctx context.Context, toot *Toot) (*Status, error) {
 	params := url.Values{}

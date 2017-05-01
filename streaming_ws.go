@@ -66,6 +66,7 @@ func (c *WSClient) streamingWS(ctx context.Context, stream, tag string) (chan Ev
 
 	q := make(chan Event)
 	go func() {
+		defer close(q)
 		for {
 			err := c.handleWS(ctx, u.String(), q)
 			if err != nil {
@@ -85,7 +86,12 @@ func (c *WSClient) handleWS(ctx context.Context, rawurl string, q chan Event) er
 		// End.
 		return err
 	}
-	defer conn.Close()
+
+	// Close the WebSocket when the context is canceled.
+	go func() {
+		<-ctx.Done()
+		conn.Close()
+	}()
 
 	for {
 		select {

@@ -80,7 +80,6 @@ func cmdStream(c *cli.Context) error {
 	go func() {
 		<-sc
 		cancel()
-		close(q)
 	}()
 
 	c.App.Metadata["signal"] = sc

@@ -285,6 +285,11 @@ func makeApp() *cli.App {
 			Usage:  "search mikami",
 			Action: cmdMikami,
 		},
+		{
+			Name:   "xsearch",
+			Usage:  "cross search",
+			Action: cmdXSearch,
+		},
 	}
 	app.Setup()
 	return app

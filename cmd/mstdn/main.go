@@ -361,8 +361,9 @@ func run() int {
 
 		client := mastodon.NewClient(config)
 		app.Metadata = map[string]interface{}{
-			"client": client,
-			"config": config,
+			"client":      client,
+			"config":      config,
+			"xsearch_url": "http://mastodonsearch.jp/cross/",
 		}
 		if config.AccessToken == "" {
 			return authenticate(client, config, file)

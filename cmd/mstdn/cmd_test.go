@@ -30,6 +30,7 @@ func testWithServer(h http.HandlerFunc, testFuncs ...func(*cli.App)) string {
 		"config": &mastodon.Config{
 			Server: "https://example.com",
 		},
+		"xsearch_url": ts.URL,
 	}
 
 	for _, f := range testFuncs {

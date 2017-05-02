@@ -7,7 +7,23 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/urfave/cli"
 )
+
+func TestCmdXSearch(t *testing.T) {
+	testWithServer(
+		func(w http.ResponseWriter, r *http.Request) {
+			fmt.Fprintln(w, `<div class="post"><div class="mst_content"><a href="http://example.com/@test/1"><p>test status</p></a></div></div>`)
+		},
+		func(app *cli.App) {
+			err := app.Run([]string{"mstdn", "xsearch", "test"})
+			if err != nil {
+				t.Fatalf("should not be fail: %v", err)
+			}
+		},
+	)
+}
 
 func TestXSearch(t *testing.T) {
 	canErr := true

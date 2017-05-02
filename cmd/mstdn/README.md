@@ -28,6 +28,7 @@ COMMANDS:
      delete        delete status
      init          initialize profile
      mikami        search mikami
+     xsearch       cross search
      help, h       Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:

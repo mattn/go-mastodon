@@ -5,5 +5,5 @@ import (
 )
 
 func cmdMikami(c *cli.Context) error {
-	return xsearch(c.App.Metadata["xsearch_url"].(string), "三上", c.App.Writer)
+	return xSearch(c.App.Metadata["xsearch_url"].(string), "三上", c.App.Writer)
 }

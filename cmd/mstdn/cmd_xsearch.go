@@ -10,10 +10,10 @@ import (
 )
 
 func cmdXSearch(c *cli.Context) error {
-	return xsearch(c.App.Metadata["xsearch_url"].(string), c.Args().First(), c.App.Writer)
+	return xSearch(c.App.Metadata["xsearch_url"].(string), c.Args().First(), c.App.Writer)
 }
 
-func xsearch(xsearchRawurl, query string, w io.Writer) error {
+func xSearch(xsearchRawurl, query string, w io.Writer) error {
 	u, err := url.Parse(xsearchRawurl)
 	if err != nil {
 		return err

@@ -16,7 +16,7 @@ type Instance struct {
 // GetInstance return Instance.
 func (c *Client) GetInstance(ctx context.Context) (*Instance, error) {
 	var instance Instance
-	err := c.doAPI(ctx, http.MethodGet, "/api/v1/instance", nil, &instance, nil)
+	_, err := c.doAPI(ctx, http.MethodGet, "/api/v1/instance", nil, &instance, nil)
 	if err != nil {
 		return nil, err
 	}

@@ -37,6 +37,9 @@ func Base64Encode(file *os.File) (string, error) {
 		";base64," + base64.StdEncoding.EncodeToString(d), nil
 }
 
+// Int64 is a helper function to get the pointer value of a int64.
+func Int64(v int64) *int64 { return &v }
+
 // String is a helper function to get the pointer value of a string.
 func String(v string) *string { return &v }
 

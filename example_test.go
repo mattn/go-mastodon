@@ -32,7 +32,7 @@ func ExampleClient() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	timeline, err := c.GetTimelineHome(context.Background())
+	timeline, _, err := c.GetTimelineHome(context.Background(), nil)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -6,7 +6,6 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"reflect"
 	"testing"
 	"time"
 )
@@ -153,7 +152,7 @@ func TestGetTimelineHome(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	tl, err := client.GetTimelineHome(context.Background())
+	tl, _, err := client.GetTimelineHome(context.Background(), nil)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -183,7 +182,7 @@ func TestGetTimelineHomeWithCancel(t *testing.T) {
 	})
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
-	_, err := client.GetTimelineHome(ctx)
+	_, _, err := client.GetTimelineHome(ctx, nil)
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
@@ -198,49 +197,4 @@ func TestForTheCoverages(t *testing.T) {
 	(*DeleteEvent)(nil).event()
 	(*ErrorEvent)(nil).event()
 	_ = (&ErrorEvent{io.EOF}).Error()
-}
-
-func TestLinkHeader(t *testing.T) {
-	tests := []struct {
-		header []string
-		rel    string
-		want   []string
-	}{
-		{
-			header: []string{`<http://example.com/?max_id=3>; rel="foo"`},
-			rel:    "boo",
-			want:   nil,
-		},
-		{
-			header: []string{`<http://example.com/?max_id=3>; rel="foo"`},
-			rel:    "foo",
-			want:   []string{"http://example.com/?max_id=3"},
-		},
-		{
-			header: []string{`<http://example.com/?max_id=3>; rel="foo1"`},
-			rel:    "foo",
-			want:   nil,
-		},
-		{
-			header: []string{`<http://example.com/?max_id=3>; rel="foo", <http://example.com/?max_id=4>; rel="bar"`},
-			rel:    "foo",
-			want:   []string{"http://example.com/?max_id=3"},
-		},
-		{
-			header: []string{`<http://example.com/?max_id=3>; rel="foo", <http://example.com/?max_id=4>; rel="bar"`},
-			rel:    "bar",
-			want:   []string{"http://example.com/?max_id=4"},
-		},
-	}
-
-	for _, test := range tests {
-		h := make(http.Header)
-		for _, he := range test.header {
-			h.Add("Link", he)
-		}
-		got := linkHeader(h, test.rel)
-		if !reflect.DeepEqual(got, test.want) {
-			t.Fatalf("want %v but %v", test.want, got)
-		}
-	}
 }

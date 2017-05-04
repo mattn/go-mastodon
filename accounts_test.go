@@ -113,7 +113,6 @@ func TestGetAccountStatuses(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
-		//w.Header().Set("Link", `<http://example.com/api/v1/accounts/1234567/statuses?max_id=123>; rel="next", <http://example.com/api/v1/accounts/1234567/statuses?since_id=789>; rel="prev"`)
 		fmt.Fprintln(w, `[{"content": "foo"}, {"content": "bar"}]`)
 		return
 	}))

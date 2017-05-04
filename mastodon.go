@@ -45,7 +45,10 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params in
 	if values, ok := params.(url.Values); ok {
 		var body io.Reader
 		if method == http.MethodGet {
-			u.RawQuery = pg.setValues(values).Encode()
+			if pg != nil {
+				values = pg.setValues(values)
+			}
+			u.RawQuery = values.Encode()
 		} else {
 			body = strings.NewReader(values.Encode())
 		}
@@ -80,6 +83,9 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params in
 		}
 		ct = mw.FormDataContentType()
 	} else {
+		if method == http.MethodGet && pg != nil {
+			u.RawQuery = pg.toValues().Encode()
+		}
 		req, err = http.NewRequest(method, u.String(), nil)
 		if err != nil {
 			return nil, err
@@ -253,17 +259,19 @@ func getPaginationID(rawurl, key string) (int64, error) {
 	return id, nil
 }
 
+func (p *Pagination) toValues() url.Values {
+	return p.setValues(url.Values{})
+}
+
 func (p *Pagination) setValues(params url.Values) url.Values {
-	if p != nil {
-		if p.MaxID != nil {
-			params.Set("max_id", fmt.Sprint(p.MaxID))
-		}
-		if p.SinceID != nil {
-			params.Set("since_id", fmt.Sprint(p.SinceID))
-		}
-		if p.Limit != nil {
-			params.Set("limit", fmt.Sprint(p.Limit))
-		}
+	if p.MaxID != nil {
+		params.Set("max_id", fmt.Sprint(*p.MaxID))
+	}
+	if p.SinceID != nil {
+		params.Set("since_id", fmt.Sprint(*p.SinceID))
+	}
+	if p.Limit != nil {
+		params.Set("limit", fmt.Sprint(*p.Limit))
 	}
 
 	return params

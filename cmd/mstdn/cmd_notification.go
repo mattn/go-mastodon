@@ -11,7 +11,7 @@ import (
 
 func cmdNotification(c *cli.Context) error {
 	client := c.App.Metadata["client"].(*mastodon.Client)
-	notifications, err := client.GetNotifications(context.Background())
+	notifications, _, err := client.GetNotifications(context.Background(), nil)
 	if err != nil {
 		return err
 	}

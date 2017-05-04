@@ -10,7 +10,7 @@ import (
 func cmdTimeline(c *cli.Context) error {
 	client := c.App.Metadata["client"].(*mastodon.Client)
 	config := c.App.Metadata["config"].(*mastodon.Config)
-	timeline, err := client.GetTimelineHome(context.Background())
+	timeline, _, err := client.GetTimelineHome(context.Background(), nil)
 	if err != nil {
 		return err
 	}

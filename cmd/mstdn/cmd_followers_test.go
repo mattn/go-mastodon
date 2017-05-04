@@ -17,6 +17,7 @@ func TestCmdFollowers(t *testing.T) {
 				fmt.Fprintln(w, `{"id": 123}`)
 				return
 			case "/api/v1/accounts/123/followers":
+				w.Header().Set("Link", `<http://example.com?since_id=890>; rel="prev"`)
 				fmt.Fprintln(w, `[{"id": 234, "username": "ZZZ", "acct": "zzz"}]`)
 				return
 			}

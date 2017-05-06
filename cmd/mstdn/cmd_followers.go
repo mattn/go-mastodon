@@ -20,8 +20,8 @@ func cmdFollowers(c *cli.Context) error {
 	var maxID *int64
 	var followers []*mastodon.Account
 	for {
-		fs, pg, err := client.GetAccountFollowers(
-			context.Background(), account.ID, &mastodon.Pagination{MaxID: maxID})
+		pg := mastodon.Pagination{MaxID: maxID}
+		fs, err := client.GetAccountFollowers(context.Background(), account.ID, &pg)
 		if err != nil {
 			return err
 		}

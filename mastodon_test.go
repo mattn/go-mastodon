@@ -13,24 +13,24 @@ import (
 
 func TestDoAPI(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		q := r.URL.Query()
-		if q.Get("max_id") == "123" && q.Get("since_id") == "789" && q.Get("limit") == "10" {
+		if r.URL.Query().Get("max_id") == "999" {
+			w.Header().Set("Link", `<:>; rel="next"`)
+		} else {
 			w.Header().Set("Link", `<http://example.com?max_id=234>; rel="next", <http://example.com?since_id=890>; rel="prev"`)
-			fmt.Fprintln(w, `[{"username": "foo"}, {"username": "bar"}]`)
 		}
-		w.Header().Set("Link", `<:>; rel="next"`)
+		fmt.Fprintln(w, `[{"username": "foo"}, {"username": "bar"}]`)
 	}))
 	defer ts.Close()
 
 	c := NewClient(&Config{Server: ts.URL})
-	err := c.doAPI(context.Background(), http.MethodGet, "/", nil, nil, &Pagination{
+	var accounts []Account
+	err := c.doAPI(context.Background(), http.MethodGet, "/", nil, &accounts, &Pagination{
 		MaxID: Int64(999),
 	})
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
 
-	var accounts []Account
 	pg := &Pagination{
 		MaxID:   Int64(123),
 		SinceID: Int64(789),
@@ -67,6 +67,18 @@ func TestDoAPI(t *testing.T) {
 	}
 	if *pg.SinceID != 890 {
 		t.Fatalf("want %d but %d", 890, *pg.SinceID)
+	}
+	if accounts[0].Username != "foo" {
+		t.Fatalf("want %q but %q", "foo", accounts[0].Username)
+	}
+	if accounts[1].Username != "bar" {
+		t.Fatalf("want %q but %q", "bar", accounts[1].Username)
+	}
+
+	// *Pagination is nil
+	err = c.doAPI(context.Background(), http.MethodGet, "/", nil, &accounts, nil)
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
 	}
 	if accounts[0].Username != "foo" {
 		t.Fatalf("want %q but %q", "foo", accounts[0].Username)

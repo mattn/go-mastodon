@@ -103,19 +103,18 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params in
 	}
 	defer resp.Body.Close()
 
-	lh := resp.Header.Get("Link")
-	if lh != "" {
-		retPG, err := newPagination(lh)
-		if err != nil {
-			return err
-		}
-		*pg = *retPG
-	}
-
 	if resp.StatusCode != http.StatusOK {
 		return parseAPIError("bad request", resp)
 	} else if res == nil {
 		return nil
+	} else if pg != nil {
+		if lh := resp.Header.Get("Link"); lh != "" {
+			pg2, err := newPagination(lh)
+			if err != nil {
+				return err
+			}
+			*pg = *pg2
+		}
 	}
 	return json.NewDecoder(resp.Body).Decode(&res)
 }

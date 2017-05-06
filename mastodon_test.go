@@ -23,7 +23,7 @@ func TestDoAPI(t *testing.T) {
 	defer ts.Close()
 
 	c := NewClient(&Config{Server: ts.URL})
-	_, err := c.doAPI(context.Background(), http.MethodGet, "/", nil, nil, &Pagination{
+	err := c.doAPI(context.Background(), http.MethodGet, "/", nil, nil, &Pagination{
 		MaxID: Int64(999),
 	})
 	if err == nil {
@@ -31,11 +31,12 @@ func TestDoAPI(t *testing.T) {
 	}
 
 	var accounts []Account
-	pg, err := c.doAPI(context.Background(), http.MethodGet, "/", url.Values{}, &accounts, &Pagination{
+	pg := &Pagination{
 		MaxID:   Int64(123),
 		SinceID: Int64(789),
 		Limit:   Int64(10),
-	})
+	}
+	err = c.doAPI(context.Background(), http.MethodGet, "/", url.Values{}, &accounts, pg)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -52,11 +53,12 @@ func TestDoAPI(t *testing.T) {
 		t.Fatalf("want %q but %q", "bar", accounts[1].Username)
 	}
 
-	pg, err = c.doAPI(context.Background(), http.MethodGet, "/", nil, &accounts, &Pagination{
+	pg = &Pagination{
 		MaxID:   Int64(123),
 		SinceID: Int64(789),
 		Limit:   Int64(10),
-	})
+	}
+	err = c.doAPI(context.Background(), http.MethodGet, "/", nil, &accounts, pg)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -216,7 +218,7 @@ func TestGetTimelineHome(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	tl, _, err := client.GetTimelineHome(context.Background(), nil)
+	tl, err := client.GetTimelineHome(context.Background(), nil)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -246,7 +248,7 @@ func TestGetTimelineHomeWithCancel(t *testing.T) {
 	})
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
-	_, _, err := client.GetTimelineHome(ctx, nil)
+	_, err := client.GetTimelineHome(ctx, nil)
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}

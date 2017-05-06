@@ -48,19 +48,19 @@ type Card struct {
 }
 
 // GetFavourites return the favorite list of the current user.
-func (c *Client) GetFavourites(ctx context.Context, pg *Pagination) ([]*Status, *Pagination, error) {
+func (c *Client) GetFavourites(ctx context.Context, pg *Pagination) ([]*Status, error) {
 	var statuses []*Status
-	retPG, err := c.doAPI(ctx, http.MethodGet, "/api/v1/favourites", nil, &statuses, pg)
+	err := c.doAPI(ctx, http.MethodGet, "/api/v1/favourites", nil, &statuses, pg)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	return statuses, retPG, nil
+	return statuses, nil
 }
 
 // GetStatus return status specified by id.
 func (c *Client) GetStatus(ctx context.Context, id int64) (*Status, error) {
 	var status Status
-	_, err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/statuses/%d", id), nil, &status, nil)
+	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/statuses/%d", id), nil, &status, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +70,7 @@ func (c *Client) GetStatus(ctx context.Context, id int64) (*Status, error) {
 // GetStatusContext return status specified by id.
 func (c *Client) GetStatusContext(ctx context.Context, id int64) (*Context, error) {
 	var context Context
-	_, err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/statuses/%d/context", id), nil, &context, nil)
+	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/statuses/%d/context", id), nil, &context, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (c *Client) GetStatusContext(ctx context.Context, id int64) (*Context, erro
 // GetStatusCard return status specified by id.
 func (c *Client) GetStatusCard(ctx context.Context, id int64) (*Card, error) {
 	var card Card
-	_, err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/statuses/%d/card", id), nil, &card, nil)
+	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/statuses/%d/card", id), nil, &card, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -88,29 +88,29 @@ func (c *Client) GetStatusCard(ctx context.Context, id int64) (*Card, error) {
 }
 
 // GetRebloggedBy returns the account list of the user who reblogged the toot of id.
-func (c *Client) GetRebloggedBy(ctx context.Context, id int64, pg *Pagination) ([]*Account, *Pagination, error) {
+func (c *Client) GetRebloggedBy(ctx context.Context, id int64, pg *Pagination) ([]*Account, error) {
 	var accounts []*Account
-	retPG, err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/statuses/%d/reblogged_by", id), nil, &accounts, pg)
+	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/statuses/%d/reblogged_by", id), nil, &accounts, pg)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	return accounts, retPG, nil
+	return accounts, nil
 }
 
 // GetFavouritedBy returns the account list of the user who liked the toot of id.
-func (c *Client) GetFavouritedBy(ctx context.Context, id int64, pg *Pagination) ([]*Account, *Pagination, error) {
+func (c *Client) GetFavouritedBy(ctx context.Context, id int64, pg *Pagination) ([]*Account, error) {
 	var accounts []*Account
-	retPG, err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/statuses/%d/favourited_by", id), nil, &accounts, pg)
+	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/statuses/%d/favourited_by", id), nil, &accounts, pg)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	return accounts, retPG, nil
+	return accounts, nil
 }
 
 // Reblog is reblog the toot of id and return status of reblog.
 func (c *Client) Reblog(ctx context.Context, id int64) (*Status, error) {
 	var status Status
-	_, err := c.doAPI(ctx, http.MethodPost, fmt.Sprintf("/api/v1/statuses/%d/reblog", id), nil, &status, nil)
+	err := c.doAPI(ctx, http.MethodPost, fmt.Sprintf("/api/v1/statuses/%d/reblog", id), nil, &status, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +120,7 @@ func (c *Client) Reblog(ctx context.Context, id int64) (*Status, error) {
 // Unreblog is unreblog the toot of id and return status of the original toot.
 func (c *Client) Unreblog(ctx context.Context, id int64) (*Status, error) {
 	var status Status
-	_, err := c.doAPI(ctx, http.MethodPost, fmt.Sprintf("/api/v1/statuses/%d/unreblog", id), nil, &status, nil)
+	err := c.doAPI(ctx, http.MethodPost, fmt.Sprintf("/api/v1/statuses/%d/unreblog", id), nil, &status, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +130,7 @@ func (c *Client) Unreblog(ctx context.Context, id int64) (*Status, error) {
 // Favourite is favourite the toot of id and return status of the favourite toot.
 func (c *Client) Favourite(ctx context.Context, id int64) (*Status, error) {
 	var status Status
-	_, err := c.doAPI(ctx, http.MethodPost, fmt.Sprintf("/api/v1/statuses/%d/favourite", id), nil, &status, nil)
+	err := c.doAPI(ctx, http.MethodPost, fmt.Sprintf("/api/v1/statuses/%d/favourite", id), nil, &status, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -140,7 +140,7 @@ func (c *Client) Favourite(ctx context.Context, id int64) (*Status, error) {
 // Unfavourite is unfavourite the toot of id and return status of the unfavourite toot.
 func (c *Client) Unfavourite(ctx context.Context, id int64) (*Status, error) {
 	var status Status
-	_, err := c.doAPI(ctx, http.MethodPost, fmt.Sprintf("/api/v1/statuses/%d/unfavourite", id), nil, &status, nil)
+	err := c.doAPI(ctx, http.MethodPost, fmt.Sprintf("/api/v1/statuses/%d/unfavourite", id), nil, &status, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -148,48 +148,48 @@ func (c *Client) Unfavourite(ctx context.Context, id int64) (*Status, error) {
 }
 
 // GetTimelineHome return statuses from home timeline.
-func (c *Client) GetTimelineHome(ctx context.Context, pg *Pagination) ([]*Status, *Pagination, error) {
+func (c *Client) GetTimelineHome(ctx context.Context, pg *Pagination) ([]*Status, error) {
 	var statuses []*Status
-	retPG, err := c.doAPI(ctx, http.MethodGet, "/api/v1/timelines/home", nil, &statuses, pg)
+	err := c.doAPI(ctx, http.MethodGet, "/api/v1/timelines/home", nil, &statuses, pg)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	return statuses, retPG, nil
+	return statuses, nil
 }
 
 // GetTimelinePublic return statuses from public timeline.
-func (c *Client) GetTimelinePublic(ctx context.Context, isLocal bool, pg *Pagination) ([]*Status, *Pagination, error) {
+func (c *Client) GetTimelinePublic(ctx context.Context, isLocal bool, pg *Pagination) ([]*Status, error) {
 	params := url.Values{}
 	if isLocal {
 		params.Set("local", "t")
 	}
 
 	var statuses []*Status
-	retPG, err := c.doAPI(ctx, http.MethodGet, "/api/v1/timelines/public", params, &statuses, pg)
+	err := c.doAPI(ctx, http.MethodGet, "/api/v1/timelines/public", params, &statuses, pg)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	return statuses, retPG, nil
+	return statuses, nil
 }
 
 // GetTimelineHashtag return statuses from tagged timeline.
-func (c *Client) GetTimelineHashtag(ctx context.Context, tag string, isLocal bool, pg *Pagination) ([]*Status, *Pagination, error) {
+func (c *Client) GetTimelineHashtag(ctx context.Context, tag string, isLocal bool, pg *Pagination) ([]*Status, error) {
 	params := url.Values{}
 	if isLocal {
 		params.Set("local", "t")
 	}
 
 	var statuses []*Status
-	retPG, err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/timelines/tag/%s", url.PathEscape(tag)), params, &statuses, pg)
+	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/timelines/tag/%s", url.PathEscape(tag)), params, &statuses, pg)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	return statuses, retPG, nil
+	return statuses, nil
 }
 
 // GetTimelineMedia return statuses from media timeline.
 // NOTE: This is an experimental feature of pawoo.net.
-func (c *Client) GetTimelineMedia(ctx context.Context, isLocal bool, pg *Pagination) ([]*Status, *Pagination, error) {
+func (c *Client) GetTimelineMedia(ctx context.Context, isLocal bool, pg *Pagination) ([]*Status, error) {
 	params := url.Values{}
 	params.Set("media", "t")
 	if isLocal {
@@ -197,11 +197,11 @@ func (c *Client) GetTimelineMedia(ctx context.Context, isLocal bool, pg *Paginat
 	}
 
 	var statuses []*Status
-	retPG, err := c.doAPI(ctx, http.MethodGet, "/api/v1/timelines/public", params, &statuses, pg)
+	err := c.doAPI(ctx, http.MethodGet, "/api/v1/timelines/public", params, &statuses, pg)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	return statuses, retPG, nil
+	return statuses, nil
 }
 
 // PostStatus post the toot.
@@ -227,7 +227,7 @@ func (c *Client) PostStatus(ctx context.Context, toot *Toot) (*Status, error) {
 	}
 
 	var status Status
-	_, err := c.doAPI(ctx, http.MethodPost, "/api/v1/statuses", params, &status, nil)
+	err := c.doAPI(ctx, http.MethodPost, "/api/v1/statuses", params, &status, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -236,8 +236,7 @@ func (c *Client) PostStatus(ctx context.Context, toot *Toot) (*Status, error) {
 
 // DeleteStatus delete the toot.
 func (c *Client) DeleteStatus(ctx context.Context, id int64) error {
-	_, err := c.doAPI(ctx, http.MethodDelete, fmt.Sprintf("/api/v1/statuses/%d", id), nil, nil, nil)
-	return err
+	return c.doAPI(ctx, http.MethodDelete, fmt.Sprintf("/api/v1/statuses/%d", id), nil, nil, nil)
 }
 
 // Search search content with query.
@@ -246,7 +245,7 @@ func (c *Client) Search(ctx context.Context, q string, resolve bool) (*Results, 
 	params.Set("q", q)
 	params.Set("resolve", fmt.Sprint(resolve))
 	var results Results
-	_, err := c.doAPI(ctx, http.MethodGet, "/api/v1/search", params, &results, nil)
+	err := c.doAPI(ctx, http.MethodGet, "/api/v1/search", params, &results, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -256,7 +255,7 @@ func (c *Client) Search(ctx context.Context, q string, resolve bool) (*Results, 
 // UploadMedia upload a media attachment.
 func (c *Client) UploadMedia(ctx context.Context, file string) (*Attachment, error) {
 	var attachment Attachment
-	_, err := c.doAPI(ctx, http.MethodPost, "/api/v1/media", file, &attachment, nil)
+	err := c.doAPI(ctx, http.MethodPost, "/api/v1/media", file, &attachment, nil)
 	if err != nil {
 		return nil, err
 	}

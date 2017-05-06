@@ -33,10 +33,10 @@ type Client struct {
 	config *Config
 }
 
-func (c *Client) doAPI(ctx context.Context, method string, uri string, params interface{}, res interface{}, pg *Pagination) (*Pagination, error) {
+func (c *Client) doAPI(ctx context.Context, method string, uri string, params interface{}, res interface{}, pg *Pagination) error {
 	u, err := url.Parse(c.config.Server)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	u.Path = path.Join(u.Path, uri)
 
@@ -54,12 +54,12 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params in
 		}
 		req, err = http.NewRequest(method, u.String(), body)
 		if err != nil {
-			return nil, err
+			return err
 		}
 	} else if file, ok := params.(string); ok {
 		f, err := os.Open(file)
 		if err != nil {
-			return nil, err
+			return err
 		}
 		defer f.Close()
 
@@ -67,19 +67,19 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params in
 		mw := multipart.NewWriter(&buf)
 		part, err := mw.CreateFormFile("file", filepath.Base(file))
 		if err != nil {
-			return nil, err
+			return err
 		}
 		_, err = io.Copy(part, f)
 		if err != nil {
-			return nil, err
+			return err
 		}
 		err = mw.Close()
 		if err != nil {
-			return nil, err
+			return err
 		}
 		req, err = http.NewRequest(method, u.String(), &buf)
 		if err != nil {
-			return nil, err
+			return err
 		}
 		ct = mw.FormDataContentType()
 	} else {
@@ -88,7 +88,7 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params in
 		}
 		req, err = http.NewRequest(method, u.String(), nil)
 		if err != nil {
-			return nil, err
+			return err
 		}
 	}
 	req = req.WithContext(ctx)
@@ -99,25 +99,25 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params in
 
 	resp, err := c.Do(req)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer resp.Body.Close()
 
 	lh := resp.Header.Get("Link")
-	var retPG *Pagination
 	if lh != "" {
-		retPG, err = newPagination(lh)
+		retPG, err := newPagination(lh)
 		if err != nil {
-			return nil, err
+			return err
 		}
+		*pg = *retPG
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, parseAPIError("bad request", resp)
+		return parseAPIError("bad request", resp)
 	} else if res == nil {
-		return nil, nil
+		return nil
 	}
-	return retPG, json.NewDecoder(resp.Body).Decode(&res)
+	return json.NewDecoder(resp.Body).Decode(&res)
 }
 
 // NewClient return new mastodon API client.

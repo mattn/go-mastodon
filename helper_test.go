@@ -62,14 +62,6 @@ func TestBase64Encode(t *testing.T) {
 	}
 }
 
-func TestInt64(t *testing.T) {
-	i := int64(1234567)
-	ip := Int64(i)
-	if *ip != i {
-		t.Fatalf("want %d but %d", i, *ip)
-	}
-}
-
 func TestString(t *testing.T) {
 	s := "test"
 	sp := String(s)

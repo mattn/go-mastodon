@@ -17,7 +17,7 @@ func cmdFollowers(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	var maxID *int64
+	var maxID int64
 	var followers []*mastodon.Account
 	for {
 		pg := mastodon.Pagination{MaxID: maxID}
@@ -26,7 +26,7 @@ func cmdFollowers(c *cli.Context) error {
 			return err
 		}
 		followers = append(followers, fs...)
-		if pg.MaxID == nil {
+		if pg.MaxID == 0 {
 			break
 		}
 		maxID = pg.MaxID

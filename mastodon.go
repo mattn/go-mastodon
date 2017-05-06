@@ -213,9 +213,9 @@ type Results struct {
 
 // Pagination is a struct for specifying the get range.
 type Pagination struct {
-	MaxID   *int64
-	SinceID *int64
-	Limit   *int64
+	MaxID   int64
+	SinceID int64
+	Limit   int64
 }
 
 func newPagination(rawlink string) (*Pagination, error) {
@@ -231,13 +231,13 @@ func newPagination(rawlink string) (*Pagination, error) {
 			if err != nil {
 				return nil, err
 			}
-			p.MaxID = &maxID
+			p.MaxID = maxID
 		case "prev":
 			sinceID, err := getPaginationID(link.URL, "since_id")
 			if err != nil {
 				return nil, err
 			}
-			p.SinceID = &sinceID
+			p.SinceID = sinceID
 		}
 	}
 
@@ -263,14 +263,14 @@ func (p *Pagination) toValues() url.Values {
 }
 
 func (p *Pagination) setValues(params url.Values) url.Values {
-	if p.MaxID != nil {
-		params.Set("max_id", fmt.Sprint(*p.MaxID))
+	if p.MaxID != 0 {
+		params.Set("max_id", fmt.Sprint(p.MaxID))
 	}
-	if p.SinceID != nil {
-		params.Set("since_id", fmt.Sprint(*p.SinceID))
+	if p.SinceID != 0 {
+		params.Set("since_id", fmt.Sprint(p.SinceID))
 	}
-	if p.Limit != nil {
-		params.Set("limit", fmt.Sprint(*p.Limit))
+	if p.Limit != 0 {
+		params.Set("limit", fmt.Sprint(p.Limit))
 	}
 
 	return params

@@ -17,10 +17,9 @@ func cmdFollowers(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	var maxID int64
 	var followers []*mastodon.Account
+	var pg mastodon.Pagination
 	for {
-		pg := mastodon.Pagination{MaxID: maxID}
 		fs, err := client.GetAccountFollowers(context.Background(), account.ID, &pg)
 		if err != nil {
 			return err
@@ -29,7 +28,7 @@ func cmdFollowers(c *cli.Context) error {
 		if pg.MaxID == 0 {
 			break
 		}
-		maxID = pg.MaxID
+		pg.SinceID = 0
 		time.Sleep(10 * time.Second)
 	}
 	s := newScreen(config)

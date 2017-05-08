@@ -79,7 +79,6 @@ func cmdStream(c *cli.Context) error {
 	}
 	go func() {
 		<-sc
-		close(q)
 		cancel()
 	}()
 

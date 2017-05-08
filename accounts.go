@@ -84,9 +84,9 @@ func (c *Client) AccountUpdate(ctx context.Context, profile *Profile) (*Account,
 }
 
 // GetAccountStatuses return statuses by specified accuont.
-func (c *Client) GetAccountStatuses(ctx context.Context, id int64) ([]*Status, error) {
+func (c *Client) GetAccountStatuses(ctx context.Context, id int64, pg *Pagination) ([]*Status, error) {
 	var statuses []*Status
-	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/accounts/%d/statuses", id), nil, &statuses, nil)
+	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/accounts/%d/statuses", id), nil, &statuses, pg)
 	if err != nil {
 		return nil, err
 	}
@@ -94,29 +94,19 @@ func (c *Client) GetAccountStatuses(ctx context.Context, id int64) ([]*Status, e
 }
 
 // GetAccountFollowers return followers list.
-func (c *Client) GetAccountFollowers(ctx context.Context, id int64) ([]*Account, error) {
-	params := url.Values{}
-	var total []*Account
-	for {
-		var accounts []*Account
-		var next bool
-		err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/accounts/%d/followers", id), params, &accounts, &next)
-		if err != nil {
-			return nil, err
-		}
-		total = append(total, accounts...)
-		if !next {
-			break
-		}
-		time.Sleep(c.interval)
+func (c *Client) GetAccountFollowers(ctx context.Context, id int64, pg *Pagination) ([]*Account, error) {
+	var accounts []*Account
+	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/accounts/%d/followers", id), nil, &accounts, pg)
+	if err != nil {
+		return nil, err
 	}
-	return total, nil
+	return accounts, nil
 }
 
 // GetAccountFollowing return following list.
-func (c *Client) GetAccountFollowing(ctx context.Context, id int64) ([]*Account, error) {
+func (c *Client) GetAccountFollowing(ctx context.Context, id int64, pg *Pagination) ([]*Account, error) {
 	var accounts []*Account
-	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/accounts/%d/following", id), nil, &accounts, nil)
+	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/accounts/%d/following", id), nil, &accounts, pg)
 	if err != nil {
 		return nil, err
 	}
@@ -124,9 +114,9 @@ func (c *Client) GetAccountFollowing(ctx context.Context, id int64) ([]*Account,
 }
 
 // GetBlocks return block list.
-func (c *Client) GetBlocks(ctx context.Context) ([]*Account, error) {
+func (c *Client) GetBlocks(ctx context.Context, pg *Pagination) ([]*Account, error) {
 	var accounts []*Account
-	err := c.doAPI(ctx, http.MethodGet, "/api/v1/blocks", nil, &accounts, nil)
+	err := c.doAPI(ctx, http.MethodGet, "/api/v1/blocks", nil, &accounts, pg)
 	if err != nil {
 		return nil, err
 	}
@@ -246,9 +236,9 @@ func (c *Client) FollowRemoteUser(ctx context.Context, uri string) (*Account, er
 }
 
 // GetFollowRequests return follow-requests.
-func (c *Client) GetFollowRequests(ctx context.Context) ([]*Account, error) {
+func (c *Client) GetFollowRequests(ctx context.Context, pg *Pagination) ([]*Account, error) {
 	var accounts []*Account
-	err := c.doAPI(ctx, http.MethodGet, "/api/v1/follow_requests", nil, &accounts, nil)
+	err := c.doAPI(ctx, http.MethodGet, "/api/v1/follow_requests", nil, &accounts, pg)
 	if err != nil {
 		return nil, err
 	}
@@ -266,9 +256,9 @@ func (c *Client) FollowRequestReject(ctx context.Context, id int64) error {
 }
 
 // GetMutes returns the list of users muted by the current user.
-func (c *Client) GetMutes(ctx context.Context) ([]*Account, error) {
+func (c *Client) GetMutes(ctx context.Context, pg *Pagination) ([]*Account, error) {
 	var accounts []*Account
-	err := c.doAPI(ctx, http.MethodGet, "/api/v1/mutes", nil, &accounts, nil)
+	err := c.doAPI(ctx, http.MethodGet, "/api/v1/mutes", nil, &accounts, pg)
 	if err != nil {
 		return nil, err
 	}

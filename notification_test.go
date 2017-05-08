@@ -32,7 +32,7 @@ func TestGetNotifications(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	ns, err := client.GetNotifications(context.Background())
+	ns, err := client.GetNotifications(context.Background(), nil)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}

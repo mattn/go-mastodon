@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -11,8 +13,10 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strconv"
 	"strings"
-	"time"
+
+	"github.com/tomnomnom/linkheader"
 )
 
 // Config is a setting for access mastodon APIs.
@@ -26,61 +30,10 @@ type Config struct {
 // Client is a API client for mastodon.
 type Client struct {
 	http.Client
-	config   *Config
-	interval time.Duration
+	config *Config
 }
 
-type page struct {
-	next string
-}
-
-func linkHeader(h http.Header, rel string) []string {
-	var links []string
-	for _, v := range h["Link"] {
-		var p string
-		for len(v) > 0 {
-			i := strings.Index(v, ";")
-			if i < 0 {
-				break
-			}
-			e := i
-			i++
-			for i < len(v) {
-				if v[i] != ' ' {
-					break
-				}
-				i++
-			}
-			p = strings.TrimSpace(v[i:])
-			if !strings.HasPrefix(p, "rel=") {
-				break
-			}
-			i += 4
-			pos := strings.Index(p[4:], `,`)
-			if pos > 0 {
-				p = p[4 : 4+pos]
-				i += pos
-			} else {
-				p = p[4:]
-				i = len(v) - 1
-			}
-			if k := strings.Trim(p, `"`); k == rel {
-				links = append(links, strings.Trim(v[:e], "<>"))
-			}
-			i++
-			for i < len(v) {
-				if v[i] != ' ' {
-					break
-				}
-				i++
-			}
-			v = v[i:]
-		}
-	}
-	return links
-}
-
-func (c *Client) doAPI(ctx context.Context, method string, uri string, params interface{}, res interface{}, next *bool) error {
+func (c *Client) doAPI(ctx context.Context, method string, uri string, params interface{}, res interface{}, pg *Pagination) error {
 	u, err := url.Parse(c.config.Server)
 	if err != nil {
 		return err
@@ -92,6 +45,9 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params in
 	if values, ok := params.(url.Values); ok {
 		var body io.Reader
 		if method == http.MethodGet {
+			if pg != nil {
+				values = pg.setValues(values)
+			}
 			u.RawQuery = values.Encode()
 		} else {
 			body = strings.NewReader(values.Encode())
@@ -127,6 +83,9 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params in
 		}
 		ct = mw.FormDataContentType()
 	} else {
+		if method == http.MethodGet && pg != nil {
+			u.RawQuery = pg.toValues().Encode()
+		}
 		req, err = http.NewRequest(method, u.String(), nil)
 		if err != nil {
 			return err
@@ -144,23 +103,18 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params in
 	}
 	defer resp.Body.Close()
 
-	if next != nil && params != nil {
-		nl := linkHeader(resp.Header, "next")
-		*next = false
-		if len(nl) > 0 {
-			u, err = url.Parse(nl[0])
-			if err == nil {
-				for k, v := range u.Query() {
-					params.(url.Values)[k] = v
-				}
-			}
-			*next = true
-		}
-	}
 	if resp.StatusCode != http.StatusOK {
 		return parseAPIError("bad request", resp)
 	} else if res == nil {
 		return nil
+	} else if pg != nil {
+		if lh := resp.Header.Get("Link"); lh != "" {
+			pg2, err := newPagination(lh)
+			if err != nil {
+				return err
+			}
+			*pg = *pg2
+		}
 	}
 	return json.NewDecoder(resp.Body).Decode(&res)
 }
@@ -168,9 +122,8 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params in
 // NewClient return new mastodon API client.
 func NewClient(config *Config) *Client {
 	return &Client{
-		Client:   *http.DefaultClient,
-		config:   config,
-		interval: 10 * time.Second,
+		Client: *http.DefaultClient,
+		config: config,
 	}
 }
 
@@ -256,4 +209,68 @@ type Results struct {
 	Accounts []*Account `json:"accounts"`
 	Statuses []*Status  `json:"statuses"`
 	Hashtags []string   `json:"hashtags"`
+}
+
+// Pagination is a struct for specifying the get range.
+type Pagination struct {
+	MaxID   int64
+	SinceID int64
+	Limit   int64
+}
+
+func newPagination(rawlink string) (*Pagination, error) {
+	if rawlink == "" {
+		return nil, errors.New("empty link header")
+	}
+
+	p := &Pagination{}
+	for _, link := range linkheader.Parse(rawlink) {
+		switch link.Rel {
+		case "next":
+			maxID, err := getPaginationID(link.URL, "max_id")
+			if err != nil {
+				return nil, err
+			}
+			p.MaxID = maxID
+		case "prev":
+			sinceID, err := getPaginationID(link.URL, "since_id")
+			if err != nil {
+				return nil, err
+			}
+			p.SinceID = sinceID
+		}
+	}
+
+	return p, nil
+}
+
+func getPaginationID(rawurl, key string) (int64, error) {
+	u, err := url.Parse(rawurl)
+	if err != nil {
+		return 0, err
+	}
+
+	id, err := strconv.ParseInt(u.Query().Get(key), 10, 64)
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
+}
+
+func (p *Pagination) toValues() url.Values {
+	return p.setValues(url.Values{})
+}
+
+func (p *Pagination) setValues(params url.Values) url.Values {
+	if p.MaxID > 0 {
+		params.Set("max_id", fmt.Sprint(p.MaxID))
+	} else if p.SinceID > 0 {
+		params.Set("since_id", fmt.Sprint(p.SinceID))
+	}
+	if p.Limit > 0 {
+		params.Set("limit", fmt.Sprint(p.Limit))
+	}
+
+	return params
 }

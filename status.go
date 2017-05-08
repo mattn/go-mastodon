@@ -48,9 +48,9 @@ type Card struct {
 }
 
 // GetFavourites return the favorite list of the current user.
-func (c *Client) GetFavourites(ctx context.Context) ([]*Status, error) {
+func (c *Client) GetFavourites(ctx context.Context, pg *Pagination) ([]*Status, error) {
 	var statuses []*Status
-	err := c.doAPI(ctx, http.MethodGet, "/api/v1/favourites", nil, &statuses, nil)
+	err := c.doAPI(ctx, http.MethodGet, "/api/v1/favourites", nil, &statuses, pg)
 	if err != nil {
 		return nil, err
 	}
@@ -88,9 +88,9 @@ func (c *Client) GetStatusCard(ctx context.Context, id int64) (*Card, error) {
 }
 
 // GetRebloggedBy returns the account list of the user who reblogged the toot of id.
-func (c *Client) GetRebloggedBy(ctx context.Context, id int64) ([]*Account, error) {
+func (c *Client) GetRebloggedBy(ctx context.Context, id int64, pg *Pagination) ([]*Account, error) {
 	var accounts []*Account
-	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/statuses/%d/reblogged_by", id), nil, &accounts, nil)
+	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/statuses/%d/reblogged_by", id), nil, &accounts, pg)
 	if err != nil {
 		return nil, err
 	}
@@ -98,9 +98,9 @@ func (c *Client) GetRebloggedBy(ctx context.Context, id int64) ([]*Account, erro
 }
 
 // GetFavouritedBy returns the account list of the user who liked the toot of id.
-func (c *Client) GetFavouritedBy(ctx context.Context, id int64) ([]*Account, error) {
+func (c *Client) GetFavouritedBy(ctx context.Context, id int64, pg *Pagination) ([]*Account, error) {
 	var accounts []*Account
-	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/statuses/%d/favourited_by", id), nil, &accounts, nil)
+	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/statuses/%d/favourited_by", id), nil, &accounts, pg)
 	if err != nil {
 		return nil, err
 	}
@@ -148,9 +148,9 @@ func (c *Client) Unfavourite(ctx context.Context, id int64) (*Status, error) {
 }
 
 // GetTimelineHome return statuses from home timeline.
-func (c *Client) GetTimelineHome(ctx context.Context) ([]*Status, error) {
+func (c *Client) GetTimelineHome(ctx context.Context, pg *Pagination) ([]*Status, error) {
 	var statuses []*Status
-	err := c.doAPI(ctx, http.MethodGet, "/api/v1/timelines/home", nil, &statuses, nil)
+	err := c.doAPI(ctx, http.MethodGet, "/api/v1/timelines/home", nil, &statuses, pg)
 	if err != nil {
 		return nil, err
 	}
@@ -158,14 +158,14 @@ func (c *Client) GetTimelineHome(ctx context.Context) ([]*Status, error) {
 }
 
 // GetTimelinePublic return statuses from public timeline.
-func (c *Client) GetTimelinePublic(ctx context.Context, isLocal bool) ([]*Status, error) {
+func (c *Client) GetTimelinePublic(ctx context.Context, isLocal bool, pg *Pagination) ([]*Status, error) {
 	params := url.Values{}
 	if isLocal {
 		params.Set("local", "t")
 	}
 
 	var statuses []*Status
-	err := c.doAPI(ctx, http.MethodGet, "/api/v1/timelines/public", params, &statuses, nil)
+	err := c.doAPI(ctx, http.MethodGet, "/api/v1/timelines/public", params, &statuses, pg)
 	if err != nil {
 		return nil, err
 	}
@@ -173,14 +173,14 @@ func (c *Client) GetTimelinePublic(ctx context.Context, isLocal bool) ([]*Status
 }
 
 // GetTimelineHashtag return statuses from tagged timeline.
-func (c *Client) GetTimelineHashtag(ctx context.Context, tag string, isLocal bool) ([]*Status, error) {
+func (c *Client) GetTimelineHashtag(ctx context.Context, tag string, isLocal bool, pg *Pagination) ([]*Status, error) {
 	params := url.Values{}
 	if isLocal {
 		params.Set("local", "t")
 	}
 
 	var statuses []*Status
-	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/timelines/tag/%s", url.PathEscape(tag)), params, &statuses, nil)
+	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/timelines/tag/%s", url.PathEscape(tag)), params, &statuses, pg)
 	if err != nil {
 		return nil, err
 	}
@@ -189,7 +189,7 @@ func (c *Client) GetTimelineHashtag(ctx context.Context, tag string, isLocal boo
 
 // GetTimelineMedia return statuses from media timeline.
 // NOTE: This is an experimental feature of pawoo.net.
-func (c *Client) GetTimelineMedia(ctx context.Context, isLocal bool) ([]*Status, error) {
+func (c *Client) GetTimelineMedia(ctx context.Context, isLocal bool, pg *Pagination) ([]*Status, error) {
 	params := url.Values{}
 	params.Set("media", "t")
 	if isLocal {
@@ -197,7 +197,7 @@ func (c *Client) GetTimelineMedia(ctx context.Context, isLocal bool) ([]*Status,
 	}
 
 	var statuses []*Status
-	err := c.doAPI(ctx, http.MethodGet, "/api/v1/timelines/public", params, &statuses, nil)
+	err := c.doAPI(ctx, http.MethodGet, "/api/v1/timelines/public", params, &statuses, pg)
 	if err != nil {
 		return nil, err
 	}

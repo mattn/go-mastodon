@@ -17,9 +17,9 @@ type Notification struct {
 }
 
 // GetNotifications return notifications.
-func (c *Client) GetNotifications(ctx context.Context) ([]*Notification, error) {
+func (c *Client) GetNotifications(ctx context.Context, pg *Pagination) ([]*Notification, error) {
 	var notifications []*Notification
-	err := c.doAPI(ctx, http.MethodGet, "/api/v1/notifications", nil, &notifications, nil)
+	err := c.doAPI(ctx, http.MethodGet, "/api/v1/notifications", nil, &notifications, pg)
 	if err != nil {
 		return nil, err
 	}

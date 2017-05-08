@@ -21,7 +21,7 @@ func TestGetFavourites(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	favs, err := client.GetFavourites(context.Background())
+	favs, err := client.GetFavourites(context.Background(), nil)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -152,11 +152,11 @@ func TestGetRebloggedBy(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	_, err := client.GetRebloggedBy(context.Background(), 123)
+	_, err := client.GetRebloggedBy(context.Background(), 123, nil)
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	rbs, err := client.GetRebloggedBy(context.Background(), 1234567)
+	rbs, err := client.GetRebloggedBy(context.Background(), 1234567, nil)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -188,11 +188,11 @@ func TestGetFavouritedBy(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	_, err := client.GetFavouritedBy(context.Background(), 123)
+	_, err := client.GetFavouritedBy(context.Background(), 123, nil)
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	fbs, err := client.GetFavouritedBy(context.Background(), 1234567)
+	fbs, err := client.GetFavouritedBy(context.Background(), 1234567, nil)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -338,11 +338,11 @@ func TestGetTimelinePublic(t *testing.T) {
 	defer ts.Close()
 
 	client := NewClient(&Config{Server: ts.URL})
-	_, err := client.GetTimelinePublic(context.Background(), false)
+	_, err := client.GetTimelinePublic(context.Background(), false, nil)
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	tl, err := client.GetTimelinePublic(context.Background(), true)
+	tl, err := client.GetTimelinePublic(context.Background(), true, nil)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -374,11 +374,11 @@ func TestGetTimelineHashtag(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	_, err := client.GetTimelineHashtag(context.Background(), "notfound", false)
+	_, err := client.GetTimelineHashtag(context.Background(), "notfound", false, nil)
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	tags, err := client.GetTimelineHashtag(context.Background(), "zzz", true)
+	tags, err := client.GetTimelineHashtag(context.Background(), "zzz", true, nil)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -410,11 +410,11 @@ func TestGetTimelineMedia(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	_, err := client.GetTimelineMedia(context.Background(), false)
+	_, err := client.GetTimelineMedia(context.Background(), false, nil)
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	tags, err := client.GetTimelineMedia(context.Background(), true)
+	tags, err := client.GetTimelineMedia(context.Background(), true, nil)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}

@@ -58,7 +58,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	timeline, err := c.GetTimelineHome(context.Background())
+	timeline, err := c.GetTimelineHome(context.Background(), nil)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -105,7 +105,6 @@ func (c *Client) streaming(ctx context.Context, p string, params url.Values) (ch
 		for {
 			select {
 			case <-ctx.Done():
-				q <- &ErrorEvent{ctx.Err()}
 				return
 			default:
 			}

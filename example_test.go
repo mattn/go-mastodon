@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/mattn/go-mastodon"
 )
@@ -38,5 +39,29 @@ func ExampleClient() {
 	}
 	for i := len(timeline) - 1; i >= 0; i-- {
 		fmt.Println(timeline[i])
+	}
+}
+
+func ExamplePagination() {
+	c := mastodon.NewClient(&mastodon.Config{
+		Server:       "https://mstdn.jp",
+		ClientID:     "client-id",
+		ClientSecret: "client-secret",
+	})
+	var followers []*mastodon.Account
+	var pg mastodon.Pagination
+	for {
+		fs, err := c.GetAccountFollowers(context.Background(), 1, &pg)
+		if err != nil {
+			log.Fatal(err)
+		}
+		followers = append(followers, fs...)
+		if pg.MaxID == 0 {
+			break
+		}
+		time.Sleep(10 * time.Second)
+	}
+	for _, f := range followers {
+		fmt.Println(f.Acct)
 	}
 }

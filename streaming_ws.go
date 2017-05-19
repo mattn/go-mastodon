@@ -61,7 +61,7 @@ func (c *WSClient) streamingWS(ctx context.Context, stream, tag string) (chan Ev
 	if err != nil {
 		return nil, err
 	}
-	u.Path = path.Join(u.Path, "/api/v1/streaming")
+	u.Path = path.Join(u.Path, "api/v1/streaming")
 	u.RawQuery = params.Encode()
 
 	q := make(chan Event)

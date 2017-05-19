@@ -89,7 +89,7 @@ func (c *Client) streaming(ctx context.Context, p string, params url.Values) (ch
 	if err != nil {
 		return nil, err
 	}
-	u.Path = path.Join(u.Path, "/api/v1/streaming", p)
+	u.Path = path.Join(u.Path, "api/v1/streaming", p)
 	u.RawQuery = params.Encode()
 
 	req, err := http.NewRequest(http.MethodGet, u.String(), nil)

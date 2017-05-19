@@ -49,7 +49,7 @@ func RegisterApp(ctx context.Context, appConfig *AppConfig) (*Application, error
 	if err != nil {
 		return nil, err
 	}
-	u.Path = path.Join(u.Path, "/api/v1/apps")
+	u.Path = path.Join(u.Path, "api/v1/apps")
 
 	req, err := http.NewRequest(http.MethodPost, u.String(), strings.NewReader(params.Encode()))
 	if err != nil {

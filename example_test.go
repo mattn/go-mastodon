@@ -51,7 +51,7 @@ func ExamplePagination() {
 	var followers []*mastodon.Account
 	var pg mastodon.Pagination
 	for {
-		fs, err := c.GetAccountFollowers(context.Background(), 1, &pg)
+		fs, err := c.GetAccountFollowers(context.Background(), "1", &pg)
 		if err != nil {
 			log.Fatal(err)
 		}

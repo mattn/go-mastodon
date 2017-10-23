@@ -25,11 +25,11 @@ func TestGetAccount(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	_, err := client.GetAccount(context.Background(), 1)
+	_, err := client.GetAccount(context.Background(), "1")
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	a, err := client.GetAccount(context.Background(), 1234567)
+	a, err := client.GetAccount(context.Background(), "1234567")
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -124,11 +124,11 @@ func TestGetAccountStatuses(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	_, err := client.GetAccountStatuses(context.Background(), 123, nil)
+	_, err := client.GetAccountStatuses(context.Background(), "123", nil)
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	ss, err := client.GetAccountStatuses(context.Background(), 1234567, nil)
+	ss, err := client.GetAccountStatuses(context.Background(), "1234567", nil)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -157,11 +157,11 @@ func TestGetAccountFollowers(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	_, err := client.GetAccountFollowers(context.Background(), 123, nil)
+	_, err := client.GetAccountFollowers(context.Background(), "123", nil)
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	fl, err := client.GetAccountFollowers(context.Background(), 1234567, nil)
+	fl, err := client.GetAccountFollowers(context.Background(), "1234567", nil)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -193,11 +193,11 @@ func TestGetAccountFollowing(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	_, err := client.GetAccountFollowing(context.Background(), 123, nil)
+	_, err := client.GetAccountFollowing(context.Background(), "123", nil)
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	fl, err := client.GetAccountFollowing(context.Background(), 1234567, nil)
+	fl, err := client.GetAccountFollowing(context.Background(), "1234567", nil)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -267,16 +267,16 @@ func TestAccountFollow(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	rel, err := client.AccountFollow(context.Background(), 123)
+	rel, err := client.AccountFollow(context.Background(), "123")
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	rel, err = client.AccountFollow(context.Background(), 1234567)
+	rel, err = client.AccountFollow(context.Background(), "1234567")
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
-	if rel.ID != 1234567 {
-		t.Fatalf("want %d but %d", 1234567, rel.ID)
+	if rel.ID != "1234567" {
+		t.Fatalf("want %q but %q", "1234567", rel.ID)
 	}
 	if !rel.Following {
 		t.Fatalf("want %t but %t", true, rel.Following)
@@ -300,16 +300,16 @@ func TestAccountUnfollow(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	rel, err := client.AccountUnfollow(context.Background(), 123)
+	rel, err := client.AccountUnfollow(context.Background(), "123")
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	rel, err = client.AccountUnfollow(context.Background(), 1234567)
+	rel, err = client.AccountUnfollow(context.Background(), "1234567")
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
-	if rel.ID != 1234567 {
-		t.Fatalf("want %d but %d", 1234567, rel.ID)
+	if rel.ID != "1234567" {
+		t.Fatalf("want %q but %q", "1234567", rel.ID)
 	}
 	if rel.Following {
 		t.Fatalf("want %t but %t", false, rel.Following)
@@ -333,16 +333,16 @@ func TestAccountBlock(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	_, err := client.AccountBlock(context.Background(), 123)
+	_, err := client.AccountBlock(context.Background(), "123")
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	rel, err := client.AccountBlock(context.Background(), 1234567)
+	rel, err := client.AccountBlock(context.Background(), "1234567")
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
-	if rel.ID != 1234567 {
-		t.Fatalf("want %d but %d", 1234567, rel.ID)
+	if rel.ID != "1234567" {
+		t.Fatalf("want %q but %q", "1234567", rel.ID)
 	}
 	if !rel.Blocking {
 		t.Fatalf("want %t but %t", true, rel.Blocking)
@@ -366,16 +366,16 @@ func TestAccountUnblock(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	_, err := client.AccountUnblock(context.Background(), 123)
+	_, err := client.AccountUnblock(context.Background(), "123")
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	rel, err := client.AccountUnblock(context.Background(), 1234567)
+	rel, err := client.AccountUnblock(context.Background(), "1234567")
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
-	if rel.ID != 1234567 {
-		t.Fatalf("want %d but %d", 1234567, rel.ID)
+	if rel.ID != "1234567" {
+		t.Fatalf("want %q but %q", "1234567", rel.ID)
 	}
 	if rel.Blocking {
 		t.Fatalf("want %t but %t", false, rel.Blocking)
@@ -399,16 +399,16 @@ func TestAccountMute(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	_, err := client.AccountMute(context.Background(), 123)
+	_, err := client.AccountMute(context.Background(), "123")
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	rel, err := client.AccountMute(context.Background(), 1234567)
+	rel, err := client.AccountMute(context.Background(), "1234567")
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
-	if rel.ID != 1234567 {
-		t.Fatalf("want %d but %d", 1234567, rel.ID)
+	if rel.ID != "1234567" {
+		t.Fatalf("want %q but %q", "1234567", rel.ID)
 	}
 	if !rel.Muting {
 		t.Fatalf("want %t but %t", true, rel.Muting)
@@ -432,16 +432,16 @@ func TestAccountUnmute(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	_, err := client.AccountUnmute(context.Background(), 123)
+	_, err := client.AccountUnmute(context.Background(), "123")
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	rel, err := client.AccountUnmute(context.Background(), 1234567)
+	rel, err := client.AccountUnmute(context.Background(), "1234567")
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
-	if rel.ID != 1234567 {
-		t.Fatalf("want %d but %d", 1234567, rel.ID)
+	if rel.ID != "1234567" {
+		t.Fatalf("want %q but %q", "1234567", rel.ID)
 	}
 	if rel.Muting {
 		t.Fatalf("want %t but %t", false, rel.Muting)
@@ -465,19 +465,19 @@ func TestGetAccountRelationship(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	_, err := client.GetAccountRelationships(context.Background(), []int64{123, 456})
+	_, err := client.GetAccountRelationships(context.Background(), []string{"123", "456"})
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	rels, err := client.GetAccountRelationships(context.Background(), []int64{1234567, 8901234})
+	rels, err := client.GetAccountRelationships(context.Background(), []string{"1234567", "8901234"})
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
-	if rels[0].ID != 1234567 {
-		t.Fatalf("want %d but %d", 1234567, rels[0].ID)
+	if rels[0].ID != "1234567" {
+		t.Fatalf("want %q but %q", "1234567", rels[0].ID)
 	}
-	if rels[1].ID != 8901234 {
-		t.Fatalf("want %d but %d", 8901234, rels[1].ID)
+	if rels[1].ID != "8901234" {
+		t.Fatalf("want %q but %q", "8901234", rels[1].ID)
 	}
 }
 
@@ -599,11 +599,11 @@ func TestFollowRequestAuthorize(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	err := client.FollowRequestAuthorize(context.Background(), 123)
+	err := client.FollowRequestAuthorize(context.Background(), "123")
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	err = client.FollowRequestAuthorize(context.Background(), 1234567)
+	err = client.FollowRequestAuthorize(context.Background(), "1234567")
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -623,11 +623,11 @@ func TestFollowRequestReject(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	err := client.FollowRequestReject(context.Background(), 123)
+	err := client.FollowRequestReject(context.Background(), "123")
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	err = client.FollowRequestReject(context.Background(), 1234567)
+	err = client.FollowRequestReject(context.Background(), "1234567")
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}

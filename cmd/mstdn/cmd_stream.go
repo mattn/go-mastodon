@@ -15,11 +15,11 @@ import (
 
 // SimpleJSON is a struct for output JSON for data to be simple used
 type SimpleJSON struct {
-	ID       int64  `json:"id"`
-	Username string `json:"username"`
-	Acct     string `json:"acct"`
-	Avatar   string `json:"avatar"`
-	Content  string `json:"content"`
+	ID       mastodon.ID `json:"id"`
+	Username string      `json:"username"`
+	Acct     string      `json:"acct"`
+	Avatar   string      `json:"avatar"`
+	Content  string      `json:"content"`
 }
 
 func checkFlag(f ...bool) bool {

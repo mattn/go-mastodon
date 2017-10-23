@@ -10,7 +10,7 @@ import (
 
 // Account hold information for mastodon account.
 type Account struct {
-	ID             int64     `json:"id"`
+	ID             string    `json:"id"`
 	Username       string    `json:"username"`
 	Acct           string    `json:"acct"`
 	DisplayName    string    `json:"display_name"`

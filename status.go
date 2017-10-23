@@ -11,7 +11,7 @@ import (
 
 // Status is struct to hold status.
 type Status struct {
-	ID                 int64        `json:"id"`
+	ID                 string       `json:"id"`
 	CreatedAt          time.Time    `json:"created_at"`
 	InReplyToID        interface{}  `json:"in_reply_to_id"`
 	InReplyToAccountID interface{}  `json:"in_reply_to_account_id"`

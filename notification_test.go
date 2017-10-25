@@ -40,17 +40,17 @@ func TestGetNotifications(t *testing.T) {
 		t.Fatalf("result should be two: %d", len(ns))
 	}
 	if ns[0].ID != "122" {
-		t.Fatalf("want %v but %v", 122, ns[0].ID)
+		t.Fatalf("want %v but %v", "122", ns[0].ID)
 	}
 	if ns[1].ID != "123" {
-		t.Fatalf("want %v but %v", 123, ns[1].ID)
+		t.Fatalf("want %v but %v", "123", ns[1].ID)
 	}
-	n, err := client.GetNotification(context.Background(), 123)
+	n, err := client.GetNotification(context.Background(), "123")
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
 	if n.ID != "123" {
-		t.Fatalf("want %v but %v", 123, n.ID)
+		t.Fatalf("want %v but %v", "123", n.ID)
 	}
 	err = client.ClearNotifications(context.Background())
 	if err != nil {

@@ -4,12 +4,10 @@ import (
 	"bufio"
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"path"
-	"strconv"
 	"strings"
 )
 
@@ -71,11 +69,7 @@ func handleReader(q chan Event, r io.Reader) error {
 					q <- &NotificationEvent{&notification}
 				}
 			case "delete":
-				var id int64
-				id, err = strconv.ParseInt(strings.TrimSpace(token[1]), 10, 64)
-				if err == nil {
-					q <- &DeleteEvent{ID(fmt.Sprintf("%20d", id))}
-				}
+				q <- &DeleteEvent{ID(strings.TrimSpace(token[1]))}
 			}
 			if err != nil {
 				q <- &ErrorEvent{err}

@@ -25,26 +25,26 @@ func TestDoAPI(t *testing.T) {
 	c := NewClient(&Config{Server: ts.URL})
 	var accounts []Account
 	err := c.doAPI(context.Background(), http.MethodGet, "/", nil, &accounts, &Pagination{
-		MaxID: 999,
+		MaxID: "999",
 	})
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
 
 	pg := &Pagination{
-		MaxID:   123,
-		SinceID: 789,
+		MaxID:   "123",
+		SinceID: "789",
 		Limit:   10,
 	}
 	err = c.doAPI(context.Background(), http.MethodGet, "/", url.Values{}, &accounts, pg)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
-	if pg.MaxID != 234 {
-		t.Fatalf("want %d but %d", 234, pg.MaxID)
+	if pg.MaxID != "234" {
+		t.Fatalf("want %q but %q", "234", pg.MaxID)
 	}
-	if pg.SinceID != 890 {
-		t.Fatalf("want %d but %d", 890, pg.SinceID)
+	if pg.SinceID != "890" {
+		t.Fatalf("want %q but %q", "890", pg.SinceID)
 	}
 	if accounts[0].Username != "foo" {
 		t.Fatalf("want %q but %q", "foo", accounts[0].Username)
@@ -54,19 +54,19 @@ func TestDoAPI(t *testing.T) {
 	}
 
 	pg = &Pagination{
-		MaxID:   123,
-		SinceID: 789,
+		MaxID:   "123",
+		SinceID: "789",
 		Limit:   10,
 	}
 	err = c.doAPI(context.Background(), http.MethodGet, "/", nil, &accounts, pg)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
-	if pg.MaxID != 234 {
-		t.Fatalf("want %d but %d", 234, pg.MaxID)
+	if pg.MaxID != "234" {
+		t.Fatalf("want %q but %q", "234", pg.MaxID)
 	}
-	if pg.SinceID != 890 {
-		t.Fatalf("want %d but %d", 890, pg.SinceID)
+	if pg.SinceID != "890" {
+		t.Fatalf("want %q but %q", "890", pg.SinceID)
 	}
 	if accounts[0].Username != "foo" {
 		t.Fatalf("want %q but %q", "foo", accounts[0].Username)
@@ -297,11 +297,11 @@ func TestNewPagination(t *testing.T) {
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
-	if pg.MaxID != 123 {
-		t.Fatalf("want %d but %d", 123, pg.MaxID)
+	if pg.MaxID != "123" {
+		t.Fatalf("want %q but %q", "123", pg.MaxID)
 	}
-	if pg.SinceID != 789 {
-		t.Fatalf("want %d but %d", 789, pg.SinceID)
+	if pg.SinceID != "789" {
+		t.Fatalf("want %q but %q", "789", pg.SinceID)
 	}
 }
 
@@ -320,15 +320,15 @@ func TestGetPaginationID(t *testing.T) {
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
-	if id != 123 {
-		t.Fatalf("want %d but %d", 123, id)
+	if id != "123" {
+		t.Fatalf("want %q but %q", "123", id)
 	}
 }
 
 func TestPaginationSetValues(t *testing.T) {
 	p := &Pagination{
-		MaxID:   123,
-		SinceID: 789,
+		MaxID:   "123",
+		SinceID: "789",
 		Limit:   10,
 	}
 	before := url.Values{"key": {"value"}}
@@ -347,8 +347,8 @@ func TestPaginationSetValues(t *testing.T) {
 	}
 
 	p = &Pagination{
-		MaxID:   0,
-		SinceID: 789,
+		MaxID:   "",
+		SinceID: "789",
 	}
 	before = url.Values{}
 	after = p.setValues(before)

@@ -534,7 +534,7 @@ func TestUploadMedia(t *testing.T) {
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
-	if attachment.ID != 123 {
-		t.Fatalf("want %q but %q", 123, attachment.ID)
+	if attachment.ID != "123" {
+		t.Fatalf("want %q but %q", "123", attachment.ID)
 	}
 }

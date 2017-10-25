@@ -25,7 +25,7 @@ func cmdFollowers(c *cli.Context) error {
 			return err
 		}
 		followers = append(followers, fs...)
-		if pg.MaxID == 0 {
+		if pg.MaxID == "" {
 			break
 		}
 		time.Sleep(10 * time.Second)

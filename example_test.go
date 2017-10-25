@@ -56,7 +56,7 @@ func ExamplePagination() {
 			log.Fatal(err)
 		}
 		followers = append(followers, fs...)
-		if pg.MaxID == 0 {
+		if pg.MaxID == "" {
 			break
 		}
 		time.Sleep(10 * time.Second)

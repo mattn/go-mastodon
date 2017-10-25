@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/mattn/go-mastodon"
 	"github.com/urfave/cli"
@@ -26,7 +27,7 @@ func cmdToot(c *cli.Context) error {
 	client := c.App.Metadata["client"].(*mastodon.Client)
 	_, err := client.PostStatus(context.Background(), &mastodon.Toot{
 		Status:      toot,
-		InReplyToID: c.Int64("i"),
+		InReplyToID: mastodon.ID(fmt.Sprint(c.Int64("i"))),
 	})
 	return err
 }

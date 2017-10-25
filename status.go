@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"strconv"
 	"time"
 )
 
@@ -208,12 +207,12 @@ func (c *Client) GetTimelineMedia(ctx context.Context, isLocal bool, pg *Paginat
 func (c *Client) PostStatus(ctx context.Context, toot *Toot) (*Status, error) {
 	params := url.Values{}
 	params.Set("status", toot.Status)
-	if toot.InReplyToID > 0 {
-		params.Set("in_reply_to_id", fmt.Sprint(toot.InReplyToID))
+	if toot.InReplyToID != "" {
+		params.Set("in_reply_to_id", string(toot.InReplyToID))
 	}
 	if toot.MediaIDs != nil {
 		for _, media := range toot.MediaIDs {
-			params.Add("media_ids[]", strconv.FormatInt(media, 10))
+			params.Add("media_ids[]", string(media))
 		}
 	}
 	if toot.Visibility != "" {

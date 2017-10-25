@@ -173,12 +173,12 @@ func (c *Client) Authenticate(ctx context.Context, username, password string) er
 
 // Toot is struct to post status.
 type Toot struct {
-	Status      string  `json:"status"`
-	InReplyToID int64   `json:"in_reply_to_id"`
-	MediaIDs    []int64 `json:"media_ids"`
-	Sensitive   bool    `json:"sensitive"`
-	SpoilerText string  `json:"spoiler_text"`
-	Visibility  string  `json:"visibility"`
+	Status      string `json:"status"`
+	InReplyToID ID     `json:"in_reply_to_id"`
+	MediaIDs    []ID   `json:"media_ids"`
+	Sensitive   bool   `json:"sensitive"`
+	SpoilerText string `json:"spoiler_text"`
+	Visibility  string `json:"visibility"`
 }
 
 // Mention hold information for mention.
@@ -186,7 +186,7 @@ type Mention struct {
 	URL      string `json:"url"`
 	Username string `json:"username"`
 	Acct     string `json:"acct"`
-	ID       int64  `json:"id"`
+	ID       ID     `json:"id"`
 }
 
 // Tag hold information for tag.
@@ -197,7 +197,7 @@ type Tag struct {
 
 // Attachment hold information for attachment.
 type Attachment struct {
-	ID         int64  `json:"id"`
+	ID         ID     `json:"id"`
 	Type       string `json:"type"`
 	URL        string `json:"url"`
 	RemoteURL  string `json:"remote_url"`
@@ -214,8 +214,8 @@ type Results struct {
 
 // Pagination is a struct for specifying the get range.
 type Pagination struct {
-	MaxID   int64
-	SinceID int64
+	MaxID   ID
+	SinceID ID
 	Limit   int64
 }
 
@@ -245,18 +245,18 @@ func newPagination(rawlink string) (*Pagination, error) {
 	return p, nil
 }
 
-func getPaginationID(rawurl, key string) (int64, error) {
+func getPaginationID(rawurl, key string) (ID, error) {
 	u, err := url.Parse(rawurl)
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 
 	id, err := strconv.ParseInt(u.Query().Get(key), 10, 64)
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 
-	return id, nil
+	return ID(fmt.Sprint(id)), nil
 }
 
 func (p *Pagination) toValues() url.Values {
@@ -264,10 +264,10 @@ func (p *Pagination) toValues() url.Values {
 }
 
 func (p *Pagination) setValues(params url.Values) url.Values {
-	if p.MaxID > 0 {
-		params.Set("max_id", fmt.Sprint(p.MaxID))
-	} else if p.SinceID > 0 {
-		params.Set("since_id", fmt.Sprint(p.SinceID))
+	if p.MaxID != "" {
+		params.Set("max_id", string(p.MaxID))
+	} else if p.SinceID != "" {
+		params.Set("since_id", string(p.SinceID))
 	}
 	if p.Limit > 0 {
 		params.Set("limit", fmt.Sprint(p.Limit))

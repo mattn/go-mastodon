@@ -205,6 +205,13 @@ type Attachment struct {
 	TextURL    string `json:"text_url"`
 }
 
+// Emoji hold information for CustomEmoji.
+type Emoji struct {
+	ShortCode string `json:"shortcode"`
+	URL       string `json:"url"`
+	StaticURL string `json:"static_url"`
+}
+
 // Results hold information for search result.
 type Results struct {
 	Accounts []*Account `json:"accounts"`

@@ -117,7 +117,7 @@ func wsTest(t *testing.T, q chan Event, cancel func()) {
 	if events[0].(*UpdateEvent).Status.Content != "foo" {
 		t.Fatalf("want %q but %q", "foo", events[0].(*UpdateEvent).Status.Content)
 	}
-	if events[1].(*NotificationEvent).Notification.ID != 123 {
+	if events[1].(*NotificationEvent).Notification.ID != "123" {
 		t.Fatalf("want %d but %d", 123, events[1].(*NotificationEvent).Notification.ID)
 	}
 	if events[2].(*DeleteEvent).ID != 1234567 {

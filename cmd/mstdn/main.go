@@ -199,10 +199,10 @@ func makeApp() *cli.App {
 					Usage: "post utf-8 string from a file(\"-\" means STDIN)",
 					Value: "",
 				},
-				cli.IntFlag{
+				cli.StringFlag{
 					Name:  "i",
 					Usage: "in-reply-to",
-					Value: 0,
+					Value: "",
 				},
 			},
 			Action: cmdToot,

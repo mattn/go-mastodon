@@ -9,7 +9,7 @@ import (
 
 // Notification hold information for mastodon notification.
 type Notification struct {
-	ID        int64     `json:"id"`
+	ID        ID        `json:"id"`
 	Type      string    `json:"type"`
 	CreatedAt time.Time `json:"created_at"`
 	Account   Account   `json:"account"`

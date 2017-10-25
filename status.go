@@ -20,6 +20,7 @@ type Status struct {
 	Application        Application  `json:"application"`
 	Account            Account      `json:"account"`
 	MediaAttachments   []Attachment `json:"media_attachments"`
+	Emojis             []Emoji      `json:"emojis"`
 	Mentions           []Mention    `json:"mentions"`
 	Tags               []Tag        `json:"tags"`
 	URI                string       `json:"uri"`

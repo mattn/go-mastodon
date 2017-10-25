@@ -9,7 +9,7 @@ import (
 
 // Notification hold information for mastodon notification.
 type Notification struct {
-	ID        int64     `json:"id"`
+	ID        ID        `json:"id"`
 	Type      string    `json:"type"`
 	CreatedAt time.Time `json:"created_at"`
 	Account   Account   `json:"account"`
@@ -27,9 +27,9 @@ func (c *Client) GetNotifications(ctx context.Context, pg *Pagination) ([]*Notif
 }
 
 // GetNotification return notification.
-func (c *Client) GetNotification(ctx context.Context, id int64) (*Notification, error) {
+func (c *Client) GetNotification(ctx context.Context, id ID) (*Notification, error) {
 	var notification Notification
-	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/notifications/%d", id), nil, &notification, nil)
+	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/notifications/%v", id), nil, &notification, nil)
 	if err != nil {
 		return nil, err
 	}

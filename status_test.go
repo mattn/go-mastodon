@@ -53,11 +53,11 @@ func TestGetStatus(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	_, err := client.GetStatus(context.Background(), 123)
+	_, err := client.GetStatus(context.Background(), "123")
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	status, err := client.GetStatus(context.Background(), 1234567)
+	status, err := client.GetStatus(context.Background(), "1234567")
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -83,11 +83,11 @@ func TestGetStatusCard(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	_, err := client.GetStatusCard(context.Background(), 123)
+	_, err := client.GetStatusCard(context.Background(), "123")
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	card, err := client.GetStatusCard(context.Background(), 1234567)
+	card, err := client.GetStatusCard(context.Background(), "1234567")
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -113,11 +113,11 @@ func TestGetStatusContext(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	_, err := client.GetStatusContext(context.Background(), 123)
+	_, err := client.GetStatusContext(context.Background(), "123")
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	context, err := client.GetStatusContext(context.Background(), 1234567)
+	context, err := client.GetStatusContext(context.Background(), "1234567")
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -152,11 +152,11 @@ func TestGetRebloggedBy(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	_, err := client.GetRebloggedBy(context.Background(), 123, nil)
+	_, err := client.GetRebloggedBy(context.Background(), "123", nil)
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	rbs, err := client.GetRebloggedBy(context.Background(), 1234567, nil)
+	rbs, err := client.GetRebloggedBy(context.Background(), "1234567", nil)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -188,11 +188,11 @@ func TestGetFavouritedBy(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	_, err := client.GetFavouritedBy(context.Background(), 123, nil)
+	_, err := client.GetFavouritedBy(context.Background(), "123", nil)
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	fbs, err := client.GetFavouritedBy(context.Background(), 1234567, nil)
+	fbs, err := client.GetFavouritedBy(context.Background(), "1234567", nil)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -224,11 +224,11 @@ func TestReblog(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	_, err := client.Reblog(context.Background(), 123)
+	_, err := client.Reblog(context.Background(), "123")
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	status, err := client.Reblog(context.Background(), 1234567)
+	status, err := client.Reblog(context.Background(), "1234567")
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -254,11 +254,11 @@ func TestUnreblog(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	_, err := client.Unreblog(context.Background(), 123)
+	_, err := client.Unreblog(context.Background(), "123")
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	status, err := client.Unreblog(context.Background(), 1234567)
+	status, err := client.Unreblog(context.Background(), "1234567")
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -284,11 +284,11 @@ func TestFavourite(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	_, err := client.Favourite(context.Background(), 123)
+	_, err := client.Favourite(context.Background(), "123")
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	status, err := client.Favourite(context.Background(), 1234567)
+	status, err := client.Favourite(context.Background(), "1234567")
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -314,11 +314,11 @@ func TestUnfavourite(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	_, err := client.Unfavourite(context.Background(), 123)
+	_, err := client.Unfavourite(context.Background(), "123")
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	status, err := client.Unfavourite(context.Background(), 1234567)
+	status, err := client.Unfavourite(context.Background(), "1234567")
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -449,11 +449,11 @@ func TestDeleteStatus(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	err := client.DeleteStatus(context.Background(), 123)
+	err := client.DeleteStatus(context.Background(), "123")
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	err = client.DeleteStatus(context.Background(), 1234567)
+	err = client.DeleteStatus(context.Background(), "1234567")
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}

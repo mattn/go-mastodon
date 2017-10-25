@@ -65,26 +65,26 @@ func TestReport(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	rp, err := client.Report(context.Background(), 121, nil, "")
+	rp, err := client.Report(context.Background(), "121", nil, "")
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	rp, err = client.Report(context.Background(), 122, nil, "")
+	rp, err = client.Report(context.Background(), "122", nil, "")
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
 	if rp.ID != 1234 {
-		t.Fatalf("want %v but %v", 1234, rp.ID)
+		t.Fatalf("want %q but %q", "1234", rp.ID)
 	}
 	if rp.ActionTaken {
 		t.Fatalf("want %v but %v", true, rp.ActionTaken)
 	}
-	rp, err = client.Report(context.Background(), 123, []int64{567}, "")
+	rp, err = client.Report(context.Background(), "123", []ID{"567"}, "")
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
 	if rp.ID != 1234 {
-		t.Fatalf("want %v but %v", 1234, rp.ID)
+		t.Fatalf("want %q but %q", "1234", rp.ID)
 	}
 	if !rp.ActionTaken {
 		t.Fatalf("want %v but %v", false, rp.ActionTaken)

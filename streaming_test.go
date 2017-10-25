@@ -45,8 +45,8 @@ data: 1234567
 			}
 		case *DeleteEvent:
 			passDelete = true
-			if event.ID != 1234567 {
-				t.Fatalf("want %d but %d", 1234567, event.ID)
+			if event.ID != "1234567" {
+				t.Fatalf("want %q but %q", "1234567", event.ID)
 			}
 		case *ErrorEvent:
 			passError = true

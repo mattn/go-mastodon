@@ -42,7 +42,7 @@ func TestGetStatus(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
-		fmt.Fprintln(w, `{"content": "zzz"}`)
+		fmt.Fprintln(w, `{"content": "zzz", "emojis":[{"shortcode":"💩", "url":"http://example.com", "static_url": "http://example.com/static"}]}`)
 		return
 	}))
 	defer ts.Close()
@@ -63,6 +63,18 @@ func TestGetStatus(t *testing.T) {
 	}
 	if status.Content != "zzz" {
 		t.Fatalf("want %q but %q", "zzz", status.Content)
+	}
+	if len(status.Emojis) != 1 {
+		t.Fatal("should have emojis")
+	}
+	if status.Emojis[0].ShortCode != "💩" {
+		t.Fatalf("want %q but %q", "💩", status.Emojis[0])
+	}
+	if status.Emojis[0].URL != "http://example.com" {
+		t.Fatalf("want %q but %q", "💩", "https://example.com")
+	}
+	if status.Emojis[0].StaticURL != "http://example.com/static" {
+		t.Fatalf("want %q but %q", "💩", "https://example.com/static")
 	}
 }
 

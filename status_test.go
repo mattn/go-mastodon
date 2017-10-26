@@ -71,10 +71,10 @@ func TestGetStatus(t *testing.T) {
 		t.Fatalf("want %q but %q", "💩", status.Emojis[0])
 	}
 	if status.Emojis[0].URL != "http://example.com" {
-		t.Fatalf("want %q but %q", "https://example.com", static.Emojis[0].URL)
+		t.Fatalf("want %q but %q", "https://example.com", status.Emojis[0].URL)
 	}
 	if status.Emojis[0].StaticURL != "http://example.com/static" {
-		t.Fatalf("want %q but %q", "https://example.com/static", static.Emojis[0].URL)
+		t.Fatalf("want %q but %q", "https://example.com/static", status.Emojis[0].StaticURL)
 	}
 }
 

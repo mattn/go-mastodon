@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/url"
 	"path"
+	"strings"
 
 	"github.com/gorilla/websocket"
 )
@@ -128,7 +129,11 @@ func (c *WSClient) handleWS(ctx context.Context, rawurl string, q chan Event) er
 				q <- &NotificationEvent{Notification: &notification}
 			}
 		case "delete":
-			q <- &DeleteEvent{ID: ID(fmt.Sprint(int64(s.Payload.(float64))))}
+			if f, ok := s.Payload.(float64); ok {
+				q <- &DeleteEvent{ID: ID(fmt.Sprint(int64(f)))}
+			} else {
+				q <- &DeleteEvent{ID: ID(strings.TrimSpace(s.Payload.(string)))}
+			}
 		}
 		if err != nil {
 			q <- &ErrorEvent{err}

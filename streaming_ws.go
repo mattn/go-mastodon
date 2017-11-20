@@ -3,9 +3,9 @@ package mastodon
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/url"
 	"path"
+	"strings"
 
 	"github.com/gorilla/websocket"
 )
@@ -128,7 +128,7 @@ func (c *WSClient) handleWS(ctx context.Context, rawurl string, q chan Event) er
 				q <- &NotificationEvent{Notification: &notification}
 			}
 		case "delete":
-			q <- &DeleteEvent{ID: ID(fmt.Sprint(int64(s.Payload.(float64))))}
+			q <- &DeleteEvent{ID: ID(strings.TrimSpace(s.Payload.(string)))}
 		}
 		if err != nil {
 			q <- &ErrorEvent{err}

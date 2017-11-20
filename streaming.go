@@ -69,7 +69,7 @@ func handleReader(q chan Event, r io.Reader) error {
 					q <- &NotificationEvent{&notification}
 				}
 			case "delete":
-				q <- &DeleteEvent{ID(strings.TrimSpace(token[1]))}
+				q <- &DeleteEvent{ID: ID(strings.TrimSpace(token[1]))}
 			}
 			if err != nil {
 				q <- &ErrorEvent{err}

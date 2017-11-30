@@ -27,7 +27,7 @@ type AppConfig struct {
 
 // Application is mastodon application.
 type Application struct {
-	ID           int64  `json:"id"`
+	ID           ID     `json:"id"`
 	RedirectURI  string `json:"redirect_uri"`
 	ClientID     string `json:"client_id"`
 	ClientSecret string `json:"client_secret"`

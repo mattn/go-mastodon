@@ -26,7 +26,7 @@ func TestRegisterApp(t *testing.T) {
 			fmt.Fprintln(w, `<html><head><title>Apps</title></head></html>`)
 			return
 		}
-		fmt.Fprintln(w, `{"client_id": "foo", "client_secret": "bar"}`)
+		fmt.Fprintln(w, `{"id": 123, "client_id": "foo", "client_secret": "bar"}`)
 		return
 	}))
 	defer ts.Close()
@@ -63,6 +63,9 @@ func TestRegisterApp(t *testing.T) {
 	})
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
+	}
+	if string(app.ID) != "123" {
+		t.Fatalf("want %q but %q", "bar", app.ClientSecret)
 	}
 	if app.ClientID != "foo" {
 		t.Fatalf("want %q but %q", "foo", app.ClientID)

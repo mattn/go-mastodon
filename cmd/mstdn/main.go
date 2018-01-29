@@ -246,6 +246,16 @@ func makeApp() *cli.App {
 			Action: cmdInstance,
 		},
 		{
+			Name:   "instance_activity",
+			Usage:  "show instance activity information",
+			Action: cmdInstanceActivity,
+		},
+		{
+			Name:   "instance_peers",
+			Usage:  "show instance peers information",
+			Action: cmdInstancePeers,
+		},
+		{
 			Name:   "account",
 			Usage:  "show account information",
 			Action: cmdAccount,

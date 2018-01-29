@@ -64,7 +64,7 @@ func TestGetInstanceActivity(t *testing.T) {
 		t.Fatalf("should not be fail: %v", err)
 	}
 	if activity[0].Week != Unixtime(time.Unix(1516579200, 0)) {
-		t.Fatalf("want %q but %q", Unixtime(time.Unix(1516579200, 0)), activity[0].Week)
+		t.Fatalf("want %v but %v", Unixtime(time.Unix(1516579200, 0)), activity[0].Week)
 	}
 	if activity[0].Logins != 1 {
 		t.Fatalf("want %q but %q", 1, activity[0].Logins)

@@ -13,7 +13,7 @@ type Instance struct {
 	EMail       string            `json:"email"`
 	Version     string            `json:"version,omitempty"`
 	URLs        map[string]string `json:"urls,omitempty"`
-	Stats       InstanceStats     `json:"stats,omitempty"`
+	Stats       *InstanceStats    `json:"stats,omitempty"`
 	Thumbnail   string            `json:"thumbnail,omitempty"`
 }
 

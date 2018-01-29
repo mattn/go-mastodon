@@ -18,7 +18,7 @@ func cmdInstanceActivity(c *cli.Context) error {
 		fmt.Fprintf(c.App.Writer, "Logins        : %v\n", activity.Logins)
 		fmt.Fprintf(c.App.Writer, "Registrations : %v\n", activity.Registrations)
 		fmt.Fprintf(c.App.Writer, "Statuses      : %v\n", activity.Statuses)
-		fmt.Fprintf(c.App.Writer, "EMail         : %v\n", activity.Week)
+		fmt.Fprintf(c.App.Writer, "Week          : %v\n", activity.Week)
 	}
 	return nil
 }

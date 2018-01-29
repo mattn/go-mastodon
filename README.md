@@ -92,6 +92,8 @@ func main() {
 * [x] POST /api/v1/follow_requests/:id/reject
 * [x] POST /api/v1/follows
 * [x] GET /api/v1/instance
+* [x] GET /api/v1/instance/activity
+* [x] GET /api/v1/instance/peers
 * [x] POST /api/v1/media
 * [x] GET /api/v1/mutes
 * [x] GET /api/v1/notifications

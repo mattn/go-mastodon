@@ -220,7 +220,7 @@ func (c *Client) PostStatus(ctx context.Context, toot *Toot) (*Status, error) {
 		params.Set("visibility", fmt.Sprint(toot.Visibility))
 	}
 	if toot.Sensitive {
-		params.Set("senstitive", "true")
+		params.Set("sensitive", "true")
 	}
 	if toot.SpoilerText != "" {
 		params.Set("spoiler_text", toot.SpoilerText)

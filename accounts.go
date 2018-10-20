@@ -25,6 +25,17 @@ type Account struct {
 	AvatarStatic   string    `json:"avatar_static"`
 	Header         string    `json:"header"`
 	HeaderStatic   string    `json:"header_static"`
+	Emojis         []Emoji   `json:"emojis"`
+	Moved          *Account  `json:"moved"`
+	Fields         []Field   `json:"fields"`
+	Bot            bool      `json:"bot"`
+}
+
+// Field is a Mastodon account profile field.
+type Field struct {
+	Name       string    `json:"name"`
+	Value      string    `json:"value"`
+	VerifiedAt time.Time `json:"verified_at"`
 }
 
 // GetAccount return Account.

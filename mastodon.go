@@ -258,7 +258,12 @@ func getPaginationID(rawurl, key string) (ID, error) {
 		return "", err
 	}
 
-	id, err := strconv.ParseInt(u.Query().Get(key), 10, 64)
+	val := u.Query().Get(key)
+	if val == "" {
+		return "", nil
+	}
+
+	id, err := strconv.ParseInt(val, 10, 64)
 	if err != nil {
 		return "", err
 	}

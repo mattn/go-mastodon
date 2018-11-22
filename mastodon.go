@@ -130,14 +130,34 @@ func NewClient(config *Config) *Client {
 
 // Authenticate get access-token to the API.
 func (c *Client) Authenticate(ctx context.Context, username, password string) error {
-	params := url.Values{}
-	params.Set("client_id", c.config.ClientID)
-	params.Set("client_secret", c.config.ClientSecret)
-	params.Set("grant_type", "password")
-	params.Set("username", username)
-	params.Set("password", password)
-	params.Set("scope", "read write follow")
+	params := url.Values{
+		"client_id":     {c.config.ClientID},
+		"client_secret": {c.config.ClientSecret},
+		"grant_type":    {"password"},
+		"username":      {username},
+		"password":      {password},
+		"scope":         {"read write follow"},
+	}
 
+	return c.authenticate(ctx, params)
+}
+
+// AuthenticateToken logs in using a grant token returned by Application.AuthURI.
+//
+// redirectURI should be the same as Application.RedirectURI.
+func (c *Client) AuthenticateToken(ctx context.Context, authCode, redirectURI string) error {
+	params := url.Values{
+		"client_id":     {c.config.ClientID},
+		"client_secret": {c.config.ClientSecret},
+		"grant_type":    {"authorization_code"},
+		"code":          {authCode},
+		"redirect_uri":  {redirectURI},
+	}
+
+	return c.authenticate(ctx, params)
+}
+
+func (c *Client) authenticate(ctx context.Context, params url.Values) error {
 	u, err := url.Parse(c.config.Server)
 	if err != nil {
 		return err
@@ -160,9 +180,9 @@ func (c *Client) Authenticate(ctx context.Context, username, password string) er
 		return parseAPIError("bad authorization", resp)
 	}
 
-	res := struct {
+	var res struct {
 		AccessToken string `json:"access_token"`
-	}{}
+	}
 	err = json.NewDecoder(resp.Body).Decode(&res)
 	if err != nil {
 		return err

@@ -211,25 +211,35 @@ type Mention struct {
 
 // Tag hold information for tag.
 type Tag struct {
-	Name string `json:"name"`
-	URL  string `json:"url"`
+	Name    string    `json:"name"`
+	URL     string    `json:"url"`
+	History []History `json:"history"`
+}
+
+// History hold information for history.
+type History struct {
+	Day      string `json:"day"`
+	Uses     int64  `json:"uses"`
+	Accounts int64  `json:"accounts"`
 }
 
 // Attachment hold information for attachment.
 type Attachment struct {
-	ID         ID     `json:"id"`
-	Type       string `json:"type"`
-	URL        string `json:"url"`
-	RemoteURL  string `json:"remote_url"`
-	PreviewURL string `json:"preview_url"`
-	TextURL    string `json:"text_url"`
+	ID          ID     `json:"id"`
+	Type        string `json:"type"`
+	URL         string `json:"url"`
+	RemoteURL   string `json:"remote_url"`
+	PreviewURL  string `json:"preview_url"`
+	TextURL     string `json:"text_url"`
+	Description string `json:"description"`
 }
 
 // Emoji hold information for CustomEmoji.
 type Emoji struct {
-	ShortCode string `json:"shortcode"`
-	URL       string `json:"url"`
-	StaticURL string `json:"static_url"`
+	ShortCode       string `json:"shortcode"`
+	StaticURL       string `json:"static_url"`
+	URL             string `json:"url"`
+	VisibleInPicker bool   `json:"visible_in_picker"`
 }
 
 // Results hold information for search result.

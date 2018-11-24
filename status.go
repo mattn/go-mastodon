@@ -11,26 +11,31 @@ import (
 // Status is struct to hold status.
 type Status struct {
 	ID                 ID           `json:"id"`
-	CreatedAt          time.Time    `json:"created_at"`
+	URI                string       `json:"uri"`
+	URL                string       `json:"url"`
+	Account            Account      `json:"account"`
 	InReplyToID        interface{}  `json:"in_reply_to_id"`
 	InReplyToAccountID interface{}  `json:"in_reply_to_account_id"`
+	Reblog             *Status      `json:"reblog"`
+	Content            string       `json:"content"`
+	CreatedAt          time.Time    `json:"created_at"`
+	Emojis             []Emoji      `json:"emojis"`
+	RepliesCount       int64        `json:"replies_count"`
+	ReblogsCount       int64        `json:"reblogs_count"`
+	FavouritesCount    int64        `json:"favourites_count"`
+	Reblogged          interface{}  `json:"reblogged"`
+	Favourited         interface{}  `json:"favourited"`
+	Muted              interface{}  `json:"muted"`
 	Sensitive          bool         `json:"sensitive"`
 	SpoilerText        string       `json:"spoiler_text"`
 	Visibility         string       `json:"visibility"`
-	Application        Application  `json:"application"`
-	Account            Account      `json:"account"`
 	MediaAttachments   []Attachment `json:"media_attachments"`
-	Emojis             []Emoji      `json:"emojis"`
 	Mentions           []Mention    `json:"mentions"`
 	Tags               []Tag        `json:"tags"`
-	URI                string       `json:"uri"`
-	Content            string       `json:"content"`
-	URL                string       `json:"url"`
-	ReblogsCount       int64        `json:"reblogs_count"`
-	FavouritesCount    int64        `json:"favourites_count"`
-	Reblog             *Status      `json:"reblog"`
-	Favourited         interface{}  `json:"favourited"`
-	Reblogged          interface{}  `json:"reblogged"`
+	Card               *Card        `json:"card"`
+	Application        Application  `json:"application"`
+	Language           string       `json:"language"`
+	Pinned             interface{}  `json:"pinned"`
 }
 
 // Context hold information for mastodon context.
@@ -41,10 +46,18 @@ type Context struct {
 
 // Card hold information for mastodon card.
 type Card struct {
-	URL         string `json:"url"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Image       string `json:"image"`
+	URL          string `json:"url"`
+	Title        string `json:"title"`
+	Description  string `json:"description"`
+	Image        string `json:"image"`
+	Type         string `json:"type"`
+	AuthorName   string `json:"author_name"`
+	AuthorURL    string `json:"author_url"`
+	ProviderName string `json:"provider_name"`
+	ProviderURL  string `json:"provider_url"`
+	HTML         string `json:"html"`
+	Width        int64  `json:"width"`
+	Height       int64  `json:"height"`
 }
 
 // GetFavourites return the favorite list of the current user.

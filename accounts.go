@@ -136,12 +136,16 @@ func (c *Client) GetBlocks(ctx context.Context, pg *Pagination) ([]*Account, err
 
 // Relationship hold information for relation-ship to the account.
 type Relationship struct {
-	ID         ID   `json:"id"`
-	Following  bool `json:"following"`
-	FollowedBy bool `json:"followed_by"`
-	Blocking   bool `json:"blocking"`
-	Muting     bool `json:"muting"`
-	Requested  bool `json:"requested"`
+	ID                  ID   `json:"id"`
+	Following           bool `json:"following"`
+	FollowedBy          bool `json:"followed_by"`
+	Blocking            bool `json:"blocking"`
+	Muting              bool `json:"muting"`
+	MutingNotifications bool `json:"muting_notifications"`
+	Requested           bool `json:"requested"`
+	DomainBlocking      bool `json:"domain_blocking"`
+	ShowingReblogs      bool `json:"showing_reblogs"`
+	Endorsed            bool `json:"endorsed"`
 }
 
 // AccountFollow follow the account.

@@ -68,7 +68,7 @@ func TestGetStatus(t *testing.T) {
 		t.Fatal("should have emojis")
 	}
 	if status.Emojis[0].ShortCode != "💩" {
-		t.Fatalf("want %q but %q", "💩", status.Emojis[0])
+		t.Fatalf("want %q but %q", "💩", status.Emojis[0].ShortCode)
 	}
 	if status.Emojis[0].URL != "http://example.com" {
 		t.Fatalf("want %q but %q", "https://example.com", status.Emojis[0].URL)

@@ -16,6 +16,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/tomnomnom/linkheader"
 )
@@ -118,11 +119,32 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params in
 		req.Header.Set("Content-Type", ct)
 	}
 
-	resp, err := c.Do(req)
-	if err != nil {
-		return err
+	var resp *http.Response
+	backoff := 1000 * time.Millisecond
+	for {
+		resp, err = c.Do(req)
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+
+		// handle status code 429, which indicates the server is throttling
+		// our requests. Do an exponential backoff and retry the request.
+		if resp.StatusCode == 429 {
+			if backoff > time.Hour {
+				break
+			}
+			backoff *= 2
+
+			select {
+			case <-time.After(backoff):
+			case <-ctx.Done():
+				return ctx.Err()
+			}
+			continue
+		}
+		break
 	}
-	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		return parseAPIError("bad request", resp)

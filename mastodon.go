@@ -225,13 +225,28 @@ type History struct {
 
 // Attachment hold information for attachment.
 type Attachment struct {
-	ID          ID     `json:"id"`
-	Type        string `json:"type"`
-	URL         string `json:"url"`
-	RemoteURL   string `json:"remote_url"`
-	PreviewURL  string `json:"preview_url"`
-	TextURL     string `json:"text_url"`
-	Description string `json:"description"`
+	ID          ID             `json:"id"`
+	Type        string         `json:"type"`
+	URL         string         `json:"url"`
+	RemoteURL   string         `json:"remote_url"`
+	PreviewURL  string         `json:"preview_url"`
+	TextURL     string         `json:"text_url"`
+	Description string         `json:"description"`
+	Meta        AttachmentMeta `json:"meta"`
+}
+
+// AttachmentMeta holds information for attachment metadata.
+type AttachmentMeta struct {
+	Original Size `json:"original"`
+	Small    Size `json:"small"`
+}
+
+// Size holds information for attatchment size.
+type Size struct {
+	Width  int64   `json:"width"`
+	Height int64   `json:"height"`
+	Size   string  `json:"size"`
+	Aspect float64 `json:"aspect"`
 }
 
 // Emoji hold information for CustomEmoji.

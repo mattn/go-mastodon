@@ -237,12 +237,12 @@ type Attachment struct {
 
 // AttachmentMeta holds information for attachment metadata.
 type AttachmentMeta struct {
-	Original Size `json:"original"`
-	Small    Size `json:"small"`
+	Original AttachmentSize `json:"original"`
+	Small    AttachmentSize `json:"small"`
 }
 
-// Size holds information for attatchment size.
-type Size struct {
+// AttachmentSize holds information for attatchment size.
+type AttachmentSize struct {
 	Width  int64   `json:"width"`
 	Height int64   `json:"height"`
 	Size   string  `json:"size"`

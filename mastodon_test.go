@@ -339,7 +339,7 @@ func TestPaginationSetValues(t *testing.T) {
 	if after.Get("max_id") != "123" {
 		t.Fatalf("want %q but %q", "123", after.Get("max_id"))
 	}
-	if after.Get("since_id") != "" {
+	if after.Get("since_id") != "789" {
 		t.Fatalf("result should be empty string: %q", after.Get("since_id"))
 	}
 	if after.Get("limit") != "10" {

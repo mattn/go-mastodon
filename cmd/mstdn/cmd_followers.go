@@ -28,6 +28,7 @@ func cmdFollowers(c *cli.Context) error {
 		if pg.MaxID == "" {
 			break
 		}
+		pg.SinceID = ""
 		time.Sleep(10 * time.Second)
 	}
 	s := newScreen(config)

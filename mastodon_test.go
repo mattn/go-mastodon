@@ -328,7 +328,8 @@ func TestGetPaginationID(t *testing.T) {
 func TestPaginationSetValues(t *testing.T) {
 	p := &Pagination{
 		MaxID:   "123",
-		SinceID: "789",
+		SinceID: "456",
+		MinID:   "789",
 		Limit:   10,
 	}
 	before := url.Values{"key": {"value"}}
@@ -339,7 +340,10 @@ func TestPaginationSetValues(t *testing.T) {
 	if after.Get("max_id") != "123" {
 		t.Fatalf("want %q but %q", "123", after.Get("max_id"))
 	}
-	if after.Get("since_id") != "789" {
+	if after.Get("since_id") != "456" {
+		t.Fatalf("result should be empty string: %q", after.Get("since_id"))
+	}
+	if after.Get("min_id") != "789" {
 		t.Fatalf("result should be empty string: %q", after.Get("since_id"))
 	}
 	if after.Get("limit") != "10" {

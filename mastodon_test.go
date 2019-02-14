@@ -341,10 +341,10 @@ func TestPaginationSetValues(t *testing.T) {
 		t.Fatalf("want %q but %q", "123", after.Get("max_id"))
 	}
 	if after.Get("since_id") != "456" {
-		t.Fatalf("result should be empty string: %q", after.Get("since_id"))
+		t.Fatalf("want %q but %q", "456", after.Get("since_id"))
 	}
 	if after.Get("min_id") != "789" {
-		t.Fatalf("result should be empty string: %q", after.Get("since_id"))
+		t.Fatalf("want %q but %q", "789", after.Get("min_id"))
 	}
 	if after.Get("limit") != "10" {
 		t.Fatalf("want %q but %q", "10", after.Get("limit"))
@@ -361,5 +361,8 @@ func TestPaginationSetValues(t *testing.T) {
 	}
 	if after.Get("since_id") != "789" {
 		t.Fatalf("want %q but %q", "789", after.Get("since_id"))
+	}
+	if after.Get("min_id") != "" {
+		t.Fatalf("result should be empty string: %q", after.Get("min_id"))
 	}
 }

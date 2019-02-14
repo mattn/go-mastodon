@@ -268,6 +268,7 @@ type Results struct {
 type Pagination struct {
 	MaxID   ID
 	SinceID ID
+	MinID   ID
 	Limit   int64
 }
 
@@ -291,6 +292,12 @@ func newPagination(rawlink string) (*Pagination, error) {
 				return nil, err
 			}
 			p.SinceID = sinceID
+
+			minID, err := getPaginationID(link.URL, "min_id")
+			if err != nil {
+				return nil, err
+			}
+			p.MinID = minID
 		}
 	}
 
@@ -323,8 +330,12 @@ func (p *Pagination) toValues() url.Values {
 func (p *Pagination) setValues(params url.Values) url.Values {
 	if p.MaxID != "" {
 		params.Set("max_id", string(p.MaxID))
-	} else if p.SinceID != "" {
+	}
+	if p.SinceID != "" {
 		params.Set("since_id", string(p.SinceID))
+	}
+	if p.MinID != "" {
+		params.Set("min_id", string(p.MinID))
 	}
 	if p.Limit > 0 {
 		params.Set("limit", fmt.Sprint(p.Limit))

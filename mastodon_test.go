@@ -293,6 +293,11 @@ func TestNewPagination(t *testing.T) {
 		t.Fatalf("should be fail: %v", err)
 	}
 
+	_, err = newPagination(`<http://example.com?min_id=abc>; rel="prev"`)
+	if err == nil {
+		t.Fatalf("should be fail: %v", err)
+	}
+
 	pg, err := newPagination(`<http://example.com?max_id=123>; rel="next", <http://example.com?since_id=789>; rel="prev"`)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)

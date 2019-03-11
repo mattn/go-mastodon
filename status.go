@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"time"
+	"io"
 )
 
 // Status is struct to hold status.
@@ -265,10 +266,20 @@ func (c *Client) Search(ctx context.Context, q string, resolve bool) (*Results, 
 	return &results, nil
 }
 
-// UploadMedia upload a media attachment.
+// UploadMedia upload a media attachment from a file.
 func (c *Client) UploadMedia(ctx context.Context, file string) (*Attachment, error) {
 	var attachment Attachment
 	err := c.doAPI(ctx, http.MethodPost, "/api/v1/media", file, &attachment, nil)
+	if err != nil {
+		return nil, err
+	}
+	return &attachment, nil
+}
+
+// UploadMediaFromReader uploads a media attachment from a io.Reader.
+func (c *Client) UploadMediaFromReader(ctx context.Context, reader io.Reader) (*Attachment, error) {
+	var attachment Attachment
+	err := c.doAPI(ctx, http.MethodPost, "/api/v1/media", reader, &attachment, nil)
 	if err != nil {
 		return nil, err
 	}

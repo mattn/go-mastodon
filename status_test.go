@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"os"
 )
 
 func TestGetFavourites(t *testing.T) {
@@ -547,6 +548,15 @@ func TestUploadMedia(t *testing.T) {
 		t.Fatalf("should not be fail: %v", err)
 	}
 	if attachment.ID != "123" {
+		t.Fatalf("want %q but %q", "123", attachment.ID)
+	}
+	file, err := os.Open("testdata/logo.png")
+	defer file.Close()
+	writerAttachment, err := client.UploadMediaFromReader(context.Background(), file)
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	if writerAttachment.ID != "123" {
 		t.Fatalf("want %q but %q", "123", attachment.ID)
 	}
 }

@@ -83,6 +83,26 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params in
 			return err
 		}
 		ct = mw.FormDataContentType()
+	} else if reader, ok := params.(io.Reader); ok {
+		var buf bytes.Buffer
+		mw := multipart.NewWriter(&buf)
+		part, err := mw.CreateFormFile("file", "upload")
+		if err != nil {
+			return err
+		}
+		_, err = io.Copy(part, reader)
+		if err != nil {
+			return err
+		}
+		err = mw.Close()
+		if err != nil {
+			return err
+		}
+		req, err = http.NewRequest(method, u.String(), &buf)
+		if err != nil {
+			return err
+		}
+		ct = mw.FormDataContentType()
 	} else {
 		if method == http.MethodGet && pg != nil {
 			u.RawQuery = pg.toValues().Encode()

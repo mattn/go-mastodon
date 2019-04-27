@@ -82,7 +82,7 @@ func main() {
 * [x] GET /api/v1/accounts/:id/unblock
 * [x] GET /api/v1/accounts/:id/mute
 * [x] GET /api/v1/accounts/:id/unmute
-* [ ] GET /api/v1/accounts/:id/lists
+* [x] GET /api/v1/accounts/:id/lists
 * [x] GET /api/v1/accounts/relationships
 * [x] GET /api/v1/accounts/search
 * [x] POST /api/v1/apps
@@ -95,14 +95,14 @@ func main() {
 * [x] GET /api/v1/instance
 * [x] GET /api/v1/instance/activity
 * [x] GET /api/v1/instance/peers
-* [ ] GET /api/v1/lists
-* [ ] GET /api/v1/lists/:id/accounts
-* [ ] GET /api/v1/lists/:id
-* [ ] POST /api/v1/lists
-* [ ] PUT /api/v1/lists/:id
-* [ ] DELETE /api/v1/lists/:id
-* [ ] POST /api/v1/lists/:id/accounts
-* [ ] DELETE /api/v1/lists/:id/accounts
+* [x] GET /api/v1/lists
+* [x] GET /api/v1/lists/:id/accounts
+* [x] GET /api/v1/lists/:id
+* [x] POST /api/v1/lists
+* [x] PUT /api/v1/lists/:id
+* [x] DELETE /api/v1/lists/:id
+* [x] POST /api/v1/lists/:id/accounts
+* [x] DELETE /api/v1/lists/:id/accounts
 * [x] POST /api/v1/media
 * [x] GET /api/v1/mutes
 * [x] GET /api/v1/notifications

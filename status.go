@@ -3,10 +3,10 @@ package mastodon
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"time"
-	"io"
 )
 
 // Status is struct to hold status.
@@ -195,6 +195,16 @@ func (c *Client) GetTimelineHashtag(ctx context.Context, tag string, isLocal boo
 
 	var statuses []*Status
 	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/timelines/tag/%s", url.PathEscape(tag)), params, &statuses, pg)
+	if err != nil {
+		return nil, err
+	}
+	return statuses, nil
+}
+
+// GetTimelineList return statuses from a list timeline.
+func (c *Client) GetTimelineList(ctx context.Context, id ID, pg *Pagination) ([]*Status, error) {
+	var statuses []*Status
+	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/timelines/list/%s", url.PathEscape(string(id))), nil, &statuses, pg)
 	if err != nil {
 		return nil, err
 	}

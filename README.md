@@ -125,6 +125,7 @@ func main() {
 * [x] GET /api/v1/timelines/home
 * [x] GET /api/v1/timelines/public
 * [x] GET /api/v1/timelines/tag/:hashtag
+* [x] GET /api/v1/timelines/list/:id
 
 ## Installation
 

@@ -34,6 +34,7 @@ type Status struct {
 	Mentions           []Mention    `json:"mentions"`
 	Tags               []Tag        `json:"tags"`
 	Card               *Card        `json:"card"`
+	Poll               *Poll        `json:"poll"`
 	Application        Application  `json:"application"`
 	Language           string       `json:"language"`
 	Pinned             interface{}  `json:"pinned"`

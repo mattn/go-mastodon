@@ -96,7 +96,7 @@ func TestAccountUpdate(t *testing.T) {
 	}
 	tbool := true
 	fields := []Field{{"foo", "bar", time.Time{}}, {"dum", "baz", time.Time{}}}
-	source := AccountSource{Language: "de", Privacy: "public", Sensitive: &tbool}
+	source := AccountSource{Language: String("de"), Privacy: String("public"), Sensitive: &tbool}
 	a, err := client.AccountUpdate(context.Background(), &Profile{
 		DisplayName: String("display_name"),
 		Note:        String("note"),

@@ -41,10 +41,10 @@ type Field struct {
 
 // AccountSource is a Mastodon account profile field.
 type AccountSource struct {
-	Privacy   string   `json:"privacy"`
+	Privacy   *string   `json:"privacy"`
 	Sensitive *bool    `json:"sensitive"`
-	Language  string   `json:"language"`
-	Note      string   `json:"note"`
+	Language  *string   `json:"language"`
+	Note      *string   `json:"note"`
 	Fields    *[]Field `json:"fields"`
 }
 
@@ -102,14 +102,14 @@ func (c *Client) AccountUpdate(ctx context.Context, profile *Profile) (*Account,
 		}
 	}
 	if profile.Source != nil {
-		if len(profile.Source.Privacy) > 0 {
-			params.Set("source[privacy]", profile.Source.Privacy)
+		if profile.Source.Privacy != nil {
+			params.Set("source[privacy]", *profile.Source.Privacy)
 		}
 		if profile.Source.Sensitive != nil {
 			params.Set("source[sensitive]", strconv.FormatBool(*profile.Source.Sensitive))
 		}
-		if len(profile.Source.Language) > 0 {
-			params.Set("source[language]", profile.Source.Language)
+		if profile.Source.Language != nil {
+			params.Set("source[language]", *profile.Source.Language)
 		}
 	}
 	if profile.Avatar != "" {

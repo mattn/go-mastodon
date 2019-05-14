@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 	"time"
 )
 
@@ -38,6 +39,15 @@ type Field struct {
 	VerifiedAt time.Time `json:"verified_at"`
 }
 
+// Source is a Mastodon account profile field
+type Source struct {
+	Privacy   string   `json:"privacy"`
+	Sensitive *bool    `json:"sensitive"`
+	Language  string   `json:"language"`
+	Note      string   `json:"note"`
+	Fields    *[]Field `json:"fields"`
+}
+
 // GetAccount return Account.
 func (c *Client) GetAccount(ctx context.Context, id ID) (*Account, error) {
 	var account Account
@@ -64,6 +74,9 @@ type Profile struct {
 	// If it is empty, update it with empty.
 	DisplayName *string
 	Note        *string
+	Locked      *bool
+	Fields      *[]Field
+	Source      *Source
 
 	// Set the base64 encoded character string of the image.
 	Avatar string
@@ -78,6 +91,26 @@ func (c *Client) AccountUpdate(ctx context.Context, profile *Profile) (*Account,
 	}
 	if profile.Note != nil {
 		params.Set("note", *profile.Note)
+	}
+	if profile.Locked != nil {
+		params.Set("locked", strconv.FormatBool(*profile.Locked))
+	}
+	if profile.Fields != nil {
+		for idx, field := range *profile.Fields {
+			params.Set(fmt.Sprintf("fields_attributes[%d][name]", idx), field.Name)
+			params.Set(fmt.Sprintf("fields_attributes[%d][value]", idx), field.Value)
+		}
+	}
+	if profile.Source != nil {
+		if len(profile.Source.Privacy) > 0 {
+			params.Set("source[privacy]", profile.Source.Privacy)
+		}
+		if profile.Source.Sensitive != nil {
+			params.Set("source[sensitive]", strconv.FormatBool(*profile.Source.Sensitive))
+		}
+		if len(profile.Source.Language) > 0 {
+			params.Set("source[language]", profile.Source.Language)
+		}
 	}
 	if profile.Avatar != "" {
 		params.Set("avatar", profile.Avatar)

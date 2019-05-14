@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 )
 
 func TestGetAccount(t *testing.T) {
@@ -93,9 +94,15 @@ func TestAccountUpdate(t *testing.T) {
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
+	tbool := true
+	fields := []Field{{"foo", "bar", time.Time{}}, {"dum", "baz", time.Time{}}}
+	source := Source{Language: "de", Privacy: "public", Sensitive: &tbool}
 	a, err := client.AccountUpdate(context.Background(), &Profile{
 		DisplayName: String("display_name"),
 		Note:        String("note"),
+		Locked:      &tbool,
+		Fields:      &fields,
+		Source:      &source,
 		Avatar:      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUoAAADrCAYAAAA...",
 		Header:      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUoAAADrCAYAAAA...",
 	})

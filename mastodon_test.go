@@ -294,8 +294,8 @@ func TestNewPagination(t *testing.T) {
 	}
 
 	_, err = newPagination(`<http://example.com?min_id=abc>; rel="prev"`)
-	if err == nil {
-		t.Fatalf("should be fail: %v", err)
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
 	}
 
 	pg, err := newPagination(`<http://example.com?max_id=123>; rel="next", <http://example.com?since_id=789>; rel="prev"`)
@@ -317,8 +317,8 @@ func TestGetPaginationID(t *testing.T) {
 	}
 
 	_, err = getPaginationID("http://example.com?max_id=abc", "max_id")
-	if err == nil {
-		t.Fatalf("should be fail: %v", err)
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
 	}
 
 	id, err := getPaginationID("http://example.com?max_id=123", "max_id")

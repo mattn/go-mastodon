@@ -14,7 +14,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"time"
 
@@ -352,17 +351,7 @@ func getPaginationID(rawurl, key string) (ID, error) {
 		return "", err
 	}
 
-	val := u.Query().Get(key)
-	if val == "" {
-		return "", nil
-	}
-
-	id, err := strconv.ParseInt(val, 10, 64)
-	if err != nil {
-		return "", err
-	}
-
-	return ID(fmt.Sprint(id)), nil
+	return ID(u.Query().Get(key)), nil
 }
 
 func (p *Pagination) toValues() url.Values {

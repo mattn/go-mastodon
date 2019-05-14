@@ -39,8 +39,8 @@ type Field struct {
 	VerifiedAt time.Time `json:"verified_at"`
 }
 
-// Source is a Mastodon account profile field
-type Source struct {
+// AccountSource is a Mastodon account profile field.
+type AccountSource struct {
 	Privacy   string   `json:"privacy"`
 	Sensitive *bool    `json:"sensitive"`
 	Language  string   `json:"language"`
@@ -76,7 +76,7 @@ type Profile struct {
 	Note        *string
 	Locked      *bool
 	Fields      *[]Field
-	Source      *Source
+	Source      *AccountSource
 
 	// Set the base64 encoded character string of the image.
 	Avatar string

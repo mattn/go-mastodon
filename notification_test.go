@@ -20,6 +20,9 @@ func TestGetNotifications(t *testing.T) {
 		case "/api/v1/notifications/clear":
 			fmt.Fprintln(w, `{}`)
 			return
+		case "/api/v1/notifications/dismiss":
+			fmt.Fprintln(w, `{}`)
+			return
 		}
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
@@ -53,6 +56,10 @@ func TestGetNotifications(t *testing.T) {
 		t.Fatalf("want %v but %v", "123", n.ID)
 	}
 	err = client.ClearNotifications(context.Background())
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	err = client.DismissNotification(context.Background(), "123")
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}

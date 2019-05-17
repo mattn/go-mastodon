@@ -2,6 +2,9 @@ package mastodon
 
 import (
 	"context"
+	"crypto/ecdsa"
+	"crypto/elliptic"
+	"crypto/rand"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -60,6 +63,82 @@ func TestGetNotifications(t *testing.T) {
 		t.Fatalf("should not be fail: %v", err)
 	}
 	err = client.DismissNotification(context.Background(), "123")
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+}
+
+func TestPushSubscription(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/api/v1/push/subscription":
+			fmt.Fprintln(w, ` {"id":1,"endpoint":"https://example.org","alerts":{"follow":"true","favourite":"true","reblog":"true","mention":"true"},"server_key":"foobar"}`)
+			return
+		}
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+		AccessToken:  "zoo",
+	})
+
+	enabled := new(Sbool)
+	*enabled = true
+	alerts := PushAlerts{Follow: enabled, Favourite: enabled, Reblog: enabled, Mention: enabled}
+
+	priv, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	shared := make([]byte, 16)
+	_, err = rand.Read(shared)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	testSub := func(sub *PushSubscription, err error) {
+		if err != nil {
+			t.Fatalf("should not be fail: %v", err)
+		}
+		if sub.ID != "1" {
+			t.Fatalf("want %v but %v", "1", sub.ID)
+		}
+		if sub.Endpoint != "https://example.org" {
+			t.Fatalf("want %v but %v", "https://example.org", sub.Endpoint)
+		}
+		if sub.ServerKey != "foobar" {
+			t.Fatalf("want %v but %v", "foobar", sub.ServerKey)
+		}
+		if *sub.Alerts.Favourite != true {
+			t.Fatalf("want %v but %v", true, *sub.Alerts.Favourite)
+		}
+		if *sub.Alerts.Mention != true {
+			t.Fatalf("want %v but %v", true, *sub.Alerts.Mention)
+		}
+		if *sub.Alerts.Reblog != true {
+			t.Fatalf("want %v but %v", true, *sub.Alerts.Reblog)
+		}
+		if *sub.Alerts.Follow != true {
+			t.Fatalf("want %v but %v", true, *sub.Alerts.Follow)
+		}
+	}
+
+	sub, err := client.AddPushSubscription(context.Background(), "http://example.org", priv.PublicKey, shared, alerts)
+	testSub(sub, err)
+
+	sub, err = client.GetPushSubscription(context.Background())
+	testSub(sub, err)
+
+	sub, err = client.UpdatePushSubscription(context.Background(), &alerts)
+	testSub(sub, err)
+
+	err = client.RemovePushSubscription(context.Background())
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}

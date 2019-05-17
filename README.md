@@ -109,6 +109,10 @@ func main() {
 * [x] GET /api/v1/notifications/:id
 * [x] POST /api/v1/notifications/dismiss
 * [x] POST /api/v1/notifications/clear
+* [x] POST /api/v1/push/subscription
+* [x] GET /api/v1/push/subscription
+* [x] PUT /api/v1/push/subscription
+* [x] DELETE /api/v1/push/subscription
 * [x] GET /api/v1/reports
 * [x] POST /api/v1/reports
 * [x] GET /api/v1/search

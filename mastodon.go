@@ -250,13 +250,13 @@ const (
 
 // Toot is struct to post status.
 type Toot struct {
-	Status      string    `json:"status"`
-	InReplyToID ID        `json:"in_reply_to_id"`
-	MediaIDs    []ID      `json:"media_ids"`
-	Sensitive   bool      `json:"sensitive"`
-	SpoilerText string    `json:"spoiler_text"`
-	Visibility  string    `json:"visibility"`
-	ScheduledAt time.Time `json:"scheduled_at,omitempty"`
+	Status      string     `json:"status"`
+	InReplyToID ID         `json:"in_reply_to_id"`
+	MediaIDs    []ID       `json:"media_ids"`
+	Sensitive   bool       `json:"sensitive"`
+	SpoilerText string     `json:"spoiler_text"`
+	Visibility  string     `json:"visibility"`
+	ScheduledAt *time.Time `json:"scheduled_at,omitempty"`
 }
 
 // Mention hold information for mention.

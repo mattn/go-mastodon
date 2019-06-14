@@ -240,6 +240,14 @@ func (c *Client) authenticate(ctx context.Context, params url.Values) error {
 	return nil
 }
 
+// Convenience constants for Toot.Visibility
+const (
+	VisibilityPublic        = "public"
+	VisibilityUnlisted      = "unlisted"
+	VisibilityFollowersOnly = "private"
+	VisibilityDirectMessage = "direct"
+)
+
 // Toot is struct to post status.
 type Toot struct {
 	Status      string `json:"status"`

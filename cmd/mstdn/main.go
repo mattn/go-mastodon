@@ -370,6 +370,7 @@ func run() int {
 		}
 
 		client := mastodon.NewClient(config)
+		client.UserAgent = "mstdn"
 		app.Metadata = map[string]interface{}{
 			"client":      client,
 			"config":      config,

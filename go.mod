@@ -1,4 +1,4 @@
-module github.com/mattn/go-mastodon
+module github.com/CaliOpen/go-mastodon
 
 go 1.12
 

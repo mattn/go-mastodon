@@ -31,7 +31,8 @@ type Config struct {
 // Client is a API client for mastodon.
 type Client struct {
 	http.Client
-	config *Config
+	config    *Config
+	UserAgent string
 }
 
 func (c *Client) doAPI(ctx context.Context, method string, uri string, params interface{}, res interface{}, pg *Pagination) error {
@@ -116,6 +117,9 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params in
 	req.Header.Set("Authorization", "Bearer "+c.config.AccessToken)
 	if params != nil {
 		req.Header.Set("Content-Type", ct)
+	}
+	if c.UserAgent != "" {
+		req.Header.Set("User-Agent", c.UserAgent)
 	}
 
 	var resp *http.Response
@@ -211,6 +215,9 @@ func (c *Client) authenticate(ctx context.Context, params url.Values) error {
 	}
 	req = req.WithContext(ctx)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	if c.UserAgent != "" {
+		req.Header.Set("User-Agent", c.UserAgent)
+	}
 	resp, err := c.Do(req)
 	if err != nil {
 		return err

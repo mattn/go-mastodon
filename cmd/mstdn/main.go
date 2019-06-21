@@ -236,6 +236,26 @@ func makeApp() *cli.App {
 			Action: cmdTimeline,
 		},
 		{
+			Name:   "timeline-home",
+			Usage:  "show timeline home",
+			Action: cmdTimelineHome,
+		},
+		{
+			Name:   "timeline-local",
+			Usage:  "show timeline local",
+			Action: cmdTimelineLocal,
+		},
+		{
+			Name:   "timeline-public",
+			Usage:  "show timeline public",
+			Action: cmdTimelinePublic,
+		},
+		{
+			Name:   "timeline-direct",
+			Usage:  "show timeline direct",
+			Action: cmdTimelineDirect,
+		},
+		{
 			Name:   "notification",
 			Usage:  "show notification",
 			Action: cmdNotification,

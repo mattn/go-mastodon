@@ -14,7 +14,13 @@ func TestCmdTimeline(t *testing.T) {
 		func(w http.ResponseWriter, r *http.Request) {
 			switch r.URL.Path {
 			case "/api/v1/timelines/home":
-				fmt.Fprintln(w, `[{"content": "zzz"}]`)
+				fmt.Fprintln(w, `[{"content": "home"}]`)
+				return
+			case "/api/v1/timelines/public":
+				fmt.Fprintln(w, `[{"content": "public"}]`)
+				return
+			case "/api/v1/timelines/direct":
+				fmt.Fprintln(w, `[{"content": "direct"}]`)
 				return
 			}
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
@@ -22,9 +28,25 @@ func TestCmdTimeline(t *testing.T) {
 		},
 		func(app *cli.App) {
 			app.Run([]string{"mstdn", "timeline"})
+			app.Run([]string{"mstdn", "timeline-home"})
+			app.Run([]string{"mstdn", "timeline-public"})
+			app.Run([]string{"mstdn", "timeline-local"})
+			app.Run([]string{"mstdn", "timeline-direct"})
 		},
 	)
-	if !strings.Contains(out, "zzz") {
-		t.Fatalf("%q should be contained in output of command: %v", "zzz", out)
+	want := strings.Join([]string{
+		"@example.com",
+		"home",
+		"@example.com",
+		"home",
+		"@example.com",
+		"public",
+		"@example.com",
+		"public",
+		"@example.com",
+		"direct",
+	}, "\n") + "\n"
+	if !strings.Contains(out, want) {
+		t.Fatalf("%q should be contained in output of command: %v", want, out)
 	}
 }

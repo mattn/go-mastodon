@@ -123,7 +123,7 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params in
 	}
 
 	var resp *http.Response
-	backoff := 1000 * time.Millisecond
+	backoff := time.Second
 	for {
 		resp, err = c.Do(req)
 		if err != nil {
@@ -137,13 +137,14 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params in
 			if backoff > time.Hour {
 				break
 			}
-			backoff *= 2
 
 			select {
 			case <-time.After(backoff):
 			case <-ctx.Done():
 				return ctx.Err()
 			}
+
+			backoff = time.Duration(1.5 * float64(backoff))
 			continue
 		}
 		break

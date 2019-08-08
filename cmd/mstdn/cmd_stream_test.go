@@ -14,8 +14,7 @@ import (
 )
 
 func TestCmdStream(t *testing.T) {
-	var ts *httptest.Server
-	ts = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/api/v1/streaming/public/local" {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return

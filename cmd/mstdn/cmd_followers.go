@@ -29,6 +29,7 @@ func cmdFollowers(c *cli.Context) error {
 			break
 		}
 		pg.SinceID = ""
+		pg.MinID = ""
 		time.Sleep(10 * time.Second)
 	}
 	s := newScreen(config)

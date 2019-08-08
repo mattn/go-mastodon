@@ -609,6 +609,9 @@ func TestUploadMedia(t *testing.T) {
 		t.Fatalf("want %q but %q", "123", attachment.ID)
 	}
 	file, err := os.Open("testdata/logo.png")
+	if err != nil {
+		t.Fatalf("could not open file: %v", err)
+	}
 	defer file.Close()
 	writerAttachment, err := client.UploadMediaFromReader(context.Background(), file)
 	if err != nil {

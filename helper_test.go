@@ -12,13 +12,13 @@ const wantBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHEAAABxCAYAAA
 
 func TestBase64EncodeFileName(t *testing.T) {
 	// Error in os.Open.
-	uri, err := Base64EncodeFileName("fail")
+	_, err := Base64EncodeFileName("fail")
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
 
 	// Success.
-	uri, err = Base64EncodeFileName("testdata/logo.png")
+	uri, err := Base64EncodeFileName("testdata/logo.png")
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -29,7 +29,7 @@ func TestBase64EncodeFileName(t *testing.T) {
 
 func TestBase64Encode(t *testing.T) {
 	// Error in file.Stat.
-	uri, err := Base64Encode(nil)
+	_, err := Base64Encode(nil)
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
@@ -43,7 +43,7 @@ func TestBase64Encode(t *testing.T) {
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
-	uri, err = Base64Encode(logo)
+	_, err = Base64Encode(logo)
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
@@ -53,7 +53,7 @@ func TestBase64Encode(t *testing.T) {
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
-	uri, err = Base64Encode(logo)
+	uri, err := Base64Encode(logo)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}

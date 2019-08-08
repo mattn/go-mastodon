@@ -41,10 +41,10 @@ type Field struct {
 
 // AccountSource is a Mastodon account profile field.
 type AccountSource struct {
-	Privacy   *string   `json:"privacy"`
+	Privacy   *string  `json:"privacy"`
 	Sensitive *bool    `json:"sensitive"`
-	Language  *string   `json:"language"`
-	Note      *string   `json:"note"`
+	Language  *string  `json:"language"`
+	Note      *string  `json:"note"`
 	Fields    *[]Field `json:"fields"`
 }
 

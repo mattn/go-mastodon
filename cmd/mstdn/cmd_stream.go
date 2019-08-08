@@ -44,9 +44,7 @@ func cmdStream(c *cli.Context) error {
 		"nl": func(s string) string {
 			return s + "\n"
 		},
-		"text": func(s string) string {
-			return textContent(s)
-		},
+		"text": textContent,
 	}).Parse(asFormat)
 	if err != nil {
 		return err

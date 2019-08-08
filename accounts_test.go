@@ -16,7 +16,6 @@ func TestGetAccount(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `{"username": "zzz"}`)
-		return
 	}))
 	defer ts.Close()
 
@@ -48,7 +47,6 @@ func TestGetAccountCurrentUser(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `{"username": "zzz"}`)
-		return
 	}))
 	defer ts.Close()
 
@@ -80,7 +78,6 @@ func TestAccountUpdate(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `{"username": "zzz"}`)
-		return
 	}))
 	defer ts.Close()
 

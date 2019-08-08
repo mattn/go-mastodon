@@ -243,12 +243,12 @@ func TestDial(t *testing.T) {
 		t.Fatalf("should be fail: %v", err)
 	}
 
-	_, rawurl, err := client.dial("ws://" + ts.Listener.Addr().String())
+	_, _, err = client.dial("ws://" + ts.Listener.Addr().String())
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
 
-	_, rawurl, err = client.dial("ws://" + ts.Listener.Addr().String())
+	_, rawurl, err := client.dial("ws://" + ts.Listener.Addr().String())
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}

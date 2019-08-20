@@ -80,7 +80,7 @@ func handleReader(q chan Event, r io.Reader) error {
 }
 
 func (c *Client) streaming(ctx context.Context, p string, params url.Values) (chan Event, error) {
-	u, err := url.Parse(c.config.Server)
+	u, err := url.Parse(c.Config.Server)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +92,7 @@ func (c *Client) streaming(ctx context.Context, p string, params url.Values) (ch
 		return nil, err
 	}
 	req = req.WithContext(ctx)
-	req.Header.Set("Authorization", "Bearer "+c.config.AccessToken)
+	req.Header.Set("Authorization", "Bearer "+c.Config.AccessToken)
 
 	q := make(chan Event)
 	go func() {

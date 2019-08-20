@@ -31,12 +31,12 @@ type Config struct {
 // Client is a API client for mastodon.
 type Client struct {
 	http.Client
-	config    *Config
+	Config    *Config
 	UserAgent string
 }
 
 func (c *Client) doAPI(ctx context.Context, method string, uri string, params interface{}, res interface{}, pg *Pagination) error {
-	u, err := url.Parse(c.config.Server)
+	u, err := url.Parse(c.Config.Server)
 	if err != nil {
 		return err
 	}
@@ -114,7 +114,7 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params in
 		}
 	}
 	req = req.WithContext(ctx)
-	req.Header.Set("Authorization", "Bearer "+c.config.AccessToken)
+	req.Header.Set("Authorization", "Bearer "+c.Config.AccessToken)
 	if params != nil {
 		req.Header.Set("Content-Type", ct)
 	}
@@ -170,15 +170,15 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params in
 func NewClient(config *Config) *Client {
 	return &Client{
 		Client: *http.DefaultClient,
-		config: config,
+		Config: config,
 	}
 }
 
 // Authenticate get access-token to the API.
 func (c *Client) Authenticate(ctx context.Context, username, password string) error {
 	params := url.Values{
-		"client_id":     {c.config.ClientID},
-		"client_secret": {c.config.ClientSecret},
+		"client_id":     {c.Config.ClientID},
+		"client_secret": {c.Config.ClientSecret},
 		"grant_type":    {"password"},
 		"username":      {username},
 		"password":      {password},
@@ -193,8 +193,8 @@ func (c *Client) Authenticate(ctx context.Context, username, password string) er
 // redirectURI should be the same as Application.RedirectURI.
 func (c *Client) AuthenticateToken(ctx context.Context, authCode, redirectURI string) error {
 	params := url.Values{
-		"client_id":     {c.config.ClientID},
-		"client_secret": {c.config.ClientSecret},
+		"client_id":     {c.Config.ClientID},
+		"client_secret": {c.Config.ClientSecret},
 		"grant_type":    {"authorization_code"},
 		"code":          {authCode},
 		"redirect_uri":  {redirectURI},
@@ -204,7 +204,7 @@ func (c *Client) AuthenticateToken(ctx context.Context, authCode, redirectURI st
 }
 
 func (c *Client) authenticate(ctx context.Context, params url.Values) error {
-	u, err := url.Parse(c.config.Server)
+	u, err := url.Parse(c.Config.Server)
 	if err != nil {
 		return err
 	}
@@ -236,7 +236,7 @@ func (c *Client) authenticate(ctx context.Context, params url.Values) error {
 	if err != nil {
 		return err
 	}
-	c.config.AccessToken = res.AccessToken
+	c.Config.AccessToken = res.AccessToken
 	return nil
 }
 

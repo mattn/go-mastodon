@@ -58,13 +58,13 @@ func (c *WSClient) StreamingWSList(ctx context.Context, id ID) (chan Event, erro
 
 func (c *WSClient) streamingWS(ctx context.Context, stream, tag string) (chan Event, error) {
 	params := url.Values{}
-	params.Set("access_token", c.client.config.AccessToken)
+	params.Set("access_token", c.client.Config.AccessToken)
 	params.Set("stream", stream)
 	if tag != "" {
 		params.Set("tag", tag)
 	}
 
-	u, err := changeWebSocketScheme(c.client.config.Server)
+	u, err := changeWebSocketScheme(c.client.Config.Server)
 	if err != nil {
 		return nil, err
 	}

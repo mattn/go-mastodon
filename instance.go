@@ -16,7 +16,7 @@ type Instance struct {
 	URLs           map[string]string `json:"urls,omitempty"`
 	Stats          *InstanceStats    `json:"stats,omitempty"`
 	Languages      []string          `json:"languages"`
-	ContactAccount *Account          `json:"account"`
+	ContactAccount *Account          `json:"contact_account"`
 }
 
 // InstanceStats hold information for mastodon instance stats.

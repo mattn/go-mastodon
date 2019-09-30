@@ -92,7 +92,7 @@ func TestRegisterAppWithCancel(t *testing.T) {
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	if want := "Post " + ts.URL + "/api/v1/apps: context canceled"; want != err.Error() {
+	if want := fmt.Sprintf("Post %q: context canceled", ts.URL+"/api/v1/apps"); want != err.Error() {
 		t.Fatalf("want %q but %q", want, err.Error())
 	}
 }

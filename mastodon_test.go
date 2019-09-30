@@ -138,7 +138,7 @@ func TestAuthenticateWithCancel(t *testing.T) {
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	if want := "Post " + ts.URL + "/oauth/token: context canceled"; want != err.Error() {
+	if want := fmt.Sprintf("Post %q: context canceled", ts.URL+"/oauth/token"); want != err.Error() {
 		t.Fatalf("want %q but %q", want, err.Error())
 	}
 }
@@ -200,7 +200,7 @@ func TestPostStatusWithCancel(t *testing.T) {
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	if want := "Post " + ts.URL + "/api/v1/statuses: context canceled"; want != err.Error() {
+	if want := fmt.Sprintf("Post %q: context canceled", ts.URL+"/api/v1/statuses"); want != err.Error() {
 		t.Fatalf("want %q but %q", want, err.Error())
 	}
 }
@@ -264,7 +264,7 @@ func TestGetTimelineHomeWithCancel(t *testing.T) {
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	if want := "Get " + ts.URL + "/api/v1/timelines/home: context canceled"; want != err.Error() {
+	if want := fmt.Sprintf("Post %q: context canceled", ts.URL+"/api/v1/timelines/home"); want != err.Error() {
 		t.Fatalf("want %q but %q", want, err.Error())
 	}
 }

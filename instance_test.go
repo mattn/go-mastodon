@@ -17,7 +17,7 @@ func TestGetInstance(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
-		fmt.Fprintln(w, `{"title": "mastodon", "uri": "http://mstdn.example.com", "description": "test mastodon", "email": "mstdn@mstdn.example.com"}`)
+		fmt.Fprintln(w, `{"title": "mastodon", "uri": "http://mstdn.example.com", "description": "test mastodon", "email": "mstdn@mstdn.example.com", "contact_account": {"username": "mattn"}}`)
 	}))
 	defer ts.Close()
 
@@ -46,6 +46,9 @@ func TestGetInstance(t *testing.T) {
 	}
 	if ins.EMail != "mstdn@mstdn.example.com" {
 		t.Fatalf("want %q but %q", "mstdn@mstdn.example.com", ins.EMail)
+	}
+	if ins.ContactAccount.Username != "mattn" {
+		t.Fatalf("want %q but %q", "mattn", ins.ContactAccount.Username)
 	}
 }
 

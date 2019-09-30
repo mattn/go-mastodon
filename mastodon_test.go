@@ -264,7 +264,7 @@ func TestGetTimelineHomeWithCancel(t *testing.T) {
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	if want := fmt.Sprintf("Post %q: context canceled", ts.URL+"/api/v1/timelines/home"); want != err.Error() {
+	if want := fmt.Sprintf("Get %q: context canceled", ts.URL+"/api/v1/timelines/home"); want != err.Error() {
 		t.Fatalf("want %q but %q", want, err.Error())
 	}
 }

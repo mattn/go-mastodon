@@ -9,5 +9,5 @@ require (
 	github.com/mattn/go-tty v0.0.0-20190424173100-523744f04859
 	github.com/tomnomnom/linkheader v0.0.0-20180905144013-02ca5825eb80
 	github.com/urfave/cli v1.20.0
-	golang.org/x/net v0.0.0-20190509222800-a4d6f7feada5
+	golang.org/x/net v0.0.0-20191209160850-c0dbc17a3553
 )

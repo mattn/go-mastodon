@@ -8,6 +8,6 @@ require (
 	github.com/gorilla/websocket v1.4.1
 	github.com/mattn/go-tty v0.0.3
 	github.com/tomnomnom/linkheader v0.0.0-20180905144013-02ca5825eb80
-	github.com/urfave/cli v1.20.0
+	github.com/urfave/cli/v2/v2 v2.1.1
 	golang.org/x/net v0.0.0-20191209160850-c0dbc17a3553
 )

@@ -61,6 +61,14 @@ type Card struct {
 	Height       int64  `json:"height"`
 }
 
+// Conversation hold information for mastodon conversation.
+type Conversation struct {
+	ID         ID         `json:"id"`
+	Accounts   []*Account `json:"accounts"`
+	Unread     bool       `json:"unread"`
+	LastStatus *Status    `json:"last_status"`
+}
+
 // GetFavourites return the favorite list of the current user.
 func (c *Client) GetFavourites(ctx context.Context, pg *Pagination) ([]*Status, error) {
 	var statuses []*Status
@@ -306,4 +314,26 @@ func (c *Client) GetTimelineDirect(ctx context.Context, pg *Pagination) ([]*Stat
 		return nil, err
 	}
 	return statuses, nil
+}
+
+// GetConversations return direct conversations.
+func (c *Client) GetConversations(ctx context.Context, pg *Pagination) ([]*Conversation, error) {
+	params := url.Values{}
+
+	var conversations []*Conversation
+	err := c.doAPI(ctx, http.MethodGet, "/api/v1/conversations", params, &conversations, pg)
+	if err != nil {
+		return nil, err
+	}
+	return conversations, nil
+}
+
+// DeleteConversation delete the conversation specified by id.
+func (c *Client) DeleteConversation(ctx context.Context, id ID) error {
+	return c.doAPI(ctx, http.MethodDelete, fmt.Sprintf("/api/v1/conversations/%s", id), nil, nil, nil)
+}
+
+// MarkConversationAsRead mark the conversation as read.
+func (c *Client) MarkConversationAsRead(ctx context.Context, id ID) error {
+	return c.doAPI(ctx, http.MethodPost, fmt.Sprintf("/api/v1/conversations/%s/read", id), nil, nil, nil)
 }

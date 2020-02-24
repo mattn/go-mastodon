@@ -621,3 +621,89 @@ func TestUploadMedia(t *testing.T) {
 		t.Fatalf("want %q but %q", "123", attachment.ID)
 	}
 }
+
+func TestGetConversations(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/api/v1/conversations" {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		}
+		fmt.Fprintln(w, `[{"id": "4", "unread":false, "last_status" : {"content": "zzz"}}, {"id": "3", "unread":true, "last_status" : {"content": "bar"}}]`)
+		return
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+		AccessToken:  "zoo",
+	})
+	convs, err := client.GetConversations(context.Background(), nil)
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	if len(convs) != 2 {
+		t.Fatalf("result should be 2: %d", len(convs))
+	}
+	if convs[0].ID != "4" {
+		t.Fatalf("want %q but %q", "4", convs[0].ID)
+	}
+	if convs[0].LastStatus.Content != "zzz" {
+		t.Fatalf("want %q but %q", "zzz", convs[0].LastStatus.Content)
+	}
+	if convs[1].Unread != true {
+		t.Fatalf("unread should be true: %t", convs[1].Unread)
+	}
+}
+
+func TestDeleteConversation(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/api/v1/conversations/12345678" {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+		if r.Method != "DELETE" {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusMethodNotAllowed)
+			return
+		}
+		return
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+		AccessToken:  "hoge",
+	})
+	err = client.DeleteConversation(context.Background(), "12345678")
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+}
+
+func TestMarkConversationsAsRead(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/api/v1/conversations/111111/read" {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+		if r.Method != "POST" {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+		return
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+		AccessToken:  "zoo",
+	})
+	err := client.MarkConversationAsRead(context.Background(), "111111")
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+}

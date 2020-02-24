@@ -87,6 +87,9 @@ func main() {
 * [x] GET /api/v1/accounts/search
 * [x] POST /api/v1/apps
 * [x] GET /api/v1/blocks
+* [x] GET /api/v1/conversations
+* [x] DELETE /api/v1/conversations/:id
+* [x] POST /api/v1/conversations/:id/read
 * [x] GET /api/v1/favourites
 * [x] GET /api/v1/follow_requests
 * [x] POST /api/v1/follow_requests/:id/authorize

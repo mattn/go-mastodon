@@ -676,7 +676,7 @@ func TestDeleteConversation(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "hoge",
 	})
-	err = client.DeleteConversation(context.Background(), "12345678")
+	err := client.DeleteConversation(context.Background(), "12345678")
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}

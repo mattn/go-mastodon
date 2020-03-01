@@ -13,8 +13,8 @@ func TestCmdSearch(t *testing.T) {
 	out := testWithServer(
 		func(w http.ResponseWriter, r *http.Request) {
 			switch r.URL.Path {
-			case "/api/v1/search":
-				fmt.Fprintln(w, `{"accounts": [{"id": 234, "acct": "zzz"}], "statuses":[{"id": 345, "content": "yyy"}], "hashtags": ["www", "わろす"]}`)
+			case "/api/v2/search":
+				fmt.Fprintln(w, `{"accounts": [{"id": 234, "acct": "zzz"}], "statuses":[{"id": 345, "content": "yyy"}], "hashtags": [{"name": "www"}, {"name": "わろす"}]}`)
 				return
 			}
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)

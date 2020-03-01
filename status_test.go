@@ -532,11 +532,11 @@ func TestDeleteStatus(t *testing.T) {
 
 func TestSearch(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/api/v1/search" {
+		if r.URL.Path != "/api/v2/search" {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
-		if r.RequestURI != "/api/v1/search?q=q&resolve=false" {
+		if r.RequestURI != "/api/v2/search?q=q&resolve=false" {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusBadRequest)
 			return
 		}
@@ -544,7 +544,7 @@ func TestSearch(t *testing.T) {
 		fmt.Fprintln(w, `
 			{"accounts":[{"username": "zzz"},{"username": "yyy"}],
 			"statuses":[{"content": "aaa"}],
-			"hashtags":["tag","tag2","tag3"]
+			"hashtags":[{"name": "tag"},{"name": "tag2"},{"name": "tag3"}]
 		}`)
 		return
 	}))
@@ -575,7 +575,7 @@ func TestSearch(t *testing.T) {
 	if len(ret.Hashtags) != 3 {
 		t.Fatalf("Hashtags have %q entries, but %q", "3", len(ret.Hashtags))
 	}
-	if ret.Hashtags[2] != "tag3" {
+	if ret.Hashtags[2].Name != "tag3" {
 		t.Fatalf("Hashtags[2] should %q , but %q", "tag3", ret.Hashtags[2])
 	}
 }

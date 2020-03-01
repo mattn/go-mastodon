@@ -277,8 +277,8 @@ type Tag struct {
 // History hold information for history.
 type History struct {
 	Day      string `json:"day"`
-	Uses     int64  `json:"uses"`
-	Accounts int64  `json:"accounts"`
+	Uses     string `json:"uses"`
+	Accounts string `json:"accounts"`
 }
 
 // Attachment hold information for attachment.

@@ -277,7 +277,7 @@ func (c *Client) Search(ctx context.Context, q string, resolve bool) (*Results, 
 	params.Set("q", q)
 	params.Set("resolve", fmt.Sprint(resolve))
 	var results Results
-	err := c.doAPI(ctx, http.MethodGet, "/api/v1/search", params, &results, nil)
+	err := c.doAPI(ctx, http.MethodGet, "/api/v2/search", params, &results, nil)
 	if err != nil {
 		return nil, err
 	}

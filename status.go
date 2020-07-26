@@ -1,11 +1,15 @@
 package mastodon
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"net/url"
+	"os"
+	"strings"
 	"time"
 )
 
@@ -68,6 +72,71 @@ type Conversation struct {
 	Accounts   []*Account `json:"accounts"`
 	Unread     bool       `json:"unread"`
 	LastStatus *Status    `json:"last_status"`
+}
+
+// Media is struct to hold media.
+type Media struct {
+	File        io.Reader
+	Thumbnail   io.Reader
+	Description string
+	Focus       string
+}
+
+func (m *Media) bodyAndContentType() (io.Reader, string, error) {
+	var buf bytes.Buffer
+	mw := multipart.NewWriter(&buf)
+
+	fileName := "upload"
+	if f, ok := m.File.(*os.File); ok {
+		fileName = f.Name()
+	}
+	file, err := mw.CreateFormFile("file", fileName)
+	if err != nil {
+		return nil, "", err
+	}
+	if _, err := io.Copy(file, m.File); err != nil {
+		return nil, "", err
+	}
+
+	if m.Thumbnail != nil {
+		thumbName := "upload"
+		if f, ok := m.Thumbnail.(*os.File); ok {
+			thumbName = f.Name()
+		}
+		thumb, err := mw.CreateFormFile("thumbnail", thumbName)
+		if err != nil {
+			return nil, "", err
+		}
+		if _, err := io.Copy(thumb, m.Thumbnail); err != nil {
+			return nil, "", err
+		}
+	}
+
+	if m.Description != "" {
+		desc, err := mw.CreateFormField("description")
+		if err != nil {
+			return nil, "", err
+		}
+		if _, err := io.Copy(desc, strings.NewReader(m.Description)); err != nil {
+			return nil, "", err
+		}
+	}
+
+	if m.Focus != "" {
+		focus, err := mw.CreateFormField("focus")
+		if err != nil {
+			return nil, "", err
+		}
+		if _, err := io.Copy(focus, strings.NewReader(m.Focus)); err != nil {
+			return nil, "", err
+		}
+	}
+
+	if err := mw.Close(); err != nil {
+		return nil, "", err
+	}
+
+	return &buf, mw.FormDataContentType(), nil
 }
 
 // GetFavourites return the favorite list of the current user.
@@ -287,19 +356,24 @@ func (c *Client) Search(ctx context.Context, q string, resolve bool) (*Results, 
 
 // UploadMedia upload a media attachment from a file.
 func (c *Client) UploadMedia(ctx context.Context, file string) (*Attachment, error) {
-	var attachment Attachment
-	err := c.doAPI(ctx, http.MethodPost, "/api/v1/media", file, &attachment, nil)
+	f, err := os.Open(file)
 	if err != nil {
 		return nil, err
 	}
-	return &attachment, nil
+	defer f.Close()
+
+	return c.UploadMediaFromMedia(ctx, &Media{File: f})
 }
 
 // UploadMediaFromReader uploads a media attachment from a io.Reader.
 func (c *Client) UploadMediaFromReader(ctx context.Context, reader io.Reader) (*Attachment, error) {
+	return c.UploadMediaFromMedia(ctx, &Media{File: reader})
+}
+
+// UploadMediaFromMedia uploads a media attachment from a Media struct.
+func (c *Client) UploadMediaFromMedia(ctx context.Context, media *Media) (*Attachment, error) {
 	var attachment Attachment
-	err := c.doAPI(ctx, http.MethodPost, "/api/v1/media", reader, &attachment, nil)
-	if err != nil {
+	if err := c.doAPI(ctx, http.MethodPost, "/api/v1/media", media, &attachment, nil); err != nil {
 		return nil, err
 	}
 	return &attachment, nil

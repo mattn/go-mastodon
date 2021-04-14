@@ -383,11 +383,19 @@ func (c *Client) UploadMediaFromMedia(ctx context.Context, media *Media) (*Attac
 func (c *Client) GetTimelineDirect(ctx context.Context, pg *Pagination) ([]*Status, error) {
 	params := url.Values{}
 
-	var statuses []*Status
-	err := c.doAPI(ctx, http.MethodGet, "/api/v1/timelines/direct", params, &statuses, pg)
+	var conversations []*Conversation
+	err := c.doAPI(ctx, http.MethodGet, "/api/v1/conversations", params, &conversations, pg)
 	if err != nil {
 		return nil, err
 	}
+
+	var statuses []*Status
+
+	for _, c := range conversations {
+		s := c.LastStatus
+		statuses = append(statuses, s)
+	}
+
 	return statuses, nil
 }
 

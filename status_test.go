@@ -372,7 +372,7 @@ func TestGetTimelinePublic(t *testing.T) {
 
 func TestGetTimelineDirect(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, `[{"content": "direct"}, {"content": "status"}]`)
+		fmt.Fprintln(w, `[{"id": "4", "unread":false, "last_status" : {"content": "zzz"}}, {"id": "3", "unread":true, "last_status" : {"content": "bar"}}]`)
 	}))
 	defer ts.Close()
 
@@ -381,13 +381,14 @@ func TestGetTimelineDirect(t *testing.T) {
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
+	t.Logf("%#v", tl)
 	if len(tl) != 2 {
 		t.Fatalf("result should be two: %d", len(tl))
 	}
-	if tl[0].Content != "direct" {
+	if tl[0].Content != "zzz" {
 		t.Fatalf("want %q but %q", "foo", tl[0].Content)
 	}
-	if tl[1].Content != "status" {
+	if tl[1].Content != "bar" {
 		t.Fatalf("want %q but %q", "bar", tl[1].Content)
 	}
 }

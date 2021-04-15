@@ -389,7 +389,7 @@ func (c *Client) GetTimelineDirect(ctx context.Context, pg *Pagination) ([]*Stat
 		return nil, err
 	}
 
-	var statuses = make([]*Status, len(conversations))
+	var statuses = []*Status{}
 
 	for _, c := range conversations {
 		s := c.LastStatus

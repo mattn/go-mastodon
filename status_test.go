@@ -381,7 +381,6 @@ func TestGetTimelineDirect(t *testing.T) {
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
-	t.Logf("%#v", tl)
 	if len(tl) != 2 {
 		t.Fatalf("result should be two: %d", len(tl))
 	}

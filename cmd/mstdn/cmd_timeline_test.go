@@ -19,8 +19,8 @@ func TestCmdTimeline(t *testing.T) {
 			case "/api/v1/timelines/public":
 				fmt.Fprintln(w, `[{"content": "public"}]`)
 				return
-			case "/api/v1/timelines/direct":
-				fmt.Fprintln(w, `[{"content": "direct"}]`)
+			case "/api/v1/conversations":
+				fmt.Fprintln(w, `[{"id": "4", "unread":false, "last_status" : {"content": "direct"}}]`)
 				return
 			}
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)

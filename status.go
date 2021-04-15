@@ -250,13 +250,22 @@ func (c *Client) GetTimelineHome(ctx context.Context, pg *Pagination) ([]*Status
 }
 
 // GetTimelineDirect return statuses from direct timeline.
-func (c *Client) GetTimelineDirect(ctx context.Context, pg *Pagination) ([]*Status, error) {
+func (c Client) GetTimelineDirect(ctx context.Context, pg *Pagination) ([]Status, error) {
+	params := url.Values{}
 
-	var statuses []*Status
-	err := c.doAPI(ctx, http.MethodGet, "/api/v1/timelines/direct", nil, &statuses, pg)
+	var conversations []*Conversation
+	err := c.doAPI(ctx, http.MethodGet, "/api/v1/conversations", params, &conversations, pg)
 	if err != nil {
 		return nil, err
 	}
+
+	statuses := make([]*Status, 0, 40)
+
+	for _, d := range conversations {
+		s := d.LastStatus
+		statuses = append(statuses, s)
+	}
+
 	return statuses, nil
 }
 

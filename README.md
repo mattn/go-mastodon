@@ -110,7 +110,7 @@ func main() {
 * [x] GET /api/v1/mutes
 * [x] GET /api/v1/notifications
 * [x] GET /api/v1/notifications/:id
-* [x] POST /api/v1/notifications/dismiss
+* [x] POST /api/v1/notifications/:id/dismiss
 * [x] POST /api/v1/notifications/clear
 * [x] POST /api/v1/push/subscription
 * [x] GET /api/v1/push/subscription

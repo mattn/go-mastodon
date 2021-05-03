@@ -23,7 +23,7 @@ func TestGetNotifications(t *testing.T) {
 		case "/api/v1/notifications/clear":
 			fmt.Fprintln(w, `{}`)
 			return
-		case "/api/v1/notifications/dismiss":
+		case "/api/v1/notifications/123/dismiss":
 			fmt.Fprintln(w, `{}`)
 			return
 		}

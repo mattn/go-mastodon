@@ -57,13 +57,7 @@ func (c *Client) GetNotification(ctx context.Context, id ID) (*Notification, err
 
 // DismissNotification deletes a single notification.
 func (c *Client) DismissNotification(ctx context.Context, id ID) error {
-	params := url.Values{}
-	params.Add("id", string(id))
-	err := c.doAPI(ctx, http.MethodPost, "/api/v1/notifications/dismiss", params, nil, nil)
-	if err != nil {
-		return err
-	}
-	return nil
+	return c.doAPI(ctx, http.MethodPost, fmt.Sprintf("/api/v1/notifications/%v/dismiss", id), nil, nil, nil)
 }
 
 // ClearNotifications clear notifications.

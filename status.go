@@ -30,6 +30,7 @@ type Status struct {
 	FavouritesCount    int64        `json:"favourites_count"`
 	Reblogged          interface{}  `json:"reblogged"`
 	Favourited         interface{}  `json:"favourited"`
+	Bookmarked         interface{}  `json:"bookmarked"`
 	Muted              interface{}  `json:"muted"`
 	Sensitive          bool         `json:"sensitive"`
 	SpoilerText        string       `json:"spoiler_text"`
@@ -149,6 +150,16 @@ func (c *Client) GetFavourites(ctx context.Context, pg *Pagination) ([]*Status, 
 	return statuses, nil
 }
 
+// GetBookmarks return the bookmark list of the current user.
+func (c *Client) GetBookmarks(ctx context.Context, pg *Pagination) ([]*Status, error) {
+	var statuses []*Status
+	err := c.doAPI(ctx, http.MethodGet, "/api/v1/bookmarks", nil, &statuses, pg)
+	if err != nil {
+		return nil, err
+	}
+	return statuses, nil
+}
+
 // GetStatus return status specified by id.
 func (c *Client) GetStatus(ctx context.Context, id ID) (*Status, error) {
 	var status Status
@@ -233,6 +244,26 @@ func (c *Client) Favourite(ctx context.Context, id ID) (*Status, error) {
 func (c *Client) Unfavourite(ctx context.Context, id ID) (*Status, error) {
 	var status Status
 	err := c.doAPI(ctx, http.MethodPost, fmt.Sprintf("/api/v1/statuses/%s/unfavourite", id), nil, &status, nil)
+	if err != nil {
+		return nil, err
+	}
+	return &status, nil
+}
+
+// Bookmark is bookmark the toot of id and return status of the bookmark toot.
+func (c *Client) Bookmark(ctx context.Context, id ID) (*Status, error) {
+	var status Status
+	err := c.doAPI(ctx, http.MethodPost, fmt.Sprintf("/api/v1/statuses/%s/bookmark", id), nil, &status, nil)
+	if err != nil {
+		return nil, err
+	}
+	return &status, nil
+}
+
+// Unbookmark is unbookmark the toot of id and return status of the unbookmark toot.
+func (c *Client) Unbookmark(ctx context.Context, id ID) (*Status, error) {
+	var status Status
+	err := c.doAPI(ctx, http.MethodPost, fmt.Sprintf("/api/v1/statuses/%s/unbookmark", id), nil, &status, nil)
 	if err != nil {
 		return nil, err
 	}

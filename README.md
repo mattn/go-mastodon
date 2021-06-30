@@ -85,6 +85,7 @@ func main() {
 * [x] GET /api/v1/accounts/:id/lists
 * [x] GET /api/v1/accounts/relationships
 * [x] GET /api/v1/accounts/search
+* [x] GET /api/v1/bookmarks
 * [x] POST /api/v1/apps
 * [x] GET /api/v1/blocks
 * [x] GET /api/v1/conversations
@@ -130,6 +131,8 @@ func main() {
 * [x] POST /api/v1/statuses/:id/unreblog
 * [x] POST /api/v1/statuses/:id/favourite
 * [x] POST /api/v1/statuses/:id/unfavourite
+* [x] POST /api/v1/statuses/:id/bookmark
+* [x] POST /api/v1/statuses/:id/unbookmark
 * [x] GET /api/v1/timelines/home
 * [x] GET /api/v1/timelines/public
 * [x] GET /api/v1/timelines/tag/:hashtag

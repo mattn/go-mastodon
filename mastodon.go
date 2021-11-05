@@ -219,6 +219,15 @@ type Toot struct {
 	SpoilerText string     `json:"spoiler_text"`
 	Visibility  string     `json:"visibility"`
 	ScheduledAt *time.Time `json:"scheduled_at,omitempty"`
+	Poll        *TootPoll  `json:"poll"`
+}
+
+// TootPoll holds information for creating a poll in Toot.
+type TootPoll struct {
+	Options          []string `json:"options"`
+	ExpiresInSeconds int64    `json:"expires_in"`
+	Multiple         bool     `json:"multiple"`
+	HideTotals       bool     `json:"hide_totals"`
 }
 
 // Mention hold information for mention.

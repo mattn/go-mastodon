@@ -349,6 +349,19 @@ func (c *Client) PostStatus(ctx context.Context, toot *Toot) (*Status, error) {
 			params.Add("media_ids[]", string(media))
 		}
 	}
+	// Can't use Media and Poll at the same time.
+	if toot.Poll != nil && toot.Poll.Options != nil && toot.MediaIDs == nil {
+		for _, opt := range toot.Poll.Options {
+			params.Add("poll[options][]", string(opt))
+		}
+		params.Add("poll[expires_in]", fmt.Sprintf("%d", toot.Poll.ExpiresInSeconds))
+		if toot.Poll.Multiple {
+			params.Add("poll[multiple]", "true")
+		}
+		if toot.Poll.HideTotals {
+			params.Add("poll[hide_totals]", "true")
+		}
+	}
 	if toot.Visibility != "" {
 		params.Set("visibility", fmt.Sprint(toot.Visibility))
 	}

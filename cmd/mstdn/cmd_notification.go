@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/RasmusLindroth/go-mastodon"
 	"github.com/fatih/color"
-	"github.com/mattn/go-mastodon"
 	"github.com/urfave/cli"
 )
 

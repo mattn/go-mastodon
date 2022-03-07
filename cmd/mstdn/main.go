@@ -14,8 +14,8 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/RasmusLindroth/go-mastodon"
 	"github.com/fatih/color"
-	"github.com/mattn/go-mastodon"
 	"github.com/mattn/go-tty"
 	"github.com/urfave/cli"
 	"golang.org/x/net/html"

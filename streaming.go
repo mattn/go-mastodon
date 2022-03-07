@@ -92,7 +92,10 @@ func (c *Client) streaming(ctx context.Context, p string, params url.Values) (ch
 		return nil, err
 	}
 	req = req.WithContext(ctx)
-	req.Header.Set("Authorization", "Bearer "+c.Config.AccessToken)
+
+	if c.Config.AccessToken != "" {
+		req.Header.Set("Authorization", "Bearer "+c.Config.AccessToken)
+	}
 
 	q := make(chan Event)
 	go func() {

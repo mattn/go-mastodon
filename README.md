@@ -93,11 +93,11 @@ func main() {
 * [x] DELETE /api/v1/conversations/:id
 * [x] POST /api/v1/conversations/:id/read
 * [x] GET /api/v1/favourites
-* [x] GET api/v1/filters
-* [x] POST api/v1/filters
-* [x] GET api/v1/filters/:id
-* [x] PUT api/v1/filters/:id
-* [x] DELETE api/v1/filters/:id
+* [x] GET /api/v1/filters
+* [x] POST /api/v1/filters
+* [x] GET /api/v1/filters/:id
+* [x] PUT /api/v1/filters/:id
+* [x] DELETE /api/v1/filters/:id
 * [x] GET /api/v1/follow_requests
 * [x] POST /api/v1/follow_requests/:id/authorize
 * [x] POST /api/v1/follow_requests/:id/reject

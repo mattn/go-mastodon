@@ -28,10 +28,10 @@ type Status struct {
 	RepliesCount       int64        `json:"replies_count"`
 	ReblogsCount       int64        `json:"reblogs_count"`
 	FavouritesCount    int64        `json:"favourites_count"`
-	Reblogged          interface{}  `json:"reblogged"`
-	Favourited         interface{}  `json:"favourited"`
-	Bookmarked         interface{}  `json:"bookmarked"`
-	Muted              interface{}  `json:"muted"`
+	Reblogged          bool         `json:"reblogged"`
+	Favourited         bool         `json:"favourited"`
+	Bookmarked         bool         `json:"bookmarked"`
+	Muted              bool         `json:"muted"`
 	Sensitive          bool         `json:"sensitive"`
 	SpoilerText        string       `json:"spoiler_text"`
 	Visibility         string       `json:"visibility"`
@@ -42,7 +42,7 @@ type Status struct {
 	Poll               *Poll        `json:"poll"`
 	Application        Application  `json:"application"`
 	Language           string       `json:"language"`
-	Pinned             interface{}  `json:"pinned"`
+	Pinned             bool         `json:"pinned"`
 }
 
 // Context hold information for mastodon context.

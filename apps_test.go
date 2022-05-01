@@ -27,7 +27,6 @@ func TestRegisterApp(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `{"id": 123, "client_id": "foo", "client_secret": "bar"}`)
-		return
 	}))
 	defer ts.Close()
 
@@ -79,7 +78,6 @@ func TestRegisterAppWithCancel(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		time.Sleep(3 * time.Second)
 		fmt.Fprintln(w, `{"client_id": "foo", "client_secret": "bar"}`)
-		return
 	}))
 	defer ts.Close()
 

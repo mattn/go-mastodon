@@ -118,7 +118,6 @@ func TestGetAccountStatuses(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `[{"content": "foo"}, {"content": "bar"}]`)
-		return
 	}))
 	defer ts.Close()
 
@@ -151,7 +150,6 @@ func TestGetAccountFollowers(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `[{"username": "foo"}, {"username": "bar"}]`)
-		return
 	}))
 	defer ts.Close()
 
@@ -187,7 +185,6 @@ func TestGetAccountFollowing(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `[{"username": "foo"}, {"username": "bar"}]`)
-		return
 	}))
 	defer ts.Close()
 
@@ -225,7 +222,6 @@ func TestGetBlocks(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `[{"username": "foo"}, {"username": "bar"}]`)
-		return
 	}))
 	defer ts.Close()
 
@@ -261,7 +257,6 @@ func TestAccountFollow(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `{"id":1234567,"following":true}`)
-		return
 	}))
 	defer ts.Close()
 
@@ -271,11 +266,11 @@ func TestAccountFollow(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	rel, err := client.AccountFollow(context.Background(), "123")
+	_, err := client.AccountFollow(context.Background(), "123")
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	rel, err = client.AccountFollow(context.Background(), "1234567")
+	rel, err := client.AccountFollow(context.Background(), "1234567")
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -294,7 +289,6 @@ func TestAccountUnfollow(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `{"id":1234567,"following":false}`)
-		return
 	}))
 	defer ts.Close()
 
@@ -304,11 +298,11 @@ func TestAccountUnfollow(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	rel, err := client.AccountUnfollow(context.Background(), "123")
+	_, err := client.AccountUnfollow(context.Background(), "123")
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	rel, err = client.AccountUnfollow(context.Background(), "1234567")
+	rel, err := client.AccountUnfollow(context.Background(), "1234567")
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -327,7 +321,6 @@ func TestAccountBlock(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `{"id":1234567,"blocking":true}`)
-		return
 	}))
 	defer ts.Close()
 
@@ -360,7 +353,6 @@ func TestAccountUnblock(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `{"id":1234567,"blocking":false}`)
-		return
 	}))
 	defer ts.Close()
 
@@ -393,7 +385,6 @@ func TestAccountMute(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `{"id":1234567,"muting":true}`)
-		return
 	}))
 	defer ts.Close()
 
@@ -426,7 +417,6 @@ func TestAccountUnmute(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `{"id":1234567,"muting":false}`)
-		return
 	}))
 	defer ts.Close()
 
@@ -492,7 +482,6 @@ func TestAccountsSearch(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `[{"username": "foobar"}, {"username": "barfoo"}]`)
-		return
 	}))
 	defer ts.Close()
 
@@ -528,7 +517,6 @@ func TestFollowRemoteUser(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `{"username": "zzz"}`)
-		return
 	}))
 	defer ts.Close()
 
@@ -560,7 +548,6 @@ func TestGetFollowRequests(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `[{"username": "foo"}, {"username": "bar"}]`)
-		return
 	}))
 	defer ts.Close()
 
@@ -646,7 +633,6 @@ func TestGetMutes(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `[{"username": "foo"}, {"username": "bar"}]`)
-		return
 	}))
 	defer ts.Close()
 

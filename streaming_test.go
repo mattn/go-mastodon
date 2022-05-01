@@ -23,12 +23,11 @@ event: delete
 data: 1234567
 :thump
 	`)
+	errs := make(chan error, 1)
 	go func() {
 		defer close(q)
 		err := handleReader(q, r)
-		if err != nil {
-			t.Fatalf("should not be fail: %v", err)
-		}
+		errs <- err
 	}()
 	var passUpdate, passNotification, passDelete, passError bool
 	for e := range q {
@@ -59,6 +58,10 @@ data: 1234567
 		t.Fatalf("have not passed through somewhere: "+
 			"update %t, notification %t, delete %t, error %t",
 			passUpdate, passNotification, passDelete, passError)
+	}
+	err := <-errs
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
 	}
 }
 
@@ -142,9 +145,6 @@ func TestDoStreaming(t *testing.T) {
 	go func() {
 		defer close(q)
 		c.doStreaming(req, q)
-		if err != nil {
-			t.Fatalf("should not be fail: %v", err)
-		}
 	}()
 	var passError bool
 	for e := range q {

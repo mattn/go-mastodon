@@ -14,7 +14,6 @@ import (
 func TestGetFilters(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, `[{"id": "6191", "phrase": "rust", "context": ["home"], "whole_word": true, "expires_at": "2019-05-21T13:47:31.333Z", "irreversible": false}, {"id": "5580", "phrase": "@twitter.com", "context": ["home", "notifications", "public", "thread"], "whole_word": false, "expires_at": null, "irreversible": true}]`)
-		return
 	}))
 	defer ts.Close()
 
@@ -85,7 +84,6 @@ func TestGetFilter(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `{"id": "1", "phrase": "rust", "context": ["home"], "whole_word": true, "expires_at": "2019-05-21T13:47:31.333Z", "irreversible": false}`)
-		return
 	}))
 	defer ts.Close()
 
@@ -328,7 +326,6 @@ func TestDeleteFilter(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusMethodNotAllowed)
 			return
 		}
-		return
 	}))
 	defer ts.Close()
 

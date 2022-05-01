@@ -2,8 +2,10 @@ package mastodon
 
 import (
 	"bufio"
+	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"net/url"
@@ -43,10 +45,27 @@ type Event interface {
 
 func handleReader(q chan Event, r io.Reader) error {
 	var name string
-	s := bufio.NewScanner(r)
-	for s.Scan() {
-		line := s.Text()
-		token := strings.SplitN(line, ":", 2)
+	var lineBuf bytes.Buffer
+	br := bufio.NewReader(r)
+	for {
+		line, isPrefix, err := br.ReadLine()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				return nil
+			}
+			return err
+		}
+		if isPrefix {
+			lineBuf.Write(line)
+			continue
+		}
+		if lineBuf.Len() > 0 {
+			lineBuf.Write(line)
+			line = lineBuf.Bytes()
+			lineBuf.Reset()
+		}
+
+		token := strings.SplitN(string(line), ":", 2)
 		if len(token) != 2 {
 			continue
 		}
@@ -76,7 +95,6 @@ func handleReader(q chan Event, r io.Reader) error {
 			}
 		}
 	}
-	return s.Err()
 }
 
 func (c *Client) streaming(ctx context.Context, p string, params url.Values) (chan Event, error) {

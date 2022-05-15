@@ -1,6 +1,7 @@
 package mastodon
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"net/http"
@@ -11,31 +12,40 @@ import (
 )
 
 func TestHandleReader(t *testing.T) {
+	large := "large"
+	largeContent := strings.Repeat(large, 2*(bufio.MaxScanTokenSize/len(large)))
+
 	q := make(chan Event)
-	r := strings.NewReader(`
+	r := strings.NewReader(fmt.Sprintf(`
 event: update
 data: {content: error}
 event: update
 data: {"content": "foo"}
+event: update
+data: {"content": "%s"}
 event: notification
 data: {"type": "mention"}
 event: delete
 data: 1234567
 :thump
-	`)
-	errs := make(chan error, 1)
+	`, largeContent))
 	go func() {
 		defer close(q)
 		err := handleReader(q, r)
-		errs <- err
+		if err != nil {
+			t.Fatalf("should not be fail: %v", err)
+		}
 	}()
-	var passUpdate, passNotification, passDelete, passError bool
+	var passUpdate, passUpdateLarge, passNotification, passDelete, passError bool
 	for e := range q {
 		switch event := e.(type) {
 		case *UpdateEvent:
-			passUpdate = true
-			if event.Status.Content != "foo" {
-				t.Fatalf("want %q but %q", "foo", event.Status.Content)
+			if event.Status.Content == "foo" {
+				passUpdate = true
+			} else if event.Status.Content == largeContent {
+				passUpdateLarge = true
+			} else {
+				t.Fatalf("bad update content: %q", event.Status.Content)
 			}
 		case *NotificationEvent:
 			passNotification = true
@@ -54,14 +64,10 @@ data: 1234567
 			}
 		}
 	}
-	if !passUpdate || !passNotification || !passDelete || !passError {
+	if !passUpdate || !passUpdateLarge || !passNotification || !passDelete || !passError {
 		t.Fatalf("have not passed through somewhere: "+
-			"update %t, notification %t, delete %t, error %t",
-			passUpdate, passNotification, passDelete, passError)
-	}
-	err := <-errs
-	if err != nil {
-		t.Fatalf("should not be fail: %v", err)
+			"update: %t, update (large): %t, notification: %t, delete: %t, error: %t",
+			passUpdate, passUpdateLarge, passNotification, passDelete, passError)
 	}
 }
 
@@ -145,6 +151,9 @@ func TestDoStreaming(t *testing.T) {
 	go func() {
 		defer close(q)
 		c.doStreaming(req, q)
+		if err != nil {
+			t.Fatalf("should not be fail: %v", err)
+		}
 	}()
 	var passError bool
 	for e := range q {

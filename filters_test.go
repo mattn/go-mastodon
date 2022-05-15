@@ -322,10 +322,6 @@ func TestDeleteFilter(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
-		if r.Method != "DELETE" {
-			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusMethodNotAllowed)
-			return
-		}
 	}))
 	defer ts.Close()
 

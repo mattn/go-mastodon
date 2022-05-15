@@ -28,6 +28,7 @@ func TestGetNotifications(t *testing.T) {
 			return
 		}
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
 	}))
 	defer ts.Close()
 
@@ -75,6 +76,7 @@ func TestPushSubscription(t *testing.T) {
 			return
 		}
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
 	}))
 	defer ts.Close()
 

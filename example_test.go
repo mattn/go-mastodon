@@ -14,7 +14,7 @@ func ExampleRegisterApp() {
 		Server:     "https://mstdn.jp",
 		ClientName: "client-name",
 		Scopes:     "read write follow",
-		Website:    "https://github.com/mattn/go-mastodon",
+		Website:    "https://github.com/RasmusLindroth/go-mastodon",
 	})
 	if err != nil {
 		log.Fatal(err)

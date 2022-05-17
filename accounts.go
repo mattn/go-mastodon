@@ -11,25 +11,27 @@ import (
 
 // Account hold information for mastodon account.
 type Account struct {
-	ID             ID        `json:"id"`
-	Username       string    `json:"username"`
-	Acct           string    `json:"acct"`
-	DisplayName    string    `json:"display_name"`
-	Locked         bool      `json:"locked"`
-	CreatedAt      time.Time `json:"created_at"`
-	FollowersCount int64     `json:"followers_count"`
-	FollowingCount int64     `json:"following_count"`
-	StatusesCount  int64     `json:"statuses_count"`
-	Note           string    `json:"note"`
-	URL            string    `json:"url"`
-	Avatar         string    `json:"avatar"`
-	AvatarStatic   string    `json:"avatar_static"`
-	Header         string    `json:"header"`
-	HeaderStatic   string    `json:"header_static"`
-	Emojis         []Emoji   `json:"emojis"`
-	Moved          *Account  `json:"moved"`
-	Fields         []Field   `json:"fields"`
-	Bot            bool      `json:"bot"`
+	ID             ID             `json:"id"`
+	Username       string         `json:"username"`
+	Acct           string         `json:"acct"`
+	DisplayName    string         `json:"display_name"`
+	Locked         bool           `json:"locked"`
+	CreatedAt      time.Time      `json:"created_at"`
+	FollowersCount int64          `json:"followers_count"`
+	FollowingCount int64          `json:"following_count"`
+	StatusesCount  int64          `json:"statuses_count"`
+	Note           string         `json:"note"`
+	URL            string         `json:"url"`
+	Avatar         string         `json:"avatar"`
+	AvatarStatic   string         `json:"avatar_static"`
+	Header         string         `json:"header"`
+	HeaderStatic   string         `json:"header_static"`
+	Emojis         []Emoji        `json:"emojis"`
+	Moved          *Account       `json:"moved"`
+	Fields         []Field        `json:"fields"`
+	Bot            bool           `json:"bot"`
+	Discoverable   bool           `json:"discoverable"`
+	Source         *AccountSource `json:"source"`
 }
 
 // Field is a Mastodon account profile field.

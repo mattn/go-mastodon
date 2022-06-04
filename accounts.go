@@ -139,6 +139,18 @@ func (c *Client) GetAccountStatuses(ctx context.Context, id ID, pg *Pagination) 
 	return statuses, nil
 }
 
+// GetAccountPinnedStatuses return statuses pinned by specified accuont.
+func (c *Client) GetAccountPinnedStatuses(ctx context.Context, id ID) ([]*Status, error) {
+	var statuses []*Status
+	params := url.Values{}
+	params.Set("pinned", "true")
+	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/accounts/%s/statuses", url.PathEscape(string(id))), params, &statuses, nil)
+	if err != nil {
+		return nil, err
+	}
+	return statuses, nil
+}
+
 // GetAccountFollowers return followers list.
 func (c *Client) GetAccountFollowers(ctx context.Context, id ID, pg *Pagination) ([]*Account, error) {
 	var accounts []*Account

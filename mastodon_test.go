@@ -144,6 +144,38 @@ func TestAuthenticateWithCancel(t *testing.T) {
 	}
 }
 
+func TestAuthenticateApp(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.FormValue("client_id") != "foo" || r.FormValue("client_secret") != "bar" {
+			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			return
+		}
+		fmt.Fprintln(w, `{"name":"zzz","website":"yyy","vapid_key":"xxx"}`)
+		return
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bat",
+	})
+	err := client.AuthenticateApp(context.Background())
+	if err == nil {
+		t.Fatalf("should be fail: %v", err)
+	}
+
+	client = NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+	})
+	err = client.AuthenticateApp(context.Background())
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+}
+
 func TestPostStatus(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("Authorization") != "Bearer zoo" {

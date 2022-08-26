@@ -150,6 +150,18 @@ func (c *Client) Authenticate(ctx context.Context, username, password string) er
 	return c.authenticate(ctx, params)
 }
 
+// AuthenticateApp logs in using client credentials.
+func (c *Client) AuthenticateApp(ctx context.Context) error {
+	params := url.Values{
+		"client_id":     {c.Config.ClientID},
+		"client_secret": {c.Config.ClientSecret},
+		"grant_type":    {"client_credentials"},
+		"redirect_uri":  {"urn:ietf:wg:oauth:2.0:oob"},
+	}
+
+	return c.authenticate(ctx, params)
+}
+
 // AuthenticateToken logs in using a grant token returned by Application.AuthURI.
 //
 // redirectURI should be the same as Application.RedirectURI.

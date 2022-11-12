@@ -153,8 +153,8 @@ func main() {
 
 ## Installation
 
-```
-$ go get github.com/mattn/go-mastodon
+```shell
+go install github.com/mattn/go-mastodon@latest
 ```
 
 ## License

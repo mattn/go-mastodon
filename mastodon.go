@@ -128,7 +128,7 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params in
 	return json.NewDecoder(resp.Body).Decode(&res)
 }
 
-// NewClient return new mastodon API client.
+// NewClient returns a new mastodon API client.
 func NewClient(config *Config) *Client {
 	return &Client{
 		Client: *http.DefaultClient,
@@ -136,7 +136,7 @@ func NewClient(config *Config) *Client {
 	}
 }
 
-// Authenticate get access-token to the API.
+// Authenticate gets access-token to the API.
 func (c *Client) Authenticate(ctx context.Context, username, password string) error {
 	params := url.Values{
 		"client_id":     {c.Config.ClientID},
@@ -222,7 +222,7 @@ const (
 	VisibilityDirectMessage = "direct"
 )
 
-// Toot is struct to post status.
+// Toot is a struct to post status.
 type Toot struct {
 	Status      string     `json:"status"`
 	InReplyToID ID         `json:"in_reply_to_id"`

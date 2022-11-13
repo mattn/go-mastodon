@@ -6,13 +6,13 @@ import (
 	"net/url"
 )
 
-// Report hold information for mastodon report.
+// Report holds information for a mastodon report.
 type Report struct {
 	ID          int64 `json:"id"`
 	ActionTaken bool  `json:"action_taken"`
 }
 
-// GetReports return report of the current user.
+// GetReports returns report of the current user.
 func (c *Client) GetReports(ctx context.Context) ([]*Report, error) {
 	var reports []*Report
 	err := c.doAPI(ctx, http.MethodGet, "/api/v1/reports", nil, &reports, nil)

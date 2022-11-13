@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-// Poll hold information for mastodon polls.
+// Poll holds information for mastodon polls.
 type Poll struct {
 	ID          ID           `json:"id"`
 	ExpiresAt   time.Time    `json:"expires_at"`
@@ -22,13 +22,13 @@ type Poll struct {
 	Emojis      []Emoji      `json:"emojis"`
 }
 
-// Poll hold information for a mastodon poll option.
+// Poll holds information for a mastodon poll option.
 type PollOption struct {
 	Title      string `json:"title"`
 	VotesCount int64  `json:"votes_count"`
 }
 
-// GetPoll return poll specified by id.
+// GetPoll returns poll specified by id.
 func (c *Client) GetPoll(ctx context.Context, id ID) (*Poll, error) {
 	var poll Poll
 	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/polls/%s", id), nil, &poll, nil)

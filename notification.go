@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-// Notification hold information for mastodon notification.
+// Notification holds information for a mastodon notification.
 type Notification struct {
 	ID        ID        `json:"id"`
 	Type      string    `json:"type"`
@@ -35,7 +35,7 @@ type PushAlerts struct {
 	Mention   *Sbool `json:"mention"`
 }
 
-// GetNotifications return notifications.
+// GetNotifications returns notifications.
 func (c *Client) GetNotifications(ctx context.Context, pg *Pagination) ([]*Notification, error) {
 	var notifications []*Notification
 	err := c.doAPI(ctx, http.MethodGet, "/api/v1/notifications", nil, &notifications, pg)
@@ -45,7 +45,7 @@ func (c *Client) GetNotifications(ctx context.Context, pg *Pagination) ([]*Notif
 	return notifications, nil
 }
 
-// GetNotification return notification.
+// GetNotification returns notification.
 func (c *Client) GetNotification(ctx context.Context, id ID) (*Notification, error) {
 	var notification Notification
 	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/notifications/%v", id), nil, &notification, nil)
@@ -60,7 +60,7 @@ func (c *Client) DismissNotification(ctx context.Context, id ID) error {
 	return c.doAPI(ctx, http.MethodPost, fmt.Sprintf("/api/v1/notifications/%v/dismiss", id), nil, nil, nil)
 }
 
-// ClearNotifications clear notifications.
+// ClearNotifications clears notifications.
 func (c *Client) ClearNotifications(ctx context.Context) error {
 	return c.doAPI(ctx, http.MethodPost, "/api/v1/notifications/clear", nil, nil, nil)
 }

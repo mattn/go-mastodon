@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-// Instance hold information for mastodon instance.
+// Instance holds information for a mastodon instance.
 type Instance struct {
 	URI            string            `json:"uri"`
 	Title          string            `json:"title"`
@@ -19,14 +19,14 @@ type Instance struct {
 	ContactAccount *Account          `json:"contact_account"`
 }
 
-// InstanceStats hold information for mastodon instance stats.
+// InstanceStats holds information for mastodon instance stats.
 type InstanceStats struct {
 	UserCount   int64 `json:"user_count"`
 	StatusCount int64 `json:"status_count"`
 	DomainCount int64 `json:"domain_count"`
 }
 
-// GetInstance return Instance.
+// GetInstance returns Instance.
 func (c *Client) GetInstance(ctx context.Context) (*Instance, error) {
 	var instance Instance
 	err := c.doAPI(ctx, http.MethodGet, "/api/v1/instance", nil, &instance, nil)
@@ -36,7 +36,7 @@ func (c *Client) GetInstance(ctx context.Context) (*Instance, error) {
 	return &instance, nil
 }
 
-// WeeklyActivity hold information for mastodon weekly activity.
+// WeeklyActivity holds information for mastodon weekly activity.
 type WeeklyActivity struct {
 	Week          Unixtime `json:"week"`
 	Statuses      int64    `json:"statuses,string"`
@@ -44,7 +44,7 @@ type WeeklyActivity struct {
 	Registrations int64    `json:"registrations,string"`
 }
 
-// GetInstanceActivity return instance activity.
+// GetInstanceActivity returns instance activity.
 func (c *Client) GetInstanceActivity(ctx context.Context) ([]*WeeklyActivity, error) {
 	var activity []*WeeklyActivity
 	err := c.doAPI(ctx, http.MethodGet, "/api/v1/instance/activity", nil, &activity, nil)
@@ -54,7 +54,7 @@ func (c *Client) GetInstanceActivity(ctx context.Context) ([]*WeeklyActivity, er
 	return activity, nil
 }
 
-// GetInstancePeers return instance peers.
+// GetInstancePeers returns instance peers.
 func (c *Client) GetInstancePeers(ctx context.Context) ([]string, error) {
 	var peers []string
 	err := c.doAPI(ctx, http.MethodGet, "/api/v1/instance/peers", nil, &peers, nil)

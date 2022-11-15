@@ -3,6 +3,7 @@ package mastodon
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -708,7 +709,7 @@ func TestUploadMedia(t *testing.T) {
 	if writerAttachment.ID != "123" {
 		t.Fatalf("want %q but %q", "123", attachment.ID)
 	}
-	bytes, err := os.ReadFile("testdata/logo.png")
+	bytes, err := ioutil.ReadFile("testdata/logo.png")
 	if err != nil {
 		t.Fatalf("could not open file: %v", err)
 	}

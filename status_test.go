@@ -708,6 +708,18 @@ func TestUploadMedia(t *testing.T) {
 	if writerAttachment.ID != "123" {
 		t.Fatalf("want %q but %q", "123", attachment.ID)
 	}
+	bytes, err := os.ReadFile("testdata/logo.png")
+	if err != nil {
+		t.Fatalf("could not open file: %v", err)
+	}
+	byteAttachment, err := client.UploadMediaFromBytes(context.Background(), bytes)
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	if byteAttachment.ID != "123" {
+		t.Fatalf("want %q but got %q", "123", attachment.ID)
+	}
+
 }
 
 func TestGetConversations(t *testing.T) {

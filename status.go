@@ -409,7 +409,12 @@ func (c *Client) UploadMedia(ctx context.Context, file string) (*Attachment, err
 	return c.UploadMediaFromMedia(ctx, &Media{File: f})
 }
 
-// UploadMediaFromReader uploads a media attachment from a io.Reader.
+// UploadMediaFromBytes uploads a media attachment from a byte slice.
+func (c *Client) UploadMediaFromBytes(ctx context.Context, b []byte) (*Attachment, error) {
+	return c.UploadMediaFromReader(ctx, bytes.NewReader(b))
+}
+
+// UploadMediaFromReader uploads a media attachment from an io.Reader.
 func (c *Client) UploadMediaFromReader(ctx context.Context, reader io.Reader) (*Attachment, error) {
 	return c.UploadMediaFromMedia(ctx, &Media{File: reader})
 }

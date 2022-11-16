@@ -15,7 +15,6 @@ func TestGetReports(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `[{"id": 122, "action_taken": false}, {"id": 123, "action_taken": true}]`)
-		return
 	}))
 	defer ts.Close()
 
@@ -55,7 +54,6 @@ func TestReport(t *testing.T) {
 		} else {
 			fmt.Fprintln(w, `{"id": 1234, "action_taken": true}`)
 		}
-		return
 	}))
 	defer ts.Close()
 

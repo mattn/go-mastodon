@@ -13,7 +13,6 @@ import (
 func TestGetFavourites(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, `[{"content": "foo"}, {"content": "bar"}]`)
-		return
 	}))
 	defer ts.Close()
 
@@ -41,7 +40,6 @@ func TestGetFavourites(t *testing.T) {
 func TestGetBookmarks(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, `[{"content": "foo"}, {"content": "bar"}]`)
-		return
 	}))
 	defer ts.Close()
 
@@ -73,7 +71,6 @@ func TestGetStatus(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `{"content": "zzz", "emojis":[{"shortcode":"💩", "url":"http://example.com", "static_url": "http://example.com/static"}]}`)
-		return
 	}))
 	defer ts.Close()
 
@@ -115,7 +112,6 @@ func TestGetStatusCard(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `{"title": "zzz"}`)
-		return
 	}))
 	defer ts.Close()
 
@@ -145,7 +141,6 @@ func TestGetStatusContext(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `{"ancestors": [{"content": "zzz"},{"content": "bbb"}]}`)
-		return
 	}))
 	defer ts.Close()
 
@@ -184,7 +179,6 @@ func TestGetRebloggedBy(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `[{"username": "foo"}, {"username": "bar"}]`)
-		return
 	}))
 	defer ts.Close()
 
@@ -220,7 +214,6 @@ func TestGetFavouritedBy(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `[{"username": "foo"}, {"username": "bar"}]`)
-		return
 	}))
 	defer ts.Close()
 
@@ -256,7 +249,6 @@ func TestReblog(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `{"content": "zzz"}`)
-		return
 	}))
 	defer ts.Close()
 
@@ -286,7 +278,6 @@ func TestUnreblog(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `{"content": "zzz"}`)
-		return
 	}))
 	defer ts.Close()
 
@@ -316,7 +307,6 @@ func TestFavourite(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `{"content": "zzz"}`)
-		return
 	}))
 	defer ts.Close()
 
@@ -346,7 +336,6 @@ func TestUnfavourite(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `{"content": "zzz"}`)
-		return
 	}))
 	defer ts.Close()
 
@@ -376,7 +365,6 @@ func TestBookmark(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `{"content": "zzz"}`)
-		return
 	}))
 	defer ts.Close()
 
@@ -406,7 +394,6 @@ func TestUnbookmark(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `{"content": "zzz"}`)
-		return
 	}))
 	defer ts.Close()
 
@@ -488,7 +475,6 @@ func TestGetTimelineHashtag(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `[{"content": "zzz"},{"content": "yyy"}]`)
-		return
 	}))
 	defer ts.Close()
 
@@ -524,7 +510,6 @@ func TestGetTimelineList(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `[{"content": "zzz"},{"content": "yyy"}]`)
-		return
 	}))
 	defer ts.Close()
 
@@ -560,7 +545,6 @@ func TestGetTimelineMedia(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `[{"content": "zzz"},{"content": "yyy"}]`)
-		return
 	}))
 	defer ts.Close()
 
@@ -599,7 +583,6 @@ func TestDeleteStatus(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusMethodNotAllowed)
 			return
 		}
-		return
 	}))
 	defer ts.Close()
 
@@ -635,7 +618,6 @@ func TestSearch(t *testing.T) {
 			"statuses":[{"content": "aaa"}],
 			"hashtags":[{"name": "tag"},{"name": "tag2"},{"name": "tag3"}]
 		}`)
-		return
 	}))
 	defer ts.Close()
 
@@ -680,7 +662,6 @@ func TestUploadMedia(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `{"id": 123}`)
-		return
 	}))
 	defer ts.Close()
 
@@ -729,7 +710,6 @@ func TestGetConversations(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		}
 		fmt.Fprintln(w, `[{"id": "4", "unread":false, "last_status" : {"content": "zzz"}}, {"id": "3", "unread":true, "last_status" : {"content": "bar"}}]`)
-		return
 	}))
 	defer ts.Close()
 
@@ -767,7 +747,6 @@ func TestDeleteConversation(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusMethodNotAllowed)
 			return
 		}
-		return
 	}))
 	defer ts.Close()
 
@@ -793,7 +772,6 @@ func TestMarkConversationsAsRead(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
-		return
 	}))
 	defer ts.Close()
 

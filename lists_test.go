@@ -15,7 +15,6 @@ func TestGetLists(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `[{"id": "1", "title": "foo"}, {"id": "2", "title": "bar"}]`)
-		return
 	}))
 	defer ts.Close()
 
@@ -47,7 +46,6 @@ func TestGetAccountLists(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `[{"id": "1", "title": "foo"}, {"id": "2", "title": "bar"}]`)
-		return
 	}))
 	defer ts.Close()
 
@@ -83,7 +81,6 @@ func TestGetListAccounts(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `[{"username": "foo"}, {"username": "bar"}]`)
-		return
 	}))
 	defer ts.Close()
 
@@ -119,7 +116,6 @@ func TestGetList(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `{"id": "1", "title": "foo"}`)
-		return
 	}))
 	defer ts.Close()
 
@@ -149,7 +145,6 @@ func TestCreateList(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `{"id": "1", "title": "foo"}`)
-		return
 	}))
 	defer ts.Close()
 
@@ -183,7 +178,6 @@ func TestRenameList(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `{"id": "1", "title": "bar"}`)
-		return
 	}))
 	defer ts.Close()
 
@@ -216,7 +210,6 @@ func TestDeleteList(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusMethodNotAllowed)
 			return
 		}
-		return
 	}))
 	defer ts.Close()
 
@@ -246,7 +239,6 @@ func TestAddToList(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
-		return
 	}))
 	defer ts.Close()
 
@@ -272,7 +264,6 @@ func TestRemoveFromList(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusMethodNotAllowed)
 			return
 		}
-		return
 	}))
 	defer ts.Close()
 

@@ -96,7 +96,6 @@ func TestAuthenticate(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `{"access_token": "zoo"}`)
-		return
 	}))
 	defer ts.Close()
 
@@ -124,7 +123,6 @@ func TestAuthenticate(t *testing.T) {
 func TestAuthenticateWithCancel(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		time.Sleep(3 * time.Second)
-		return
 	}))
 	defer ts.Close()
 
@@ -151,7 +149,6 @@ func TestAuthenticateApp(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `{"name":"zzz","website":"yyy","vapid_key":"xxx"}`)
-		return
 	}))
 	defer ts.Close()
 
@@ -183,7 +180,6 @@ func TestPostStatus(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `{"access_token": "zoo"}`)
-		return
 	}))
 	defer ts.Close()
 
@@ -216,7 +212,6 @@ func TestPostStatus(t *testing.T) {
 func TestPostStatusWithCancel(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		time.Sleep(3 * time.Second)
-		return
 	}))
 	defer ts.Close()
 
@@ -351,7 +346,6 @@ func TestPostStatusParams(t *testing.T) {
 func TestGetTimelineHome(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, `[{"content": "foo"}, {"content": "bar"}]`)
-		return
 	}))
 	defer ts.Close()
 
@@ -391,7 +385,6 @@ func TestGetTimelineHome(t *testing.T) {
 func TestGetTimelineHomeWithCancel(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		time.Sleep(3 * time.Second)
-		return
 	}))
 	defer ts.Close()
 

@@ -63,11 +63,11 @@ func TestReport(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	rp, err := client.Report(context.Background(), "121", nil, "")
+	_, err := client.Report(context.Background(), "121", nil, "")
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	rp, err = client.Report(context.Background(), "122", nil, "")
+	rp, err := client.Report(context.Background(), "122", nil, "")
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}

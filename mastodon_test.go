@@ -252,6 +252,9 @@ func TestPostStatusParams(t *testing.T) {
 		if r.FormValue("visibility") != "" {
 			s.Visibility = (r.FormValue("visibility"))
 		}
+		if r.FormValue("language") != "" {
+			s.Language = (r.FormValue("language"))
+		}
 		if r.FormValue("sensitive") == "true" {
 			s.Sensitive = true
 			s.SpoilerText = fmt.Sprintf("<p>%s</p>", r.FormValue("spoiler_text"))
@@ -288,6 +291,7 @@ func TestPostStatusParams(t *testing.T) {
 		Status:      "foobar",
 		InReplyToID: ID("2"),
 		Visibility:  "unlisted",
+		Language:    "sv",
 		Sensitive:   true,
 		SpoilerText: "bar",
 		MediaIDs:    []ID{"1", "2"},
@@ -309,6 +313,9 @@ func TestPostStatusParams(t *testing.T) {
 	}
 	if s.Visibility != "unlisted" {
 		t.Fatalf("want %q but %q", "unlisted", s.Visibility)
+	}
+	if s.Language != "sv" {
+		t.Fatalf("want %q but %q", "sv", s.Language)
 	}
 	if s.Sensitive != true {
 		t.Fatalf("want %t but %t", true, s.Sensitive)

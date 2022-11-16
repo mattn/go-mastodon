@@ -230,6 +230,7 @@ type Toot struct {
 	Sensitive   bool       `json:"sensitive"`
 	SpoilerText string     `json:"spoiler_text"`
 	Visibility  string     `json:"visibility"`
+	Language    string     `json:"language"`
 	ScheduledAt *time.Time `json:"scheduled_at,omitempty"`
 	Poll        *TootPoll  `json:"poll"`
 }

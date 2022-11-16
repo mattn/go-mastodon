@@ -365,6 +365,9 @@ func (c *Client) PostStatus(ctx context.Context, toot *Toot) (*Status, error) {
 	if toot.Visibility != "" {
 		params.Set("visibility", fmt.Sprint(toot.Visibility))
 	}
+	if toot.Language != "" {
+		params.Set("language", fmt.Sprint(toot.Language))
+	}
 	if toot.Sensitive {
 		params.Set("sensitive", "true")
 	}

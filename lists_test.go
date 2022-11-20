@@ -125,11 +125,11 @@ func TestGetList(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	list, err := client.GetList(context.Background(), "2")
+	_, err := client.GetList(context.Background(), "2")
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	list, err = client.GetList(context.Background(), "1")
+	list, err := client.GetList(context.Background(), "1")
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -154,11 +154,11 @@ func TestCreateList(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	list, err := client.CreateList(context.Background(), "")
+	_, err := client.CreateList(context.Background(), "")
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	list, err = client.CreateList(context.Background(), "foo")
+	list, err := client.CreateList(context.Background(), "foo")
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -187,11 +187,11 @@ func TestRenameList(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	list, err := client.RenameList(context.Background(), "2", "bar")
+	_, err := client.RenameList(context.Background(), "2", "bar")
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	list, err = client.RenameList(context.Background(), "1", "bar")
+	list, err := client.RenameList(context.Background(), "1", "bar")
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}

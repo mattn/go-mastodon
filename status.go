@@ -209,6 +209,7 @@ func (c *Client) GetStatusCard(ctx context.Context, id ID) (*Card, error) {
 	return &card, nil
 }
 
+// GetStatusSource returns source data specified by id.
 func (c *Client) GetStatusSource(ctx context.Context, id ID) (*Source, error) {
 	var source Source
 	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/statuses/%s/source", id), nil, &source, nil)

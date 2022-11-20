@@ -24,6 +24,7 @@ type Status struct {
 	Reblog             *Status      `json:"reblog"`
 	Content            string       `json:"content"`
 	CreatedAt          time.Time    `json:"created_at"`
+	EditedAt           time.Time    `json:"edited_at"`
 	Emojis             []Emoji      `json:"emojis"`
 	RepliesCount       int64        `json:"replies_count"`
 	ReblogsCount       int64        `json:"reblogs_count"`
@@ -43,6 +44,17 @@ type Status struct {
 	Application        Application  `json:"application"`
 	Language           string       `json:"language"`
 	Pinned             interface{}  `json:"pinned"`
+}
+
+// StatusHistory is a struct to hold status history data.
+type StatusHistory struct {
+	Content          string       `json:"content"`
+	SpoilerText      string       `json:"spoiler_text"`
+	Account          Account      `json:"account"`
+	Sensitive        bool         `json:"sensitive"`
+	CreatedAt        time.Time    `json:"created_at"`
+	Emojis           []Emoji      `json:"emojis"`
+	MediaAttachments []Attachment `json:"media_attachments"`
 }
 
 // Context holds information for a mastodon context.
@@ -65,6 +77,13 @@ type Card struct {
 	HTML         string `json:"html"`
 	Width        int64  `json:"width"`
 	Height       int64  `json:"height"`
+}
+
+// Source holds source properties so a status can be edited.
+type Source struct {
+	ID          ID     `json:"id"`
+	Text        string `json:"text"`
+	SpoilerText string `json:"spoiler_text"`
 }
 
 // Conversation holds information for a mastodon conversation.
@@ -188,6 +207,25 @@ func (c *Client) GetStatusCard(ctx context.Context, id ID) (*Card, error) {
 		return nil, err
 	}
 	return &card, nil
+}
+
+func (c *Client) GetStatusSource(ctx context.Context, id ID) (*Source, error) {
+	var source Source
+	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/statuses/%s/source", id), nil, &source, nil)
+	if err != nil {
+		return nil, err
+	}
+	return &source, nil
+}
+
+// GetStatusHistory returns the status history specified by id.
+func (c *Client) GetStatusHistory(ctx context.Context, id ID) ([]*StatusHistory, error) {
+	var statuses []*StatusHistory
+	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/statuses/%s/history", id), nil, &statuses, nil)
+	if err != nil {
+		return nil, err
+	}
+	return statuses, nil
 }
 
 // GetRebloggedBy returns the account list of the user who reblogged the toot of id.
@@ -339,6 +377,15 @@ func (c *Client) GetTimelineMedia(ctx context.Context, isLocal bool, pg *Paginat
 
 // PostStatus post the toot.
 func (c *Client) PostStatus(ctx context.Context, toot *Toot) (*Status, error) {
+	return c.postStatus(ctx, toot, false, ID("none"))
+}
+
+// UpdateStatus updates the toot.
+func (c *Client) UpdateStatus(ctx context.Context, toot *Toot, id ID) (*Status, error) {
+	return c.postStatus(ctx, toot, true, id)
+}
+
+func (c *Client) postStatus(ctx context.Context, toot *Toot, update bool, updateID ID) (*Status, error) {
 	params := url.Values{}
 	params.Set("status", toot.Status)
 	if toot.InReplyToID != "" {
@@ -376,7 +423,12 @@ func (c *Client) PostStatus(ctx context.Context, toot *Toot) (*Status, error) {
 	}
 
 	var status Status
-	err := c.doAPI(ctx, http.MethodPost, "/api/v1/statuses", params, &status, nil)
+	var err error
+	if !update {
+		err = c.doAPI(ctx, http.MethodPost, "/api/v1/statuses", params, &status, nil)
+	} else {
+		err = c.doAPI(ctx, http.MethodPut, fmt.Sprintf("/api/v1/statuses/%s", updateID), params, &status, nil)
+	}
 	if err != nil {
 		return nil, err
 	}

@@ -326,10 +326,188 @@ func TestPostStatusParams(t *testing.T) {
 	s, err = client.PostStatus(context.Background(), &Toot{
 		Status: "foobar",
 		Poll: &TootPoll{
+			Multiple:   true,
+			Options:    []string{"A", "B"},
+			HideTotals: true,
+		},
+	})
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	if s.Poll == nil {
+		t.Fatalf("poll should not be %v", s.Poll)
+	}
+	if len(s.Poll.Options) != 2 {
+		t.Fatalf("want %q but %q", 2, len(s.Poll.Options))
+	}
+	if s.Poll.Options[0].Title != "A" {
+		t.Fatalf("want %q but %q", "A", s.Poll.Options[0].Title)
+	}
+	if s.Poll.Options[1].Title != "B" {
+		t.Fatalf("want %q but %q", "B", s.Poll.Options[1].Title)
+	}
+	if s.Poll.Multiple != true {
+		t.Fatalf("want %t but %t", true, s.Poll.Multiple)
+	}
+}
+
+func TestUpdateStatus(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("Authorization") != "Bearer zoo" {
+			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			return
+		}
+		fmt.Fprintln(w, `{"access_token": "zoo"}`)
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+	})
+	_, err := client.UpdateStatus(context.Background(), &Toot{
+		Status: "foobar",
+	}, ID("1"))
+	if err == nil {
+		t.Fatalf("should be fail: %v", err)
+	}
+
+	client = NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+		AccessToken:  "zoo",
+	})
+	_, err = client.UpdateStatus(context.Background(), &Toot{
+		Status: "foobar",
+	}, ID("1"))
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+}
+
+func TestUpdateStatusWithCancel(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		time.Sleep(3 * time.Second)
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+	})
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	_, err := client.UpdateStatus(ctx, &Toot{
+		Status: "foobar",
+	}, ID("1"))
+	if err == nil {
+		t.Fatalf("should be fail: %v", err)
+	}
+	if want := fmt.Sprintf("Put %q: context canceled", ts.URL+"/api/v1/statuses/1"); want != err.Error() {
+		t.Fatalf("want %q but %q", want, err.Error())
+	}
+}
+func TestUpdateStatusParams(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/api/v1/statuses/1" {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+		r.ParseForm()
+		if r.FormValue("media_ids[]") != "" && r.FormValue("poll[options][]") != "" {
+			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		}
+		s := Status{
+			ID:      ID("1"),
+			Content: fmt.Sprintf("<p>%s</p>", r.FormValue("status")),
+		}
+		if r.FormValue("in_reply_to_id") != "" {
+			s.InReplyToID = ID(r.FormValue("in_reply_to_id"))
+		}
+		if r.FormValue("visibility") != "" {
+			s.Visibility = (r.FormValue("visibility"))
+		}
+		if r.FormValue("language") != "" {
+			s.Language = (r.FormValue("language"))
+		}
+		if r.FormValue("sensitive") == "true" {
+			s.Sensitive = true
+			s.SpoilerText = fmt.Sprintf("<p>%s</p>", r.FormValue("spoiler_text"))
+		}
+		if r.FormValue("media_ids[]") != "" {
+			for _, id := range r.Form["media_ids[]"] {
+				s.MediaAttachments = append(s.MediaAttachments,
+					Attachment{ID: ID(id)})
+			}
+		}
+		if r.FormValue("poll[options][]") != "" {
+			p := Poll{}
+			for _, opt := range r.Form["poll[options][]"] {
+				p.Options = append(p.Options, PollOption{
+					Title:      opt,
+					VotesCount: 0,
+				})
+			}
+			if r.FormValue("poll[multiple]") == "true" {
+				p.Multiple = true
+			}
+			s.Poll = &p
+		}
+		json.NewEncoder(w).Encode(s)
+	}))
+	defer ts.Close()
+	client := NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+		AccessToken:  "zoo",
+	})
+	s, err := client.UpdateStatus(context.Background(), &Toot{
+		Status:      "foobar",
+		InReplyToID: ID("2"),
+		Visibility:  "unlisted",
+		Language:    "sv",
+		Sensitive:   true,
+		SpoilerText: "bar",
+		MediaIDs:    []ID{"1", "2"},
+		Poll: &TootPoll{
+			Options: []string{"A", "B"},
+		},
+	}, ID("1"))
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	if len(s.MediaAttachments) > 0 && s.Poll != nil {
+		t.Fatal("should not fail, can't have both Media and Poll")
+	}
+	if s.Content != "<p>foobar</p>" {
+		t.Fatalf("want %q but %q", "<p>foobar</p>", s.Content)
+	}
+	if s.InReplyToID != "2" {
+		t.Fatalf("want %q but %q", "2", s.InReplyToID)
+	}
+	if s.Visibility != "unlisted" {
+		t.Fatalf("want %q but %q", "unlisted", s.Visibility)
+	}
+	if s.Language != "sv" {
+		t.Fatalf("want %q but %q", "sv", s.Language)
+	}
+	if s.Sensitive != true {
+		t.Fatalf("want %t but %t", true, s.Sensitive)
+	}
+	if s.SpoilerText != "<p>bar</p>" {
+		t.Fatalf("want %q but %q", "<p>bar</p>", s.SpoilerText)
+	}
+	s, err = client.UpdateStatus(context.Background(), &Toot{
+		Status: "foobar",
+		Poll: &TootPoll{
 			Multiple: true,
 			Options:  []string{"A", "B"},
 		},
-	})
+	}, ID("1"))
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}

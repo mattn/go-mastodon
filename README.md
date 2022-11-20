@@ -130,9 +130,12 @@ func main() {
 * [x] GET /api/v1/statuses/:id
 * [x] GET /api/v1/statuses/:id/context
 * [x] GET /api/v1/statuses/:id/card
+* [x] GET /api/v1/statuses/:id/history
 * [x] GET /api/v1/statuses/:id/reblogged_by
+* [x] GET /api/v1/statuses/:id/source
 * [x] GET /api/v1/statuses/:id/favourited_by
 * [x] POST /api/v1/statuses
+* [x] PUT /api/v1/statuses/:id
 * [x] DELETE /api/v1/statuses/:id
 * [x] POST /api/v1/statuses/:id/reblog
 * [x] POST /api/v1/statuses/:id/unreblog

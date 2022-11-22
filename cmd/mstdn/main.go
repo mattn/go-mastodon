@@ -256,6 +256,17 @@ func makeApp() *cli.App {
 			Action: cmdTimelineDirect,
 		},
 		{
+			Name:   "timeline-tag",
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "local",
+					Usage: "local tags only",
+				},
+                        },
+			Usage:  "show tagged timeline",
+			Action: cmdTimelineHashtag,
+		},
+		{
 			Name:   "notification",
 			Usage:  "show notification",
 			Action: cmdNotification,

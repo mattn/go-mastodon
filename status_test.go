@@ -655,6 +655,53 @@ func TestGetTimelineDirect(t *testing.T) {
 	}
 }
 
+func TestGetTimelineHashtagMultiple(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/api/v1/timelines/tag/zzz" {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+		if r.FormValue("any[]") != "aaa" {
+			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			return
+		}
+		if r.FormValue("all[]") != "bbb" {
+			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			return
+		}
+		if r.FormValue("none[]") != "ccc" {
+			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			return
+		}
+		fmt.Fprintln(w, `[{"content": "zzz"},{"content": "yyy"}]`)
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+		AccessToken:  "zoo",
+	})
+	_, err := client.GetTimelineHashtagMultiple(context.Background(), "notfound", false, &TagData{}, nil)
+	if err == nil {
+		t.Fatalf("should be fail: %v", err)
+	}
+	tags, err := client.GetTimelineHashtagMultiple(context.Background(), "zzz", true, &TagData{Any: []string{"aaa"}, All: []string{"bbb"}, None: []string{"ccc"}}, nil)
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	if len(tags) != 2 {
+		t.Fatalf("should have %q entries but %q", "2", len(tags))
+	}
+	if tags[0].Content != "zzz" {
+		t.Fatalf("want %q but %q", "zzz", tags[0].Content)
+	}
+	if tags[1].Content != "yyy" {
+		t.Fatalf("want %q but %q", "zzz", tags[1].Content)
+	}
+}
+
 func TestGetTimelineHashtag(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/api/v1/timelines/tag/zzz" {

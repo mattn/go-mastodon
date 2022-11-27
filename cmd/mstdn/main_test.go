@@ -7,7 +7,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 func TestReadFileFile(t *testing.T) {

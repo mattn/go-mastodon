@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 func TestCmdSearch(t *testing.T) {

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 func TestCmdMikami(t *testing.T) {

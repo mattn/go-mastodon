@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 
 	"github.com/mattn/go-mastodon"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 func testWithServer(h http.HandlerFunc, testFuncs ...func(*cli.App)) string {

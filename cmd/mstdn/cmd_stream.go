@@ -10,7 +10,7 @@ import (
 	"text/template"
 
 	"github.com/mattn/go-mastodon"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 // SimpleJSON is a struct for output JSON for data to be simple used

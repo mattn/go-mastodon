@@ -667,6 +667,44 @@ func TestAccountsSearch(t *testing.T) {
 		t.Fatalf("want %q but %q", "barfoo", res[1].Username)
 	}
 }
+func TestAccountsSearchResolve(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Query()["q"][0] != "foo" {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+		if r.FormValue("resolve") != "true" {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+		fmt.Fprintln(w, `[{"username": "foobar"}, {"username": "barfoo"}]`)
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+		AccessToken:  "zoo",
+	})
+	_, err := client.AccountsSearchResolve(context.Background(), "zzz", 2, false)
+	if err == nil {
+		t.Fatalf("should be fail: %v", err)
+	}
+	res, err := client.AccountsSearchResolve(context.Background(), "foo", 2, true)
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	if len(res) != 2 {
+		t.Fatalf("result should be two: %d", len(res))
+	}
+	if res[0].Username != "foobar" {
+		t.Fatalf("want %q but %q", "foobar", res[0].Username)
+	}
+	if res[1].Username != "barfoo" {
+		t.Fatalf("want %q but %q", "barfoo", res[1].Username)
+	}
+}
 
 func TestFollowRemoteUser(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

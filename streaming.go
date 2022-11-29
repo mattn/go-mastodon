@@ -13,32 +13,32 @@ import (
 	"strings"
 )
 
-// UpdateEvent is struct for passing status event to app.
+// UpdateEvent is a struct for passing status event to app.
 type UpdateEvent struct {
 	Status *Status `json:"status"`
 }
 
 func (e *UpdateEvent) event() {}
 
-// NotificationEvent is struct for passing notification event to app.
+// NotificationEvent is a struct for passing notification event to app.
 type NotificationEvent struct {
 	Notification *Notification `json:"notification"`
 }
 
 func (e *NotificationEvent) event() {}
 
-// DeleteEvent is struct for passing deletion event to app.
+// DeleteEvent is a struct for passing deletion event to app.
 type DeleteEvent struct{ ID ID }
 
 func (e *DeleteEvent) event() {}
 
-// ErrorEvent is struct for passing errors to app.
+// ErrorEvent is a struct for passing errors to app.
 type ErrorEvent struct{ err error }
 
 func (e *ErrorEvent) event()        {}
 func (e *ErrorEvent) Error() string { return e.err.Error() }
 
-// Event is interface passing events to app.
+// Event is an interface passing events to app.
 type Event interface {
 	event()
 }
@@ -150,12 +150,12 @@ func (c *Client) doStreaming(req *http.Request, q chan Event) {
 	}
 }
 
-// StreamingUser return channel to read events on home.
+// StreamingUser returns a channel to read events on home.
 func (c *Client) StreamingUser(ctx context.Context) (chan Event, error) {
 	return c.streaming(ctx, "user", nil)
 }
 
-// StreamingPublic return channel to read events on public.
+// StreamingPublic returns a channel to read events on public.
 func (c *Client) StreamingPublic(ctx context.Context, isLocal bool) (chan Event, error) {
 	p := "public"
 	if isLocal {
@@ -165,7 +165,7 @@ func (c *Client) StreamingPublic(ctx context.Context, isLocal bool) (chan Event,
 	return c.streaming(ctx, p, nil)
 }
 
-// StreamingHashtag return channel to read events on tagged timeline.
+// StreamingHashtag returns a channel to read events on tagged timeline.
 func (c *Client) StreamingHashtag(ctx context.Context, tag string, isLocal bool) (chan Event, error) {
 	params := url.Values{}
 	params.Set("tag", tag)
@@ -178,7 +178,7 @@ func (c *Client) StreamingHashtag(ctx context.Context, tag string, isLocal bool)
 	return c.streaming(ctx, p, params)
 }
 
-// StreamingList return channel to read events on a list.
+// StreamingList returns a channel to read events on a list.
 func (c *Client) StreamingList(ctx context.Context, id ID) (chan Event, error) {
 	params := url.Values{}
 	params.Set("list", string(id))
@@ -186,7 +186,7 @@ func (c *Client) StreamingList(ctx context.Context, id ID) (chan Event, error) {
 	return c.streaming(ctx, "list", params)
 }
 
-// StreamingDirect return channel to read events on a direct messages.
+// StreamingDirect returns a channel to read events on a direct messages.
 func (c *Client) StreamingDirect(ctx context.Context) (chan Event, error) {
 	return c.streaming(ctx, "direct", nil)
 }

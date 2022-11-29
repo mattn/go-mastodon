@@ -17,7 +17,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/mattn/go-mastodon"
 	"github.com/mattn/go-tty"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 	"golang.org/x/net/html"
 )
 
@@ -183,23 +183,23 @@ func makeApp() *cli.App {
 	app.Usage = "mastodon client"
 	app.Version = "0.0.1"
 	app.Flags = []cli.Flag{
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "profile",
 			Usage: "profile name",
 			Value: "",
 		},
 	}
-	app.Commands = []cli.Command{
+	app.Commands = []*cli.Command{
 		{
 			Name:  "toot",
 			Usage: "post toot",
 			Flags: []cli.Flag{
-				cli.StringFlag{
+				&cli.StringFlag{
 					Name:  "ff",
 					Usage: "post utf-8 string from a file(\"-\" means STDIN)",
 					Value: "",
 				},
-				cli.StringFlag{
+				&cli.StringFlag{
 					Name:  "i",
 					Usage: "in-reply-to",
 					Value: "",
@@ -211,19 +211,19 @@ func makeApp() *cli.App {
 			Name:  "stream",
 			Usage: "stream statuses",
 			Flags: []cli.Flag{
-				cli.StringFlag{
+				&cli.StringFlag{
 					Name:  "type",
 					Usage: "stream type (public,public/local,user:NAME,hashtag:TAG)",
 				},
-				cli.BoolFlag{
+				&cli.BoolFlag{
 					Name:  "json",
 					Usage: "output JSON",
 				},
-				cli.BoolFlag{
+				&cli.BoolFlag{
 					Name:  "simplejson",
 					Usage: "output simple JSON",
 				},
-				cli.StringFlag{
+				&cli.StringFlag{
 					Name:  "template",
 					Usage: "output with tamplate format",
 				},

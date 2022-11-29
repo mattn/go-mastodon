@@ -45,13 +45,13 @@ type Status struct {
 	Pinned             interface{}  `json:"pinned"`
 }
 
-// Context hold information for mastodon context.
+// Context holds information for a mastodon context.
 type Context struct {
 	Ancestors   []*Status `json:"ancestors"`
 	Descendants []*Status `json:"descendants"`
 }
 
-// Card hold information for mastodon card.
+// Card holds information for a mastodon card.
 type Card struct {
 	URL          string `json:"url"`
 	Title        string `json:"title"`
@@ -67,7 +67,7 @@ type Card struct {
 	Height       int64  `json:"height"`
 }
 
-// Conversation hold information for mastodon conversation.
+// Conversation holds information for a mastodon conversation.
 type Conversation struct {
 	ID         ID         `json:"id"`
 	Accounts   []*Account `json:"accounts"`
@@ -140,7 +140,7 @@ func (m *Media) bodyAndContentType() (io.Reader, string, error) {
 	return &buf, mw.FormDataContentType(), nil
 }
 
-// GetFavourites return the favorite list of the current user.
+// GetFavourites returns the favorite list of the current user.
 func (c *Client) GetFavourites(ctx context.Context, pg *Pagination) ([]*Status, error) {
 	var statuses []*Status
 	err := c.doAPI(ctx, http.MethodGet, "/api/v1/favourites", nil, &statuses, pg)
@@ -150,7 +150,7 @@ func (c *Client) GetFavourites(ctx context.Context, pg *Pagination) ([]*Status, 
 	return statuses, nil
 }
 
-// GetBookmarks return the bookmark list of the current user.
+// GetBookmarks returns the bookmark list of the current user.
 func (c *Client) GetBookmarks(ctx context.Context, pg *Pagination) ([]*Status, error) {
 	var statuses []*Status
 	err := c.doAPI(ctx, http.MethodGet, "/api/v1/bookmarks", nil, &statuses, pg)
@@ -160,7 +160,7 @@ func (c *Client) GetBookmarks(ctx context.Context, pg *Pagination) ([]*Status, e
 	return statuses, nil
 }
 
-// GetStatus return status specified by id.
+// GetStatus returns status specified by id.
 func (c *Client) GetStatus(ctx context.Context, id ID) (*Status, error) {
 	var status Status
 	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/statuses/%s", id), nil, &status, nil)
@@ -170,7 +170,7 @@ func (c *Client) GetStatus(ctx context.Context, id ID) (*Status, error) {
 	return &status, nil
 }
 
-// GetStatusContext return status specified by id.
+// GetStatusContext returns status specified by id.
 func (c *Client) GetStatusContext(ctx context.Context, id ID) (*Context, error) {
 	var context Context
 	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/statuses/%s/context", id), nil, &context, nil)
@@ -180,7 +180,7 @@ func (c *Client) GetStatusContext(ctx context.Context, id ID) (*Context, error) 
 	return &context, nil
 }
 
-// GetStatusCard return status specified by id.
+// GetStatusCard returns status specified by id.
 func (c *Client) GetStatusCard(ctx context.Context, id ID) (*Card, error) {
 	var card Card
 	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/statuses/%s/card", id), nil, &card, nil)
@@ -210,7 +210,7 @@ func (c *Client) GetFavouritedBy(ctx context.Context, id ID, pg *Pagination) ([]
 	return accounts, nil
 }
 
-// Reblog is reblog the toot of id and return status of reblog.
+// Reblog reblogs the toot of id and returns status of reblog.
 func (c *Client) Reblog(ctx context.Context, id ID) (*Status, error) {
 	var status Status
 	err := c.doAPI(ctx, http.MethodPost, fmt.Sprintf("/api/v1/statuses/%s/reblog", id), nil, &status, nil)
@@ -220,7 +220,7 @@ func (c *Client) Reblog(ctx context.Context, id ID) (*Status, error) {
 	return &status, nil
 }
 
-// Unreblog is unreblog the toot of id and return status of the original toot.
+// Unreblog unreblogs the toot of id and returns status of the original toot.
 func (c *Client) Unreblog(ctx context.Context, id ID) (*Status, error) {
 	var status Status
 	err := c.doAPI(ctx, http.MethodPost, fmt.Sprintf("/api/v1/statuses/%s/unreblog", id), nil, &status, nil)
@@ -230,7 +230,7 @@ func (c *Client) Unreblog(ctx context.Context, id ID) (*Status, error) {
 	return &status, nil
 }
 
-// Favourite is favourite the toot of id and return status of the favourite toot.
+// Favourite favourites the toot of id and returns status of the favourite toot.
 func (c *Client) Favourite(ctx context.Context, id ID) (*Status, error) {
 	var status Status
 	err := c.doAPI(ctx, http.MethodPost, fmt.Sprintf("/api/v1/statuses/%s/favourite", id), nil, &status, nil)
@@ -240,7 +240,7 @@ func (c *Client) Favourite(ctx context.Context, id ID) (*Status, error) {
 	return &status, nil
 }
 
-// Unfavourite is unfavourite the toot of id and return status of the unfavourite toot.
+// Unfavourite unfavourites the toot of id and returns status of the unfavourite toot.
 func (c *Client) Unfavourite(ctx context.Context, id ID) (*Status, error) {
 	var status Status
 	err := c.doAPI(ctx, http.MethodPost, fmt.Sprintf("/api/v1/statuses/%s/unfavourite", id), nil, &status, nil)
@@ -250,7 +250,7 @@ func (c *Client) Unfavourite(ctx context.Context, id ID) (*Status, error) {
 	return &status, nil
 }
 
-// Bookmark is bookmark the toot of id and return status of the bookmark toot.
+// Bookmark bookmarks the toot of id and returns status of the bookmark toot.
 func (c *Client) Bookmark(ctx context.Context, id ID) (*Status, error) {
 	var status Status
 	err := c.doAPI(ctx, http.MethodPost, fmt.Sprintf("/api/v1/statuses/%s/bookmark", id), nil, &status, nil)
@@ -365,6 +365,9 @@ func (c *Client) PostStatus(ctx context.Context, toot *Toot) (*Status, error) {
 	if toot.Visibility != "" {
 		params.Set("visibility", fmt.Sprint(toot.Visibility))
 	}
+	if toot.Language != "" {
+		params.Set("language", fmt.Sprint(toot.Language))
+	}
 	if toot.Sensitive {
 		params.Set("sensitive", "true")
 	}
@@ -409,7 +412,12 @@ func (c *Client) UploadMedia(ctx context.Context, file string) (*Attachment, err
 	return c.UploadMediaFromMedia(ctx, &Media{File: f})
 }
 
-// UploadMediaFromReader uploads a media attachment from a io.Reader.
+// UploadMediaFromBytes uploads a media attachment from a byte slice.
+func (c *Client) UploadMediaFromBytes(ctx context.Context, b []byte) (*Attachment, error) {
+	return c.UploadMediaFromReader(ctx, bytes.NewReader(b))
+}
+
+// UploadMediaFromReader uploads a media attachment from an io.Reader.
 func (c *Client) UploadMediaFromReader(ctx context.Context, reader io.Reader) (*Attachment, error) {
 	return c.UploadMediaFromMedia(ctx, &Media{File: reader})
 }

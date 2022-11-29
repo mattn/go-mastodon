@@ -27,7 +27,7 @@ type AppConfig struct {
 	Website string
 }
 
-// Application is mastodon application.
+// Application is a mastodon application.
 type Application struct {
 	ID           ID     `json:"id"`
 	RedirectURI  string `json:"redirect_uri"`

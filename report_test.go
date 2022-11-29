@@ -15,7 +15,6 @@ func TestGetReports(t *testing.T) {
 			return
 		}
 		fmt.Fprintln(w, `[{"id": 122, "action_taken": false}, {"id": 123, "action_taken": true}]`)
-		return
 	}))
 	defer ts.Close()
 
@@ -55,7 +54,6 @@ func TestReport(t *testing.T) {
 		} else {
 			fmt.Fprintln(w, `{"id": 1234, "action_taken": true}`)
 		}
-		return
 	}))
 	defer ts.Close()
 
@@ -65,11 +63,11 @@ func TestReport(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	rp, err := client.Report(context.Background(), "121", nil, "")
+	_, err := client.Report(context.Background(), "121", nil, "")
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	rp, err = client.Report(context.Background(), "122", nil, "")
+	rp, err := client.Report(context.Background(), "122", nil, "")
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}

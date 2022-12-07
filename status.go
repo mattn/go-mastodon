@@ -39,6 +39,7 @@ type Status struct {
 	MediaAttachments   []Attachment `json:"media_attachments"`
 	Mentions           []Mention    `json:"mentions"`
 	Tags               []Tag        `json:"tags"`
+	Text               string       `json:"text"`
 	Card               *Card        `json:"card"`
 	Poll               *Poll        `json:"poll"`
 	Application        Application  `json:"application"`

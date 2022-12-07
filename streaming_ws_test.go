@@ -80,6 +80,13 @@ func wsMock(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = conn.WriteMessage(websocket.TextMessage,
+		[]byte(`{"event":"update","payload":"{\"text\":\"foo\"}"}`))
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	err = conn.WriteMessage(websocket.TextMessage,
 		[]byte(`{"event":"notification","payload":"{\"id\":123}"}`))
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -111,25 +118,28 @@ func wsTest(t *testing.T, q chan Event, cancel func()) {
 	for e := range q {
 		events = append(events, e)
 	}
-	if len(events) != 6 {
+	if len(events) != 7 {
 		t.Fatalf("result should be four: %d", len(events))
 	}
 	if events[0].(*UpdateEvent).Status.Content != "foo" {
 		t.Fatalf("want %q but %q", "foo", events[0].(*UpdateEvent).Status.Content)
 	}
-	if events[1].(*NotificationEvent).Notification.ID != "123" {
-		t.Fatalf("want %q but %q", "123", events[1].(*NotificationEvent).Notification.ID)
+	if events[1].(*UpdateEvent).Status.Text != "foo" {
+		t.Fatalf("want %q but %q", "foo", events[1].(*UpdateEvent).Status.Content)
 	}
-	if events[2].(*DeleteEvent).ID != "1234567" {
-		t.Fatalf("want %q but %q", "1234567", events[2].(*DeleteEvent).ID)
+	if events[2].(*NotificationEvent).Notification.ID != "123" {
+		t.Fatalf("want %q but %q", "123", events[2].(*NotificationEvent).Notification.ID)
 	}
-	if errorEvent, ok := events[3].(*ErrorEvent); !ok {
-		t.Fatalf("should be fail: %v", errorEvent.err)
+	if events[3].(*DeleteEvent).ID != "1234567" {
+		t.Fatalf("want %q but %q", "1234567", events[3].(*DeleteEvent).ID)
 	}
 	if errorEvent, ok := events[4].(*ErrorEvent); !ok {
 		t.Fatalf("should be fail: %v", errorEvent.err)
 	}
 	if errorEvent, ok := events[5].(*ErrorEvent); !ok {
+		t.Fatalf("should be fail: %v", errorEvent.err)
+	}
+	if errorEvent, ok := events[6].(*ErrorEvent); !ok {
 		t.Fatalf("should be fail: %v", errorEvent.err)
 	}
 }

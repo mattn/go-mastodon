@@ -22,6 +22,8 @@ data: {content: error}
 event: update
 data: {"content": "foo"}
 event: update
+data: {"text": "foo"}
+event: update
 data: {"content": "%s"}
 event: notification
 data: {"type": "mention"}
@@ -41,6 +43,8 @@ data: 1234567
 		switch event := e.(type) {
 		case *UpdateEvent:
 			if event.Status.Content == "foo" {
+				passUpdate = true
+			} else if event.Status.Text == "foo" {
 				passUpdate = true
 			} else if event.Status.Content == largeContent {
 				passUpdateLarge = true

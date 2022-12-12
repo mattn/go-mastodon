@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"sync"
 	"testing"
 	"time"
 
@@ -151,12 +152,16 @@ func TestStreamingWS(t *testing.T) {
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
+	var wg sync.WaitGroup
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		e := <-q
 		if errorEvent, ok := e.(*ErrorEvent); !ok {
-			t.Fatalf("should be fail: %v", errorEvent.err)
+			t.Errorf("should be fail: %v", errorEvent.err)
 		}
 	}()
+	wg.Wait()
 }
 
 func TestHandleWS(t *testing.T) {
@@ -183,10 +188,13 @@ func TestHandleWS(t *testing.T) {
 	q := make(chan Event)
 	client := NewClient(&Config{}).NewWSClient()
 
+	var wg sync.WaitGroup
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		e := <-q
 		if errorEvent, ok := e.(*ErrorEvent); !ok {
-			t.Fatalf("should be fail: %v", errorEvent.err)
+			t.Errorf("should be fail: %v", errorEvent.err)
 		}
 	}()
 	err := client.handleWS(context.Background(), ":", q)
@@ -196,10 +204,12 @@ func TestHandleWS(t *testing.T) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		e := <-q
 		if errorEvent, ok := e.(*ErrorEvent); !ok {
-			t.Fatalf("should be fail: %v", errorEvent.err)
+			t.Errorf("should be fail: %v", errorEvent.err)
 		}
 	}()
 	err = client.handleWS(ctx, "ws://"+ts.Listener.Addr().String(), q)
@@ -207,13 +217,17 @@ func TestHandleWS(t *testing.T) {
 		t.Fatalf("should be fail: %v", err)
 	}
 
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		e := <-q
 		if errorEvent, ok := e.(*ErrorEvent); !ok {
-			t.Fatalf("should be fail: %v", errorEvent.err)
+			t.Errorf("should be fail: %v", errorEvent.err)
 		}
 	}()
 	client.handleWS(context.Background(), "ws://"+ts.Listener.Addr().String(), q)
+
+	wg.Wait()
 }
 
 func TestDialRedirect(t *testing.T) {

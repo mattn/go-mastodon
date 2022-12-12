@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 )
@@ -29,11 +30,14 @@ event: delete
 data: 1234567
 :thump
 	`, largeContent))
+	var wg sync.WaitGroup
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		defer close(q)
 		err := handleReader(q, r)
 		if err != nil {
-			t.Fatalf("should not be fail: %v", err)
+			t.Errorf("should not be fail: %v", err)
 		}
 	}()
 	var passUpdate, passUpdateLarge, passNotification, passDelete, passError bool
@@ -69,6 +73,7 @@ data: 1234567
 			"update: %t, update (large): %t, notification: %t, delete: %t, error: %t",
 			passUpdate, passUpdateLarge, passNotification, passDelete, passError)
 	}
+	wg.Wait()
 }
 
 func TestStreaming(t *testing.T) {
@@ -148,11 +153,14 @@ func TestDoStreaming(t *testing.T) {
 	req = req.WithContext(ctx)
 
 	q := make(chan Event)
+	var wg sync.WaitGroup
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		defer close(q)
 		c.doStreaming(req, q)
 		if err != nil {
-			t.Fatalf("should not be fail: %v", err)
+			t.Errorf("should not be fail: %v", err)
 		}
 	}()
 	var passError bool
@@ -167,6 +175,7 @@ func TestDoStreaming(t *testing.T) {
 	if !passError {
 		t.Fatalf("have not passed through: error %t", passError)
 	}
+	wg.Wait()
 }
 
 func TestStreamingUser(t *testing.T) {

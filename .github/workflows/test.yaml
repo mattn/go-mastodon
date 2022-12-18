@@ -11,11 +11,11 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, macos-latest, ubuntu-latest]
-        go: ["1.15", "1.16", "1.17"]
+        go: ["1.16", "1.17", "1.18", "1.19"]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
         with:
           go-version: ${{ matrix.go }}
 
@@ -24,4 +24,4 @@ jobs:
       - run: go test ./... -v -cover -coverprofile coverage.out
       - run: go test -bench . -benchmem
 
-      - uses: codecov/codecov-action@v1
+      - uses: codecov/codecov-action@v2

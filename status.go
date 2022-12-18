@@ -45,6 +45,7 @@ type Status struct {
 	Language           string          `json:"language"`
 	Pinned             interface{}     `json:"pinned"`
 	ScheduledParams    ScheduledParams `json:"params"`
+	Filtered           []FilterResult  `json:"filtered"`
 }
 
 // StatusHistory is a struct to hold status history data.

@@ -60,7 +60,7 @@ func TestGetInstanceMore(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
-		fmt.Fprintln(w, `{"title": "mastodon", "uri": "http://mstdn.example.com", "description": "test mastodon", "email": "mstdn@mstdn.example.com", "version": "0.0.1", "urls":{"foo":"http://stream1.example.com", "bar": "http://stream2.example.com"}, "thumbnail": "http://mstdn.example.com/logo.png", "stats":{"user_count":1, "status_count":2, "domain_count":3}}}`)
+		fmt.Fprintln(w, `{"title": "mastodon", "uri": "http://mstdn.example.com", "description": "test mastodon", "email": "mstdn@mstdn.example.com", "version": "0.0.1", "urls":{"foo":"http://stream1.example.com", "bar": "http://stream2.example.com"}, "thumbnail": "http://mstdn.example.com/logo.png", "configuration":{"accounts": {"max_featured_tags": 10}, "statuses": {"max_characters": 500}}, "stats":{"user_count":1, "status_count":2, "domain_count":3}}}`)
 	}))
 	defer ts.Close()
 
@@ -103,7 +103,7 @@ func TestGetInstanceMore(t *testing.T) {
 		t.Fatalf("want %q but %q", "http://mstdn.example.com/logo.png", ins.Thumbnail)
 	}
 	if ins.Stats == nil {
-		t.Fatal("status should be nil")
+		t.Fatal("stats should not be nil")
 	}
 	if ins.Stats.UserCount != 1 {
 		t.Fatalf("want %v but %v", 1, ins.Stats.UserCount)
@@ -114,6 +114,15 @@ func TestGetInstanceMore(t *testing.T) {
 	if ins.Stats.DomainCount != 3 {
 		t.Fatalf("want %v but %v", 3, ins.Stats.DomainCount)
 	}
+
+	cfg := ins.GetConfig()
+	if cfg.Accounts == nil {
+		t.Error("expected accounts to be non nil")
+	}
+	if cfg.Statuses == nil {
+		t.Error("expected statuses to be non nil")
+	}
+
 }
 
 func TestGetInstanceActivity(t *testing.T) {

@@ -17,6 +17,17 @@ type Instance struct {
 	Stats          *InstanceStats    `json:"stats,omitempty"`
 	Languages      []string          `json:"languages"`
 	ContactAccount *Account          `json:"contact_account"`
+	Configuration  *InstanceConfig   `json:"configuration"`
+}
+
+type InstanceConfigMap map[string]int
+
+// InstanceConfig holds configuration accessible for clients.
+type InstanceConfig struct {
+	Accounts         *InstanceConfigMap     `json:"accounts"`
+	Statuses         *InstanceConfigMap     `json:"statuses"`
+	MediaAttachments map[string]interface{} `json:"media_attachments"`
+	Polls            *InstanceConfigMap     `json:"polls"`
 }
 
 // InstanceStats holds information for mastodon instance stats.
@@ -34,6 +45,11 @@ func (c *Client) GetInstance(ctx context.Context) (*Instance, error) {
 		return nil, err
 	}
 	return &instance, nil
+}
+
+// GetConfig returns InstanceConfig.
+func (c *Instance) GetConfig() *InstanceConfig {
+	return c.Configuration
 }
 
 // WeeklyActivity holds information for mastodon weekly activity.

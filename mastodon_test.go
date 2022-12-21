@@ -592,6 +592,7 @@ func TestGetTimelineHomeWithCancel(t *testing.T) {
 
 func TestForTheCoverages(t *testing.T) {
 	(*UpdateEvent)(nil).event()
+	(*UpdateEditEvent)(nil).event()
 	(*NotificationEvent)(nil).event()
 	(*DeleteEvent)(nil).event()
 	(*ErrorEvent)(nil).event()

@@ -20,6 +20,13 @@ type UpdateEvent struct {
 
 func (e *UpdateEvent) event() {}
 
+// UpdateEditEvent is a struct for passing status edit event to app.
+type UpdateEditEvent struct {
+	Status *Status `json:"status"`
+}
+
+func (e *UpdateEditEvent) event() {}
+
 // NotificationEvent is a struct for passing notification event to app.
 type NotificationEvent struct {
 	Notification *Notification `json:"notification"`
@@ -80,6 +87,12 @@ func handleReader(q chan Event, r io.Reader) error {
 				err = json.Unmarshal([]byte(token[1]), &status)
 				if err == nil {
 					q <- &UpdateEvent{&status}
+				}
+			case "status.update":
+				var status Status
+				err = json.Unmarshal([]byte(token[1]), &status)
+				if err == nil {
+					q <- &UpdateEditEvent{&status}
 				}
 			case "notification":
 				var notification Notification

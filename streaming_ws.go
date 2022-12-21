@@ -127,6 +127,12 @@ func (c *WSClient) handleWS(ctx context.Context, rawurl string, q chan Event) er
 			if err == nil {
 				q <- &UpdateEvent{Status: &status}
 			}
+		case "status.update":
+			var status Status
+			err = json.Unmarshal([]byte(s.Payload.(string)), &status)
+			if err == nil {
+				q <- &UpdateEditEvent{Status: &status}
+			}
 		case "notification":
 			var notification Notification
 			err = json.Unmarshal([]byte(s.Payload.(string)), &notification)

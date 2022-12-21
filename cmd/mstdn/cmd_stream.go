@@ -87,7 +87,16 @@ func cmdStream(c *cli.Context) error {
 		if asJSON {
 			json.NewEncoder(c.App.Writer).Encode(e)
 		} else if asSimpleJSON {
-			if t, ok := e.(*mastodon.UpdateEvent); ok {
+			switch t := e.(type) {
+			case *mastodon.UpdateEvent:
+				json.NewEncoder(c.App.Writer).Encode(&SimpleJSON{
+					ID:       t.Status.ID,
+					Username: t.Status.Account.Username,
+					Acct:     t.Status.Account.Acct,
+					Avatar:   t.Status.Account.AvatarStatic,
+					Content:  textContent(t.Status.Content),
+				})
+			case *mastodon.UpdateEditEvent:
 				json.NewEncoder(c.App.Writer).Encode(&SimpleJSON{
 					ID:       t.Status.ID,
 					Username: t.Status.Account.Username,
@@ -101,6 +110,8 @@ func cmdStream(c *cli.Context) error {
 		} else {
 			switch t := e.(type) {
 			case *mastodon.UpdateEvent:
+				s.displayStatus(c.App.Writer, t.Status)
+			case *mastodon.UpdateEditEvent:
 				s.displayStatus(c.App.Writer, t.Status)
 			case *mastodon.NotificationEvent:
 				// TODO s.displayStatus(c.App.Writer, t.Notification.Status)

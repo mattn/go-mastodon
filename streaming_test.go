@@ -28,6 +28,8 @@ event: notification
 data: {"type": "mention"}
 event: delete
 data: 1234567
+event: status.update
+data: {"content": "foo"}
 :thump
 	`, largeContent))
 	var wg sync.WaitGroup
@@ -44,6 +46,14 @@ data: 1234567
 	for e := range q {
 		switch event := e.(type) {
 		case *UpdateEvent:
+			if event.Status.Content == "foo" {
+				passUpdate = true
+			} else if event.Status.Content == largeContent {
+				passUpdateLarge = true
+			} else {
+				t.Fatalf("bad update content: %q", event.Status.Content)
+			}
+		case *UpdateEditEvent:
 			if event.Status.Content == "foo" {
 				passUpdate = true
 			} else if event.Status.Content == largeContent {
@@ -120,6 +130,12 @@ data: {"content": "foo"}
 				t.Fatalf("should be fail: %v", event.err)
 			}
 		case *UpdateEvent:
+			cnt++
+			passUpdate = true
+			if event.Status.Content != "foo" {
+				t.Fatalf("want %q but %q", "foo", event.Status.Content)
+			}
+		case *UpdateEditEvent:
 			cnt++
 			passUpdate = true
 			if event.Status.Content != "foo" {

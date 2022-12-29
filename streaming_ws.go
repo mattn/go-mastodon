@@ -56,6 +56,11 @@ func (c *WSClient) StreamingWSList(ctx context.Context, id ID) (chan Event, erro
 	return c.streamingWS(ctx, "list", string(id))
 }
 
+// StreamingWSDirect return channel to read events on a direct messages using WebSocket.
+func (c *WSClient) StreamingWSDirect(ctx context.Context) (chan Event, error) {
+	return c.streamingWS(ctx, "direct", "")
+}
+
 func (c *WSClient) streamingWS(ctx context.Context, stream, tag string) (chan Event, error) {
 	params := url.Values{}
 	params.Set("access_token", c.client.Config.AccessToken)
@@ -138,6 +143,12 @@ func (c *WSClient) handleWS(ctx context.Context, rawurl string, q chan Event) er
 			err = json.Unmarshal([]byte(s.Payload.(string)), &notification)
 			if err == nil {
 				q <- &NotificationEvent{Notification: &notification}
+			}
+		case "conversation":
+			var conversation Conversation
+			err = json.Unmarshal([]byte(s.Payload.(string)), &conversation)
+			if err == nil {
+				q <- &ConversationEvent{Conversation: &conversation}
 			}
 		case "delete":
 			if f, ok := s.Payload.(float64); ok {

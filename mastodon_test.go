@@ -679,6 +679,7 @@ func TestForTheCoverages(t *testing.T) {
 	(*UpdateEvent)(nil).event()
 	(*UpdateEditEvent)(nil).event()
 	(*NotificationEvent)(nil).event()
+	(*ConversationEvent)(nil).event()
 	(*DeleteEvent)(nil).event()
 	(*ErrorEvent)(nil).event()
 	_ = (&ErrorEvent{io.EOF}).Error()

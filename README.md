@@ -102,6 +102,7 @@ func main() {
 * [x] GET /api/v1/follow_requests
 * [x] POST /api/v1/follow_requests/:id/authorize
 * [x] POST /api/v1/follow_requests/:id/reject
+* [x] GET /api/v1/followed_tags
 * [x] POST /api/v1/follows
 * [x] GET /api/v1/instance
 * [x] GET /api/v1/instance/activity
@@ -143,16 +144,19 @@ func main() {
 * [x] POST /api/v1/statuses/:id/unfavourite
 * [x] POST /api/v1/statuses/:id/bookmark
 * [x] POST /api/v1/statuses/:id/unbookmark
-* [x] GET /api/v1/timelines/home
-* [x] GET /api/v1/timelines/public
-* [x] GET /api/v1/timelines/tag/:hashtag
-* [x] GET /api/v1/timelines/list/:id
 * [x] GET /api/v1/streaming/user
 * [x] GET /api/v1/streaming/public
 * [x] GET /api/v1/streaming/hashtag?tag=:hashtag
 * [x] GET /api/v1/streaming/hashtag/local?tag=:hashtag
 * [x] GET /api/v1/streaming/list?list=:list_id
 * [x] GET /api/v1/streaming/direct
+* [x] GET /api/v1/tags/:hashtag
+* [x] POST /api/v1/tags/:hashtag/follow
+* [x] POST /api/v1/tags/:hashtag/unfollow
+* [x] GET /api/v1/timelines/home
+* [x] GET /api/v1/timelines/public
+* [x] GET /api/v1/timelines/tag/:hashtag
+* [x] GET /api/v1/timelines/list/:id
 
 ## Installation
 

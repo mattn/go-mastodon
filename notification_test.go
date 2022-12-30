@@ -15,7 +15,11 @@ func TestGetNotifications(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case "/api/v1/notifications":
-			fmt.Fprintln(w, `[{"id": 122, "action_taken": false}, {"id": 123, "action_taken": true}]`)
+			if r.URL.Query().Get("exclude_types[]") == "follow" {
+				fmt.Fprintln(w, `[{"id": 321, "action_taken": true}]`)
+			} else {
+				fmt.Fprintln(w, `[{"id": 122, "action_taken": false}, {"id": 123, "action_taken": true}]`)
+			}
 			return
 		case "/api/v1/notifications/123":
 			fmt.Fprintln(w, `{"id": 123, "action_taken": true}`)
@@ -49,6 +53,16 @@ func TestGetNotifications(t *testing.T) {
 	}
 	if ns[1].ID != "123" {
 		t.Fatalf("want %v but %v", "123", ns[1].ID)
+	}
+	nse, err := client.GetNotificationsExclude(context.Background(), &[]string{"follow"}, nil)
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	if len(nse) != 1 {
+		t.Fatalf("result should be one: %d", len(nse))
+	}
+	if nse[0].ID != "321" {
+		t.Fatalf("want %v but %v", "321", nse[0].ID)
 	}
 	n, err := client.GetNotification(context.Background(), "123")
 	if err != nil {

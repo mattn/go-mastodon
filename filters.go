@@ -19,6 +19,18 @@ type Filter struct {
 	Irreversible bool      `json:"irreversible"`
 }
 
+type FilterResult struct {
+	Filter struct {
+		ID           string    `json:"id"`
+		Title        string    `json:"title"`
+		Context      []string  `json:"context"`
+		ExpiresAt    time.Time `json:"expires_at"`
+		FilterAction string    `json:"filter_action"`
+	} `json:"filter"`
+	KeywordMatches []string `json:"keyword_matches"`
+	StatusMatches  []string `json:"status_matches"`
+}
+
 // GetFilters returns all the filters on the current account.
 func (c *Client) GetFilters(ctx context.Context) ([]*Filter, error) {
 	var filters []*Filter

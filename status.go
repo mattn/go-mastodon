@@ -15,35 +15,36 @@ import (
 
 // Status is struct to hold status.
 type Status struct {
-	ID                 ID           `json:"id"`
-	URI                string       `json:"uri"`
-	URL                string       `json:"url"`
-	Account            Account      `json:"account"`
-	InReplyToID        interface{}  `json:"in_reply_to_id"`
-	InReplyToAccountID interface{}  `json:"in_reply_to_account_id"`
-	Reblog             *Status      `json:"reblog"`
-	Content            string       `json:"content"`
-	CreatedAt          time.Time    `json:"created_at"`
-	EditedAt           time.Time    `json:"edited_at"`
-	Emojis             []Emoji      `json:"emojis"`
-	RepliesCount       int64        `json:"replies_count"`
-	ReblogsCount       int64        `json:"reblogs_count"`
-	FavouritesCount    int64        `json:"favourites_count"`
-	Reblogged          interface{}  `json:"reblogged"`
-	Favourited         interface{}  `json:"favourited"`
-	Bookmarked         interface{}  `json:"bookmarked"`
-	Muted              interface{}  `json:"muted"`
-	Sensitive          bool         `json:"sensitive"`
-	SpoilerText        string       `json:"spoiler_text"`
-	Visibility         string       `json:"visibility"`
-	MediaAttachments   []Attachment `json:"media_attachments"`
-	Mentions           []Mention    `json:"mentions"`
-	Tags               []Tag        `json:"tags"`
-	Card               *Card        `json:"card"`
-	Poll               *Poll        `json:"poll"`
-	Application        Application  `json:"application"`
-	Language           string       `json:"language"`
-	Pinned             interface{}  `json:"pinned"`
+	ID                 ID             `json:"id"`
+	URI                string         `json:"uri"`
+	URL                string         `json:"url"`
+	Account            Account        `json:"account"`
+	InReplyToID        interface{}    `json:"in_reply_to_id"`
+	InReplyToAccountID interface{}    `json:"in_reply_to_account_id"`
+	Reblog             *Status        `json:"reblog"`
+	Content            string         `json:"content"`
+	CreatedAt          time.Time      `json:"created_at"`
+	EditedAt           time.Time      `json:"edited_at"`
+	Emojis             []Emoji        `json:"emojis"`
+	RepliesCount       int64          `json:"replies_count"`
+	ReblogsCount       int64          `json:"reblogs_count"`
+	FavouritesCount    int64          `json:"favourites_count"`
+	Reblogged          interface{}    `json:"reblogged"`
+	Favourited         interface{}    `json:"favourited"`
+	Bookmarked         interface{}    `json:"bookmarked"`
+	Muted              interface{}    `json:"muted"`
+	Sensitive          bool           `json:"sensitive"`
+	SpoilerText        string         `json:"spoiler_text"`
+	Visibility         string         `json:"visibility"`
+	MediaAttachments   []Attachment   `json:"media_attachments"`
+	Mentions           []Mention      `json:"mentions"`
+	Tags               []Tag          `json:"tags"`
+	Card               *Card          `json:"card"`
+	Poll               *Poll          `json:"poll"`
+	Application        Application    `json:"application"`
+	Language           string         `json:"language"`
+	Pinned             interface{}    `json:"pinned"`
+	Filtered           []FilterResult `json:"filtered"`
 }
 
 // StatusHistory is a struct to hold status history data.
@@ -100,6 +101,12 @@ type Media struct {
 	Thumbnail   io.Reader
 	Description string
 	Focus       string
+}
+
+type TagData struct {
+	Any  []string
+	All  []string
+	None []string
 }
 
 func (m *Media) bodyAndContentType() (io.Reader, string, error) {
@@ -339,6 +346,32 @@ func (c *Client) GetTimelineHashtag(ctx context.Context, tag string, isLocal boo
 	params := url.Values{}
 	if isLocal {
 		params.Set("local", "t")
+	}
+
+	var statuses []*Status
+	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/timelines/tag/%s", url.PathEscape(tag)), params, &statuses, pg)
+	if err != nil {
+		return nil, err
+	}
+	return statuses, nil
+}
+
+// GetTimelineHashtag return statuses from tagged timeline.
+func (c *Client) GetTimelineHashtagMultiple(ctx context.Context, tag string, isLocal bool, td *TagData, pg *Pagination) ([]*Status, error) {
+	params := url.Values{}
+	if isLocal {
+		params.Set("local", "t")
+	}
+	if td != nil {
+		for _, v := range td.Any {
+			params.Add("any[]", v)
+		}
+		for _, v := range td.All {
+			params.Add("all[]", v)
+		}
+		for _, v := range td.None {
+			params.Add("none[]", v)
+		}
 	}
 
 	var statuses []*Status

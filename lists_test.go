@@ -235,7 +235,7 @@ func TestAddToList(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
-		if r.PostFormValue("account_ids") != "1" {
+		if r.PostFormValue("account_ids[]") != "1" {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}

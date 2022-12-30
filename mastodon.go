@@ -251,13 +251,6 @@ type Mention struct {
 	ID       ID     `json:"id"`
 }
 
-// Tag hold information for tag.
-type Tag struct {
-	Name    string    `json:"name"`
-	URL     string    `json:"url"`
-	History []History `json:"history"`
-}
-
 // History hold information for history.
 type History struct {
 	Day      string `json:"day"`

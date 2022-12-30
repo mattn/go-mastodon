@@ -15,35 +15,36 @@ import (
 
 // Status is struct to hold status.
 type Status struct {
-	ID                 ID           `json:"id"`
-	URI                string       `json:"uri"`
-	URL                string       `json:"url"`
-	Account            Account      `json:"account"`
-	InReplyToID        interface{}  `json:"in_reply_to_id"`
-	InReplyToAccountID interface{}  `json:"in_reply_to_account_id"`
-	Reblog             *Status      `json:"reblog"`
-	Content            string       `json:"content"`
-	CreatedAt          time.Time    `json:"created_at"`
-	EditedAt           time.Time    `json:"edited_at"`
-	Emojis             []Emoji      `json:"emojis"`
-	RepliesCount       int64        `json:"replies_count"`
-	ReblogsCount       int64        `json:"reblogs_count"`
-	FavouritesCount    int64        `json:"favourites_count"`
-	Reblogged          interface{}  `json:"reblogged"`
-	Favourited         interface{}  `json:"favourited"`
-	Bookmarked         interface{}  `json:"bookmarked"`
-	Muted              interface{}  `json:"muted"`
-	Sensitive          bool         `json:"sensitive"`
-	SpoilerText        string       `json:"spoiler_text"`
-	Visibility         string       `json:"visibility"`
-	MediaAttachments   []Attachment `json:"media_attachments"`
-	Mentions           []Mention    `json:"mentions"`
-	Tags               []Tag        `json:"tags"`
-	Card               *Card        `json:"card"`
-	Poll               *Poll        `json:"poll"`
-	Application        Application  `json:"application"`
-	Language           string       `json:"language"`
-	Pinned             interface{}  `json:"pinned"`
+	ID                 ID             `json:"id"`
+	URI                string         `json:"uri"`
+	URL                string         `json:"url"`
+	Account            Account        `json:"account"`
+	InReplyToID        interface{}    `json:"in_reply_to_id"`
+	InReplyToAccountID interface{}    `json:"in_reply_to_account_id"`
+	Reblog             *Status        `json:"reblog"`
+	Content            string         `json:"content"`
+	CreatedAt          time.Time      `json:"created_at"`
+	EditedAt           time.Time      `json:"edited_at"`
+	Emojis             []Emoji        `json:"emojis"`
+	RepliesCount       int64          `json:"replies_count"`
+	ReblogsCount       int64          `json:"reblogs_count"`
+	FavouritesCount    int64          `json:"favourites_count"`
+	Reblogged          interface{}    `json:"reblogged"`
+	Favourited         interface{}    `json:"favourited"`
+	Bookmarked         interface{}    `json:"bookmarked"`
+	Muted              interface{}    `json:"muted"`
+	Sensitive          bool           `json:"sensitive"`
+	SpoilerText        string         `json:"spoiler_text"`
+	Visibility         string         `json:"visibility"`
+	MediaAttachments   []Attachment   `json:"media_attachments"`
+	Mentions           []Mention      `json:"mentions"`
+	Tags               []Tag          `json:"tags"`
+	Card               *Card          `json:"card"`
+	Poll               *Poll          `json:"poll"`
+	Application        Application    `json:"application"`
+	Language           string         `json:"language"`
+	Pinned             interface{}    `json:"pinned"`
+	Filtered           []FilterResult `json:"filtered"`
 }
 
 // StatusHistory is a struct to hold status history data.

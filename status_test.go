@@ -70,7 +70,7 @@ func TestGetStatus(t *testing.T) {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
-		fmt.Fprintln(w, `{"content": "zzz", "emojis":[{"shortcode":"💩", "url":"http://example.com", "static_url": "http://example.com/static"}]}`)
+		fmt.Fprintln(w, `{"content": "zzz", "emojis":[{"shortcode":"💩", "url":"http://example.com", "static_url": "http://example.com/static"}], "filtered": [{"filter": {"id": "3", "title": "Hide completely", "context": ["home"], "expires_at": "2022-09-20T17:27:39.296Z", "filter_action": "hide"}, "keyword_matches": ["bad word"], "status_matches": ["109031743575371913"]}]}`)
 	}))
 	defer ts.Close()
 
@@ -102,6 +102,36 @@ func TestGetStatus(t *testing.T) {
 	}
 	if status.Emojis[0].StaticURL != "http://example.com/static" {
 		t.Fatalf("want %q but %q", "https://example.com/static", status.Emojis[0].StaticURL)
+	}
+	if len(status.Filtered) != 1 {
+		t.Fatal("should have filtered")
+	}
+	if status.Filtered[0].Filter.ID != "3" {
+		t.Fatalf("want %q but %q", "3", status.Filtered[0].Filter.ID)
+	}
+	if status.Filtered[0].Filter.Title != "Hide completely" {
+		t.Fatalf("want %q but %q", "Hide completely", status.Filtered[0].Filter.Title)
+	}
+	if len(status.Filtered[0].Filter.Context) != 1 {
+		t.Fatal("should have one context")
+	}
+	if status.Filtered[0].Filter.Context[0] != "home" {
+		t.Fatalf("want %q but %q", "home", status.Filtered[0].Filter.Context[0])
+	}
+	if status.Filtered[0].Filter.FilterAction != "hide" {
+		t.Fatalf("want %q but %q", "hide", status.Filtered[0].Filter.FilterAction)
+	}
+	if len(status.Filtered[0].KeywordMatches) != 1 {
+		t.Fatal("should have one matching keyword")
+	}
+	if status.Filtered[0].KeywordMatches[0] != "bad word" {
+		t.Fatalf("want %q but %q", "bad word", status.Filtered[0].KeywordMatches[0])
+	}
+	if len(status.Filtered[0].StatusMatches) != 1 {
+		t.Fatal("should have one matching status")
+	}
+	if status.Filtered[0].StatusMatches[0] != "109031743575371913" {
+		t.Fatalf("want %q but %q", "109031743575371913", status.Filtered[0].StatusMatches[0])
 	}
 }
 

@@ -137,7 +137,7 @@ func TestTagFollow(t *testing.T) {
 
 func TestTagUnfollow(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/api/v1/tags/test/follow" {
+		if r.URL.Path != "/api/v1/tags/test/unfollow" {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
@@ -168,11 +168,11 @@ func TestTagUnfollow(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
-	_, err := client.TagFollow(context.Background(), "foo")
+	_, err := client.TagUnfollow(context.Background(), "foo")
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
-	tag, err := client.TagFollow(context.Background(), "test")
+	tag, err := client.TagUnfollow(context.Background(), "test")
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -201,6 +201,15 @@ func TestTagUnfollow(t *testing.T) {
 
 func TestTagsFollowed(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/api/v1/followed_tags" {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+		if r.FormValue("limit") == "1" {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+
 		fmt.Fprintln(w, `
 		[{
 			"name": "test",
@@ -245,6 +254,10 @@ func TestTagsFollowed(t *testing.T) {
 		ClientSecret: "bar",
 		AccessToken:  "zoo",
 	})
+	_, err := client.TagsFollowed(context.Background(), &Pagination{Limit: 1})
+	if err == nil {
+		t.Fatalf("should be fail: %v", err)
+	}
 	tags, err := client.TagsFollowed(context.Background(), nil)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)

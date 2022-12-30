@@ -103,6 +103,12 @@ type Media struct {
 	Focus       string
 }
 
+type TagData struct {
+	Any  []string
+	All  []string
+	None []string
+}
+
 func (m *Media) bodyAndContentType() (io.Reader, string, error) {
 	var buf bytes.Buffer
 	mw := multipart.NewWriter(&buf)
@@ -340,6 +346,32 @@ func (c *Client) GetTimelineHashtag(ctx context.Context, tag string, isLocal boo
 	params := url.Values{}
 	if isLocal {
 		params.Set("local", "t")
+	}
+
+	var statuses []*Status
+	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/timelines/tag/%s", url.PathEscape(tag)), params, &statuses, pg)
+	if err != nil {
+		return nil, err
+	}
+	return statuses, nil
+}
+
+// GetTimelineHashtag return statuses from tagged timeline.
+func (c *Client) GetTimelineHashtagMultiple(ctx context.Context, tag string, isLocal bool, td *TagData, pg *Pagination) ([]*Status, error) {
+	params := url.Values{}
+	if isLocal {
+		params.Set("local", "t")
+	}
+	if td != nil {
+		for _, v := range td.Any {
+			params.Add("any[]", v)
+		}
+		for _, v := range td.All {
+			params.Add("all[]", v)
+		}
+		for _, v := range td.None {
+			params.Add("none[]", v)
+		}
 	}
 
 	var statuses []*Status

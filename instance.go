@@ -20,7 +20,7 @@ type Instance struct {
 	Configuration  *InstanceConfig   `json:"configuration"`
 }
 
-type InstanceConfigMap map[string]int
+type InstanceConfigMap map[string]interface{}
 
 // InstanceConfig holds configuration accessible for clients.
 type InstanceConfig struct {

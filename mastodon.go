@@ -3,6 +3,7 @@ package mastodon
 
 import (
 	"context"
+	"compress/gzip"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -76,6 +77,7 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params in
 		}
 	}
 	req = req.WithContext(ctx)
+	req.Header.Set("Accept-Encoding", "gzip")
 	req.Header.Set("Authorization", "Bearer "+c.Config.AccessToken)
 	if params != nil {
 		req.Header.Set("Content-Type", ct)
@@ -125,7 +127,16 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params in
 			*pg = *pg2
 		}
 	}
-	return json.NewDecoder(resp.Body).Decode(&res)
+
+	var reader io.ReadCloser
+        switch resp.Header.Get("Content-Encoding") {
+        	case "gzip":
+			reader, err = gzip.NewReader(resp.Body)
+                	defer reader.Close()
+        	default:
+                	reader = resp.Body
+        }
+        return json.NewDecoder(reader).Decode(&res)
 }
 
 // NewClient returns a new mastodon API client.

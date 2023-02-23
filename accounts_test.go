@@ -38,6 +38,40 @@ func TestGetAccount(t *testing.T) {
 	}
 }
 
+func TestAccountLookup(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/api/v1/accounts/lookup" {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+		acct := r.URL.Query().Get("acct")
+		if acct != "foo@bar" {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+		fmt.Fprintln(w, `{"username": "foo@bar"}`)
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+		AccessToken:  "zoo",
+	})
+	_, err := client.AccountLookup(context.Background(), "123")
+	if err == nil {
+		t.Fatalf("should be fail: %v", err)
+	}
+	a, err := client.AccountLookup(context.Background(), "foo@bar")
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	if a.Username != "foo@bar" {
+		t.Fatalf("want %q but %q", "foo@bar", a.Username)
+	}
+}
+
 func TestGetAccountCurrentUser(t *testing.T) {
 	canErr := true
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

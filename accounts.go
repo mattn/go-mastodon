@@ -106,6 +106,7 @@ func (c *Client) GetAccountCurrentUser(ctx context.Context) (*Account, error) {
 	return &account, nil
 }
 
+// AccountLookup returns the Account of specified acct uri.
 func (c *Client) AccountLookup(ctx context.Context, acct string) (*Account, error) {
 	var account Account
 	params := url.Values{}

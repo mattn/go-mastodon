@@ -106,6 +106,17 @@ func (c *Client) GetAccountCurrentUser(ctx context.Context) (*Account, error) {
 	return &account, nil
 }
 
+func (c *Client) AccountLookup(ctx context.Context, acct string) (*Account, error) {
+	var account Account
+	params := url.Values{}
+	params.Set("acct", acct)
+	err := c.doAPI(ctx, http.MethodGet, "/api/v1/accounts/lookup", params, &account, nil)
+	if err != nil {
+		return nil, err
+	}
+	return &account, nil
+}
+
 // Profile is a struct for updating profiles.
 type Profile struct {
 	// If it is nil it will not be updated.

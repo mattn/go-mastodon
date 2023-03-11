@@ -73,8 +73,8 @@ data: {"content": "foo"}
 			}
 		case *ErrorEvent:
 			passError = true
-			if event.err == nil {
-				t.Fatalf("should be fail: %v", event.err)
+			if event.Err == nil {
+				t.Fatalf("should be fail: %v", event.Err)
 			}
 		}
 	}
@@ -126,8 +126,8 @@ data: {"content": "foo"}
 		switch event := e.(type) {
 		case *ErrorEvent:
 			passError = true
-			if event.err == nil {
-				t.Fatalf("should be fail: %v", event.err)
+			if event.Err == nil {
+				t.Fatalf("should be fail: %v", event.Err)
 			}
 		case *UpdateEvent:
 			cnt++
@@ -183,8 +183,8 @@ func TestDoStreaming(t *testing.T) {
 	for e := range q {
 		if event, ok := e.(*ErrorEvent); ok {
 			passError = true
-			if event.err == nil {
-				t.Fatalf("should be fail: %v", event.err)
+			if event.Err == nil {
+				t.Fatalf("should be fail: %v", event.Err)
 			}
 		}
 	}

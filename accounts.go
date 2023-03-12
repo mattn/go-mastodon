@@ -2,6 +2,7 @@ package mastodon
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -32,6 +33,7 @@ type Account struct {
 	Bot            bool           `json:"bot"`
 	Discoverable   bool           `json:"discoverable"`
 	Source         *AccountSource `json:"source"`
+	FollowedTag    []FollowedTag  `json:"followed_tags"`
 }
 
 // Field is a Mastodon account profile field.
@@ -48,6 +50,40 @@ type AccountSource struct {
 	Language  *string  `json:"language"`
 	Note      *string  `json:"note"`
 	Fields    *[]Field `json:"fields"`
+}
+
+// UnixTimeString represents a time in a Unix Epoch string
+type UnixTimeString struct {
+	time.Time
+}
+
+func (u *UnixTimeString) UnmarshalJSON(b []byte) error {
+	var timestampSring string
+	err := json.Unmarshal(b, &timestampSring)
+	if err != nil {
+		return err
+	}
+	timestamp, err := strconv.ParseInt(timestampSring, 0, 0)
+	if err != nil {
+		return err
+	}
+	u.Time = time.Unix(timestamp, 0)
+	return nil
+}
+
+// History is the history of a followed tag
+type FollowedTagHistory struct {
+	Day      UnixTimeString `json:"day,omitempty"`
+	Accounts int            `json:"accounts,string,omitempty"`
+	Uses     int            `json:"uses,string,omitempty"`
+}
+
+// FollowedTag is a Hash Tag followed by the user
+type FollowedTag struct {
+	Name      string               `json:"name,omitempty"`
+	URL       string               `json:"url,omitempty"`
+	History   []FollowedTagHistory `json:"history,omitempty"`
+	Following bool                 `json:"following,omitempty"`
 }
 
 // GetAccount return Account.
@@ -325,4 +361,14 @@ func (c *Client) GetMutes(ctx context.Context, pg *Pagination) ([]*Account, erro
 		return nil, err
 	}
 	return accounts, nil
+}
+
+// GetMutes returns the list of users muted by the current user.
+func (c *Client) GetFollowedTags(ctx context.Context, pg *Pagination) ([]*FollowedTag, error) {
+	var followedTags []*FollowedTag
+	err := c.doAPI(ctx, http.MethodGet, "/api/v1/followed_tags", nil, &followedTags, pg)
+	if err != nil {
+		return nil, err
+	}
+	return followedTags, nil
 }

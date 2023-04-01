@@ -697,3 +697,92 @@ func TestGetMutes(t *testing.T) {
 		t.Fatalf("want %q but %q", "bar", mutes[1].Username)
 	}
 }
+func TestGetFollowedTags(t *testing.T) {
+	canErr := true
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if canErr {
+			canErr = false
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+		fmt.Fprintln(w, `[
+  {
+    "name": "Test1",
+    "url": "http://mastodon.example/tags/test1",
+    "history": [
+      {
+        "day": "1668211200",
+        "accounts": "0",
+        "uses": "0"
+      },
+      {
+        "day": "1668124800",
+        "accounts": "0",
+        "uses": "0"
+      },
+      {
+        "day": "1668038400",
+        "accounts": "0",
+        "uses": "0"
+      }
+    ],
+    "following": true
+  },
+  {
+    "name": "Test2",
+    "url": "http://mastodon.example/tags/test2",
+    "history": [
+      {
+        "day": "1668211200",
+        "accounts": "0",
+        "uses": "0"
+      }
+    ],
+    "following": true
+  }
+]`)
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+		AccessToken:  "zoo",
+	})
+	_, err := client.GetFollowedTags(context.Background(), nil)
+	if err == nil {
+		t.Fatalf("should be fail: %v", err)
+	}
+	followedTags, err := client.GetFollowedTags(context.Background(), nil)
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	if len(followedTags) != 2 {
+		t.Fatalf("result should be two: %d", len(followedTags))
+	}
+	if followedTags[0].Name != "Test1" {
+		t.Fatalf("want %q but %q", "Test1", followedTags[0].Name)
+	}
+	if followedTags[0].URL != "http://mastodon.example/tags/test1" {
+		t.Fatalf("want %q but got %q", "http://mastodon.example/tags/test1", followedTags[0].URL)
+	}
+	if !followedTags[0].Following {
+		t.Fatalf("want following, but got false")
+	}
+	if 3 != len(followedTags[0].History){
+		t.Fatalf("expecting first tag history length to be %d but got %d", 3, len(followedTags[0].History))
+	}
+	if followedTags[1].Name != "Test2" {
+		t.Fatalf("want %q but %q", "Test2", followedTags[1].Name)
+	}
+	if followedTags[1].URL != "http://mastodon.example/tags/test2" {
+		t.Fatalf("want %q but got %q", "http://mastodon.example/tags/test2", followedTags[1].URL)
+	}
+	if !followedTags[1].Following {
+		t.Fatalf("want following, but got false")
+	}
+	if 1 != len(followedTags[1].History){
+		t.Fatalf("expecting first tag history length to be %d but got %d", 1, len(followedTags[1].History))
+	}
+}

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -34,6 +35,45 @@ func TestGetFavourites(t *testing.T) {
 	}
 	if favs[1].Content != "bar" {
 		t.Fatalf("want %q but %q", "bar", favs[1].Content)
+	}
+}
+
+func TestGetFavouritesSavedJSON(t *testing.T) {
+	ourJSON := `[{"content": "foo"}, {"content": "bar"}]`
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, ourJSON)
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+		AccessToken:  "zoo",
+	})
+
+	client.SaveJSON = true
+
+	favs, err := client.GetFavourites(context.Background(), nil)
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	if len(favs) != 2 {
+		t.Fatalf("result should be two: %d", len(favs))
+	}
+	if favs[0].Content != "foo" {
+		t.Fatalf("want %q but %q", "foo", favs[0].Content)
+	}
+	if favs[1].Content != "bar" {
+		t.Fatalf("want %q but %q", "bar", favs[1].Content)
+	}
+
+	// We get a trailing `\n` from the API which we need to trim
+	// off before we compare it with our literal above.
+	theirJSON := strings.TrimSpace(string(client.LastJSON))
+
+	if theirJSON != ourJSON {
+		t.Fatalf("want %q but %q", ourJSON, theirJSON)
 	}
 }
 

@@ -29,6 +29,7 @@ type Client struct {
 	http.Client
 	Config    *Config
 	UserAgent string
+	SaveJSON  bool
 	LastJSON  []byte
 }
 
@@ -127,17 +128,22 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params in
 		}
 	}
 
-	// If we want to store the JSON received, we absolutely have to
-	// read all of it.  But we restrict ourselves to a max of 100M.
-	safer := &io.LimitedReader{resp.Body, 100 * 1_048_576}
-	c.LastJSON, err = io.ReadAll(safer)
+	if c.SaveJSON {
+		// We want to store the JSON received -> we absolutely have to
+		// read all of it.  But we restrict ourselves to a max of 100M.
+		safer := &io.LimitedReader{resp.Body, 100 * 1_048_576}
+		c.LastJSON, err = io.ReadAll(safer)
 
-	if err != nil || c.LastJSON == nil {
-		return err
+		if err != nil || c.LastJSON == nil {
+			return err
+		}
+
+		// ...which means we can't use `NewDecoder.Decode` any more.
+		return json.Unmarshal(c.LastJSON, &res)
+	} else {
+		// We don't want the JSON, just do the previous streaming decode.
+		return json.NewDecoder(resp.Body).Decode(&res)
 	}
-
-	// ...which means we can't use `NewDecoder.Decode` any more.
-	return json.Unmarshal(c.LastJSON, &res)
 }
 
 // NewClient returns a new mastodon API client.

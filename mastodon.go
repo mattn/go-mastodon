@@ -24,13 +24,17 @@ type Config struct {
 	AccessToken  string
 }
 
+type WriteResetter interface {
+	io.Writer
+	Reset()
+}
+
 // Client is a API client for mastodon.
 type Client struct {
 	http.Client
-	Config    *Config
-	UserAgent string
-	SaveJSON  bool
-	LastJSON  []byte
+	Config     *Config
+	UserAgent  string
+	JSONWriter WriteResetter
 }
 
 func (c *Client) doAPI(ctx context.Context, method string, uri string, params interface{}, res interface{}, pg *Pagination) error {
@@ -128,20 +132,10 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params in
 		}
 	}
 
-	if c.SaveJSON {
-		// We want to store the JSON received -> we absolutely have to
-		// read all of it.  But we restrict ourselves to a max of 100M.
-		safer := &io.LimitedReader{resp.Body, 100 * 1_048_576}
-		c.LastJSON, err = io.ReadAll(safer)
-
-		if err != nil || c.LastJSON == nil {
-			return err
-		}
-
-		// ...which means we can't use `NewDecoder.Decode` any more.
-		return json.Unmarshal(c.LastJSON, &res)
+	if c.JSONWriter != nil {
+		c.JSONWriter.Reset()
+		return json.NewDecoder(io.TeeReader(resp.Body, c.JSONWriter)).Decode(&res)
 	} else {
-		// We don't want the JSON, just do the previous streaming decode.
 		return json.NewDecoder(resp.Body).Decode(&res)
 	}
 }

@@ -24,17 +24,12 @@ type Config struct {
 	AccessToken  string
 }
 
-type WriteResetter interface {
-	io.Writer
-	Reset()
-}
-
 // Client is a API client for mastodon.
 type Client struct {
 	http.Client
 	Config     *Config
 	UserAgent  string
-	JSONWriter WriteResetter
+	JSONWriter io.Writer
 }
 
 func (c *Client) doAPI(ctx context.Context, method string, uri string, params interface{}, res interface{}, pg *Pagination) error {
@@ -133,7 +128,6 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params in
 	}
 
 	if c.JSONWriter != nil {
-		c.JSONWriter.Reset()
 		return json.NewDecoder(io.TeeReader(resp.Body, c.JSONWriter)).Decode(&res)
 	} else {
 		return json.NewDecoder(resp.Body).Decode(&res)

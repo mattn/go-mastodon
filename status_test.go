@@ -1,6 +1,7 @@
 package mastodon
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io/ioutil"
@@ -52,7 +53,8 @@ func TestGetFavouritesSavedJSON(t *testing.T) {
 		AccessToken:  "zoo",
 	})
 
-	client.SaveJSON = true
+	var buf bytes.Buffer
+	client.JSONWriter = &buf
 
 	favs, err := client.GetFavourites(context.Background(), nil)
 	if err != nil {
@@ -70,7 +72,7 @@ func TestGetFavouritesSavedJSON(t *testing.T) {
 
 	// We get a trailing `\n` from the API which we need to trim
 	// off before we compare it with our literal above.
-	theirJSON := strings.TrimSpace(string(client.LastJSON))
+	theirJSON := strings.TrimSpace(string(buf.Bytes()))
 
 	if theirJSON != ourJSON {
 		t.Fatalf("want %q but %q", ourJSON, theirJSON)

@@ -698,6 +698,7 @@ func TestGetMutes(t *testing.T) {
 	}
 }
 func TestGetFollowedTags(t *testing.T) {
+	t.Parallel()
 	canErr := true
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if canErr {
@@ -770,7 +771,7 @@ func TestGetFollowedTags(t *testing.T) {
 	if !followedTags[0].Following {
 		t.Fatalf("want following, but got false")
 	}
-	if 3 != len(followedTags[0].History){
+	if 3 != len(followedTags[0].History) {
 		t.Fatalf("expecting first tag history length to be %d but got %d", 3, len(followedTags[0].History))
 	}
 	if followedTags[1].Name != "Test2" {
@@ -782,7 +783,7 @@ func TestGetFollowedTags(t *testing.T) {
 	if !followedTags[1].Following {
 		t.Fatalf("want following, but got false")
 	}
-	if 1 != len(followedTags[1].History){
+	if 1 != len(followedTags[1].History) {
 		t.Fatalf("expecting first tag history length to be %d but got %d", 1, len(followedTags[1].History))
 	}
 }

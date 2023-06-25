@@ -363,7 +363,7 @@ func (c *Client) GetMutes(ctx context.Context, pg *Pagination) ([]*Account, erro
 	return accounts, nil
 }
 
-// GetMutes returns the list of users muted by the current user.
+// GetFollowedTags returns the list of Hashtags followed by the user.
 func (c *Client) GetFollowedTags(ctx context.Context, pg *Pagination) ([]*FollowedTag, error) {
 	var followedTags []*FollowedTag
 	err := c.doAPI(ctx, http.MethodGet, "/api/v1/followed_tags", nil, &followedTags, pg)

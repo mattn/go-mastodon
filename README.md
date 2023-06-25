@@ -69,6 +69,65 @@ func main() {
 }
 ```
 
+### Client with Token
+This option lets the user avoid storing login credentials in the application.  Instead, the user's Mastodon server
+provides an access token which is used to authenticate.  This token can be stored in the application, but should be guarded.
+
+```
+package main
+
+import (
+	"context"
+	"fmt"
+	"log"
+	"net/url"
+
+	"github.com/mattn/go-mastodon"
+)
+
+func main() {
+	appConfig := &mastodon.AppConfig{
+		Server:       "https://stranger.social",
+		ClientName:   "client-name",
+		Scopes:       "read write follow",
+		Website:      "https://github.com/mattn/go-mastodon",
+		RedirectURIs: "urn:ietf:wg:oauth:2.0:oob",
+	}
+	app, err := mastodon.RegisterApp(context.Background(), appConfig)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Have the user manually get the token and send it back to us
+	u, err := url.Parse(app.AuthURI)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Open your browser to \n%s\n and copy/paste the given token\n", u)
+	var token string
+	fmt.Print("Paste the token here:")
+	fmt.Scanln(&token)
+	config := &mastodon.Config{
+		Server:       "https://stranger.social",
+		ClientID:     app.ClientID,
+		ClientSecret: app.ClientSecret,
+		AccessToken:  token,
+	}
+
+	c := mastodon.NewClient(config)
+	err = c.AuthenticateToken(context.Background(), token, "urn:ietf:wg:oauth:2.0:oob")
+	if err != nil {
+        log.Fatal((err)
+	}
+
+	acct, err := c.GetAccountCurrentUser(context.Background())
+	if err != nil {
+        log.Fatal((err)
+	}
+	fmt.Printf("Account is %v\n", acct)
+}
+```
+
 ## Status of implementations
 
 * [x] GET /api/v1/accounts/:id
@@ -102,6 +161,7 @@ func main() {
 * [x] GET /api/v1/follow_requests
 * [x] POST /api/v1/follow_requests/:id/authorize
 * [x] POST /api/v1/follow_requests/:id/reject
+* [x] GET /api/v1/followed_tags
 * [x] POST /api/v1/follows
 * [x] GET /api/v1/instance
 * [x] GET /api/v1/instance/activity

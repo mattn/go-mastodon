@@ -729,7 +729,7 @@ func TestSearch(t *testing.T) {
 		t.Fatalf("Hashtags have %q entries, but %q", "3", len(ret.Hashtags))
 	}
 	if ret.Hashtags[2].Name != "tag3" {
-		t.Fatalf("Hashtags[2] should %q , but %q", "tag3", ret.Hashtags[2])
+		t.Fatalf("Hashtags[2] should %v , but %v", "tag3", ret.Hashtags[2])
 	}
 }
 

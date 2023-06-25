@@ -258,7 +258,7 @@ func makeApp() *cli.App {
 		{
 			Name:   "timeline-tag",
 			Flags: []cli.Flag{
-				cli.BoolFlag{
+				&cli.BoolFlag{
 					Name:  "local",
 					Usage: "local tags only",
 				},

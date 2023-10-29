@@ -15,35 +15,36 @@ import (
 
 // Status is struct to hold status.
 type Status struct {
-	ID                 ID           `json:"id"`
-	URI                string       `json:"uri"`
-	URL                string       `json:"url"`
-	Account            Account      `json:"account"`
-	InReplyToID        interface{}  `json:"in_reply_to_id"`
-	InReplyToAccountID interface{}  `json:"in_reply_to_account_id"`
-	Reblog             *Status      `json:"reblog"`
-	Content            string       `json:"content"`
-	CreatedAt          time.Time    `json:"created_at"`
-	EditedAt           time.Time    `json:"edited_at"`
-	Emojis             []Emoji      `json:"emojis"`
-	RepliesCount       int64        `json:"replies_count"`
-	ReblogsCount       int64        `json:"reblogs_count"`
-	FavouritesCount    int64        `json:"favourites_count"`
-	Reblogged          interface{}  `json:"reblogged"`
-	Favourited         interface{}  `json:"favourited"`
-	Bookmarked         interface{}  `json:"bookmarked"`
-	Muted              interface{}  `json:"muted"`
-	Sensitive          bool         `json:"sensitive"`
-	SpoilerText        string       `json:"spoiler_text"`
-	Visibility         string       `json:"visibility"`
-	MediaAttachments   []Attachment `json:"media_attachments"`
-	Mentions           []Mention    `json:"mentions"`
-	Tags               []Tag        `json:"tags"`
-	Card               *Card        `json:"card"`
-	Poll               *Poll        `json:"poll"`
-	Application        Application  `json:"application"`
-	Language           string       `json:"language"`
-	Pinned             interface{}  `json:"pinned"`
+	ID                 ID              `json:"id"`
+	URI                string          `json:"uri"`
+	URL                string          `json:"url"`
+	Account            Account         `json:"account"`
+	InReplyToID        interface{}     `json:"in_reply_to_id"`
+	InReplyToAccountID interface{}     `json:"in_reply_to_account_id"`
+	Reblog             *Status         `json:"reblog"`
+	Content            string          `json:"content"`
+	CreatedAt          time.Time       `json:"created_at"`
+	EditedAt           time.Time       `json:"edited_at"`
+	Emojis             []Emoji         `json:"emojis"`
+	RepliesCount       int64           `json:"replies_count"`
+	ReblogsCount       int64           `json:"reblogs_count"`
+	FavouritesCount    int64           `json:"favourites_count"`
+	Reblogged          interface{}     `json:"reblogged"`
+	Favourited         interface{}     `json:"favourited"`
+	Bookmarked         interface{}     `json:"bookmarked"`
+	Muted              interface{}     `json:"muted"`
+	Sensitive          bool            `json:"sensitive"`
+	SpoilerText        string          `json:"spoiler_text"`
+	Visibility         string          `json:"visibility"`
+	MediaAttachments   []Attachment    `json:"media_attachments"`
+	Mentions           []Mention       `json:"mentions"`
+	Tags               []Tag           `json:"tags"`
+	Card               *Card           `json:"card"`
+	Poll               *Poll           `json:"poll"`
+	Application        Application     `json:"application"`
+	Language           string          `json:"language"`
+	Pinned             interface{}     `json:"pinned"`
+	ScheduledParams    ScheduledParams `json:"params"`
 }
 
 // StatusHistory is a struct to hold status history data.
@@ -55,6 +56,20 @@ type StatusHistory struct {
 	CreatedAt        time.Time    `json:"created_at"`
 	Emojis           []Emoji      `json:"emojis"`
 	MediaAttachments []Attachment `json:"media_attachments"`
+}
+
+// ScheduledStatus holds information returned when ScheduledAt is set on a status
+type ScheduledParams struct {
+	ApplicationID ID          `json:"application_id"`
+	Idempotency   string      `json:"idempotency"`
+	InReplyToID   interface{} `json:"in_reply_to_id"`
+	MediaIDs      []ID        `json:"media_ids"`
+	Poll          *Poll       `json:"poll"`
+	ScheduledAt   *time.Time  `json:"scheduled_at,omitempty"`
+	Sensitive     bool        `json:"sensitive"`
+	SpoilerText   string      `json:"spoiler_text"`
+	Text          string      `json:"text"`
+	Visibility    string      `json:"visibility"`
 }
 
 // Context holds information for a mastodon context.
@@ -421,6 +436,9 @@ func (c *Client) postStatus(ctx context.Context, toot *Toot, update bool, update
 	}
 	if toot.SpoilerText != "" {
 		params.Set("spoiler_text", toot.SpoilerText)
+	}
+	if !toot.ScheduledAt.IsZero() {
+		params.Set("scheduled_at", toot.ScheduledAt.Format(time.RFC3339))
 	}
 
 	var status Status

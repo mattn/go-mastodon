@@ -437,7 +437,7 @@ func (c *Client) postStatus(ctx context.Context, toot *Toot, update bool, update
 	if toot.SpoilerText != "" {
 		params.Set("spoiler_text", toot.SpoilerText)
 	}
-	if !toot.ScheduledAt.IsZero() {
+	if toot.ScheduledAt != nil {
 		params.Set("scheduled_at", toot.ScheduledAt.Format(time.RFC3339))
 	}
 

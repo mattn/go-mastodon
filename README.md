@@ -73,7 +73,7 @@ func main() {
 This option lets the user avoid storing login credentials in the application.  Instead, the user's Mastodon server
 provides an access token which is used to authenticate.  This token can be stored in the application, but should be guarded.
 
-```
+```go
 package main
 
 import (
@@ -117,14 +117,30 @@ func main() {
 	c := mastodon.NewClient(config)
 	err = c.AuthenticateToken(context.Background(), token, "urn:ietf:wg:oauth:2.0:oob")
 	if err != nil {
-        log.Fatal((err)
+		log.Fatal(err)
 	}
 
 	acct, err := c.GetAccountCurrentUser(context.Background())
 	if err != nil {
-        log.Fatal((err)
+		log.Fatal(err)
 	}
 	fmt.Printf("Account is %v\n", acct)
+
+	finalText := "This is the content of my new post!"
+	visibility := "public"
+
+	// Post a toot
+	toot := mastodon.Toot{
+		Status:     finalText,
+		Visibility: visibility,
+	}
+	post, err := c.PostStatus(context.Background(), &toot)
+
+	if err != nil {
+		log.Fatalf("%#v\n", err)
+	}
+
+	fmt.Printf("My new post is %v\n", post)
 }
 ```
 

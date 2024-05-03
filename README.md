@@ -229,6 +229,7 @@ func main() {
 * [x] GET /api/v1/streaming/hashtag/local?tag=:hashtag
 * [x] GET /api/v1/streaming/list?list=:list_id
 * [x] GET /api/v1/streaming/direct
+* [x] GET /api/v1/endorsements
 
 ## Installation
 

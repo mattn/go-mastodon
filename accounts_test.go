@@ -321,6 +321,93 @@ func TestGetBlocks(t *testing.T) {
 	}
 }
 
+func TestGetEndorsements(t *testing.T) {
+	canErr := true
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if canErr {
+			canErr = false
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+		fmt.Fprintln(w, `[
+  {
+    "id": "952529",
+    "username": "foo",
+    "acct": "alayna@desvox.es",
+    "display_name": "Alayna Desirae",
+    "locked": true,
+    "bot": false,
+    "created_at": "2019-10-26T23:12:06.570Z",
+    "note": "experiencing ________ difficulties<br>22y/o INFP in Oklahoma",
+    "url": "https://desvox.es/users/alayna",
+    "avatar": "https://files.mastodon.social/accounts/avatars/000/952/529/original/6534122046d050d5.png",
+    "avatar_static": "https://files.mastodon.social/accounts/avatars/000/952/529/original/6534122046d050d5.png",
+    "header": "https://files.mastodon.social/accounts/headers/000/952/529/original/496f1f817e042ade.png",
+    "header_static": "https://files.mastodon.social/accounts/headers/000/952/529/original/496f1f817e042ade.png",
+    "followers_count": 0,
+    "following_count": 0,
+    "statuses_count": 955,
+    "last_status_at": "2019-11-23T07:05:50.682Z",
+    "emojis": [],
+    "fields": []
+  },
+  {
+    "id": "832844",
+    "username": "bar",
+    "acct": "a9@broadcast.wolfgirl.engineering",
+    "display_name": "vivienne :collar: ",
+    "locked": true,
+    "bot": false,
+    "created_at": "2019-06-12T18:55:12.053Z",
+    "note": "borderline nsfw, considered a schedule I drug by nixon<br>waiting for the year of the illumos desktop",
+    "url": "https://broadcast.wolfgirl.engineering/users/a9",
+    "avatar": "https://files.mastodon.social/accounts/avatars/000/832/844/original/ae1de0b8fb63d1c6.png",
+    "avatar_static": "https://files.mastodon.social/accounts/avatars/000/832/844/original/ae1de0b8fb63d1c6.png",
+    "header": "https://files.mastodon.social/accounts/headers/000/832/844/original/5088e4a16e6d8736.png",
+    "header_static": "https://files.mastodon.social/accounts/headers/000/832/844/original/5088e4a16e6d8736.png",
+    "followers_count": 43,
+    "following_count": 67,
+    "statuses_count": 5906,
+    "last_status_at": "2019-11-23T05:23:47.911Z",
+    "emojis": [
+      {
+        "shortcode": "collar",
+        "url": "https://files.mastodon.social/custom_emojis/images/000/106/920/original/80953b9cd96ec4dc.png",
+        "static_url": "https://files.mastodon.social/custom_emojis/images/000/106/920/static/80953b9cd96ec4dc.png",
+        "visible_in_picker": true
+      }
+    ],
+    "fields": []
+  }
+]`)
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+		AccessToken:  "zoo",
+	})
+	_, err := client.GetEndorsements(context.Background(), nil)
+	if err == nil {
+		t.Fatalf("should be fail: %v", err)
+	}
+	endorsements, err := client.GetEndorsements(context.Background(), nil)
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	if len(endorsements) != 2 {
+		t.Fatalf("result should be two: %d", len(endorsements))
+	}
+	if endorsements[0].Username != "foo" {
+		t.Fatalf("want %q but %q", "foo", endorsements[0].Username)
+	}
+	if endorsements[1].Username != "bar" {
+		t.Fatalf("want %q but %q", "bar", endorsements[1].Username)
+	}
+}
+
 func TestAccountFollow(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/api/v1/accounts/1234567/follow" {

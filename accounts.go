@@ -229,6 +229,16 @@ func (c *Client) GetBlocks(ctx context.Context, pg *Pagination) ([]*Account, err
 	return accounts, nil
 }
 
+// GetEndorsements return accounts that the user is currently featuring on their profile.
+func (c *Client) GetEndorsements(ctx context.Context, pg *Pagination) ([]*Account, error) {
+	var accounts []*Account
+	err := c.doAPI(ctx, http.MethodGet, "/api/v1/endorsements", nil, &accounts, pg)
+	if err != nil {
+		return nil, err
+	}
+	return accounts, nil
+}
+
 // Relationship holds information for relationship to the account.
 type Relationship struct {
 	ID                  ID   `json:"id"`

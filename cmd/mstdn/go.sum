@@ -19,8 +19,8 @@ github.com/mattn/go-isatty v0.0.20/go.mod h1:W+V8PltTTMOvKvAeJH7IuucS94S2C6jfK/D
 github.com/mattn/go-runewidth v0.0.7/go.mod h1:H031xJmbD/WCDINGzjvQ9THkh0rPKHF+m2gUSrubnMI=
 github.com/mattn/go-tty v0.0.5 h1:s09uXI7yDbXzzTTfw3zonKFzwGkyYlgU3OMjqA0ddz4=
 github.com/mattn/go-tty v0.0.5/go.mod h1:u5GGXBtZU6RQoKV8gY5W6UhMudbR5vXnUe7j3pxse28=
-github.com/rmrfslashbin/go-mastodon v1.0.0 h1:XF2aKXORjfnnuG/W4tO8JqsAH/dmkrRFNwroDZxybKE=
-github.com/rmrfslashbin/go-mastodon v1.0.0/go.mod h1:Yyy/VEwVUBd/GKUqmd70tQYd1T3hFt6yJ1HLx0pu9EE=
+github.com/mattn/go-mastodon v1.0.0 h1:XF2aKXORjfnnuG/W4tO8JqsAH/dmkrRFNwroDZxybKE=
+github.com/mattn/go-mastodon v1.0.0/go.mod h1:Yyy/VEwVUBd/GKUqmd70tQYd1T3hFt6yJ1HLx0pu9EE=
 github.com/russross/blackfriday/v2 v2.1.0 h1:JIOH55/0cWyOuilr9/qlrm0BSXldqnqwMsf35Ld67mk=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/tomnomnom/linkheader v0.0.0-20180905144013-02ca5825eb80 h1:nrZ3ySNYwJbSpD6ce9duiP+QkD3JuLCcWkdaehUS/3Y=

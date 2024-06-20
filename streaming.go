@@ -118,11 +118,11 @@ func (c *Client) streaming(ctx context.Context, p string, params url.Values) (ch
 	u.Path = path.Join(u.Path, "/api/v1/streaming", p)
 	u.RawQuery = params.Encode()
 
-	req, err := http.NewRequest(http.MethodGet, u.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil {
 		return nil, err
 	}
-	req = req.WithContext(ctx)
+	req.URL = u
 
 	if c.Config.AccessToken != "" {
 		req.Header.Set("Authorization", "Bearer "+c.Config.AccessToken)
@@ -136,6 +136,15 @@ func (c *Client) streaming(ctx context.Context, p string, params url.Values) (ch
 			case <-ctx.Done():
 				return
 			default:
+			}
+
+			if i, err := c.GetInstance(ctx); err == nil {
+				if su, ok := i.URLs["streaming_api"]; ok {
+					if u2, err := url.Parse(su); err == nil && u2.Host != "" {
+						u.Host = u2.Host
+						req.Host = u.Host
+					}
+				}
 			}
 
 			c.doStreaming(req, q)

@@ -31,10 +31,10 @@ func TestGetReports(t *testing.T) {
 	if len(rs) != 2 {
 		t.Fatalf("result should be two: %d", len(rs))
 	}
-	if rs[0].ID != 122 {
+	if rs[0].ID != "122" {
 		t.Fatalf("want %v but %v", 122, rs[0].ID)
 	}
-	if rs[1].ID != 123 {
+	if rs[1].ID != "123" {
 		t.Fatalf("want %v but %v", 123, rs[1].ID)
 	}
 }
@@ -71,7 +71,7 @@ func TestReport(t *testing.T) {
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
-	if rp.ID != 1234 {
+	if rp.ID != "1234" {
 		t.Fatalf("want %q but %q", "1234", rp.ID)
 	}
 	if rp.ActionTaken {
@@ -81,7 +81,7 @@ func TestReport(t *testing.T) {
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
-	if rp.ID != 1234 {
+	if rp.ID != "1234" {
 		t.Fatalf("want %q but %q", "1234", rp.ID)
 	}
 	if !rp.ActionTaken {

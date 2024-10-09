@@ -8,8 +8,8 @@ import (
 
 // Report holds information for a mastodon report.
 type Report struct {
-	ID          int64 `json:"id"`
-	ActionTaken bool  `json:"action_taken"`
+	ID          ID   `json:"id"`
+	ActionTaken bool `json:"action_taken"`
 }
 
 // GetReports returns report of the current user.

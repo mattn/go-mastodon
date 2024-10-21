@@ -115,6 +115,10 @@ func main() {
 	}
 
 	c := mastodon.NewClient(config)
+
+	// Token will be at c.Config.AccessToken
+	// and will need to be persisted.
+	// Otherwise you'll need to register and authenticate token again.
 	err = c.AuthenticateToken(context.Background(), token, "urn:ietf:wg:oauth:2.0:oob")
 	if err != nil {
 		log.Fatal(err)

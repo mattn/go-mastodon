@@ -12,6 +12,10 @@ import (
 	"time"
 )
 
+const (
+	redirectURI = "urn:ietf:wg:oauth:2.0:oob"
+)
+
 func TestDoAPI(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Query().Get("max_id") == "999" {
@@ -142,6 +146,7 @@ func TestAuthenticateWithCancel(t *testing.T) {
 	}
 }
 
+// DEPRECATED: AuthenticateApp is deprecated and replaced by GetAppAccessToken
 func TestAuthenticateApp(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.FormValue("client_id") != "foo" || r.FormValue("client_secret") != "bar" {
@@ -170,6 +175,86 @@ func TestAuthenticateApp(t *testing.T) {
 	err = client.AuthenticateApp(context.Background())
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
+	}
+}
+
+func TestGetAppAccessToken(t *testing.T) {
+	wantAccessToken := "applicationAccessToken"
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.FormValue("client_id") != "foo" || r.FormValue("client_secret") != "bar" {
+			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			return
+		}
+		fmt.Fprintf(w, `{"accesS_token":"%s"}\n`, wantAccessToken)
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bat",
+	})
+
+	err := client.GetAppAccessToken(context.Background(), redirectURI)
+	if err == nil {
+		t.Fatalf("should be fail: %v", err)
+	}
+
+	client = NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+	})
+
+	err = client.GetAppAccessToken(context.Background(), redirectURI)
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	gotAccessToken := client.Config.AccessToken
+
+	if wantAccessToken != gotAccessToken {
+		t.Fatalf("want %s but got %s", wantAccessToken, gotAccessToken)
+	}
+}
+
+func TestGetUserAccessToken(t *testing.T) {
+	wantAccessToken := "userAccessToken"
+	authCode := "AuthorizationCode"
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.FormValue("client_id") != "foo" || r.FormValue("client_secret") != "bar" || r.FormValue("code") != authCode {
+			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			return
+		}
+		fmt.Fprintf(w, `{"accesS_token":"%s"}\n`, wantAccessToken)
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bat",
+	})
+
+	err := client.GetUserAccessToken(context.Background(), authCode, redirectURI)
+	if err == nil {
+		t.Fatalf("should be fail: %v", err)
+	}
+
+	client = NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+	})
+
+	err = client.GetUserAccessToken(context.Background(), authCode, redirectURI)
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	gotAccessToken := client.Config.AccessToken
+
+	if wantAccessToken != gotAccessToken {
+		t.Fatalf("want %s but got %s", wantAccessToken, gotAccessToken)
 	}
 }
 

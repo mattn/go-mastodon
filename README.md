@@ -8,145 +8,32 @@
 
 ## Usage
 
-### Application
+There are three ways to authenticate users. Fully working examples can be found in the [examples](./examples) directory.
 
-```go
-package main
+### User Credentials
 
-import (
-	"context"
-	"fmt"
-	"log"
+This method is the simplest and allows you to use an application registered in your account to interact with the Mastodon API on your behalf.
 
-	"github.com/mattn/go-mastodon"
-)
+* Create an application on Mastodon by navigating to: Preferences > Development > New Application
+* Select the necessary scopes
 
-func main() {
-	app, err := mastodon.RegisterApp(context.Background(), &mastodon.AppConfig{
-		Server:     "https://mstdn.jp",
-		ClientName: "client-name",
-		Scopes:     "read write follow",
-		Website:    "https://github.com/mattn/go-mastodon",
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("client-id    : %s\n", app.ClientID)
-	fmt.Printf("client-secret: %s\n", app.ClientSecret)
-}
-```
+**Working example:** [examples/user-credentials/main.go](./examples/user-credentials/main.go)
 
-### Client
+### Public Application
 
-```go
-package main
+Public applications use application tokens and have limited access to the API, allowing access only to public data.
 
-import (
-	"context"
-	"fmt"
-	"log"
+**Learn more at:** [Mastodon docs](https://docs.joinmastodon.org/client/token/)
 
-	"github.com/mattn/go-mastodon"
-)
+**Working example:** [examples/public-application/main.go](./examples/public-application/main.go)
 
-func main() {
-	c := mastodon.NewClient(&mastodon.Config{
-		Server:       "https://mstdn.jp",
-		ClientID:     "client-id",
-		ClientSecret: "client-secret",
-	})
-	err := c.Authenticate(context.Background(), "your-email", "your-password")
-	if err != nil {
-		log.Fatal(err)
-	}
-	timeline, err := c.GetTimelineHome(context.Background(), nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-	for i := len(timeline) - 1; i >= 0; i-- {
-		fmt.Println(timeline[i])
-	}
-}
-```
+### Application with Client Credentials (OAuth)
 
-### Client with Token
-This option lets the user avoid storing login credentials in the application.  Instead, the user's Mastodon server
-provides an access token which is used to authenticate.  This token can be stored in the application, but should be guarded.
+This option allows you to create an application that can interact with the Mastodon API on behalf of a user. It registers the application and requests user authorization to obtain an access token.
 
-```go
-package main
+**Learn more at:** [Mastodon docs](https://docs.joinmastodon.org/client/authorized/)
 
-import (
-	"context"
-	"fmt"
-	"log"
-	"net/url"
-
-	"github.com/mattn/go-mastodon"
-)
-
-func main() {
-	appConfig := &mastodon.AppConfig{
-		Server:       "https://stranger.social",
-		ClientName:   "client-name",
-		Scopes:       "read write follow",
-		Website:      "https://github.com/mattn/go-mastodon",
-		RedirectURIs: "urn:ietf:wg:oauth:2.0:oob",
-	}
-	app, err := mastodon.RegisterApp(context.Background(), appConfig)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Have the user manually get the token and send it back to us
-	u, err := url.Parse(app.AuthURI)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("Open your browser to \n%s\n and copy/paste the given token\n", u)
-	var token string
-	fmt.Print("Paste the token here:")
-	fmt.Scanln(&token)
-	config := &mastodon.Config{
-		Server:       "https://stranger.social",
-		ClientID:     app.ClientID,
-		ClientSecret: app.ClientSecret,
-		AccessToken:  token,
-	}
-
-	c := mastodon.NewClient(config)
-
-	// Token will be at c.Config.AccessToken
-	// and will need to be persisted.
-	// Otherwise you'll need to register and authenticate token again.
-	err = c.AuthenticateToken(context.Background(), token, "urn:ietf:wg:oauth:2.0:oob")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	acct, err := c.GetAccountCurrentUser(context.Background())
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("Account is %v\n", acct)
-
-	finalText := "This is the content of my new post!"
-	visibility := "public"
-
-	// Post a toot
-	toot := mastodon.Toot{
-		Status:     finalText,
-		Visibility: visibility,
-	}
-	post, err := c.PostStatus(context.Background(), &toot)
-
-	if err != nil {
-		log.Fatalf("%#v\n", err)
-	}
-
-	fmt.Printf("My new post is %v\n", post)
-}
-```
+**Working example:** [examples/user-oauth-authorization/main.go](./examples/user-oauth-authorization/main.go)
 
 ## Status of implementations
 

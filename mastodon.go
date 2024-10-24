@@ -151,6 +151,8 @@ func NewClient(config *Config) *Client {
 }
 
 // Authenticate gets access-token to the API.
+// DEPRECATED: Authenticating with username and password is no longer supported, please use
+// GetAppAccessToken() or GetUserAccessToken() instead
 func (c *Client) Authenticate(ctx context.Context, username, password string) error {
 	params := url.Values{
 		"client_id":     {c.Config.ClientID},
@@ -165,6 +167,7 @@ func (c *Client) Authenticate(ctx context.Context, username, password string) er
 }
 
 // AuthenticateApp logs in using client credentials.
+// DEPRECATED: use GetAppAccessToken() instead
 func (c *Client) AuthenticateApp(ctx context.Context) error {
 	params := url.Values{
 		"client_id":     {c.Config.ClientID},
@@ -176,9 +179,22 @@ func (c *Client) AuthenticateApp(ctx context.Context) error {
 	return c.authenticate(ctx, params)
 }
 
+// GetAppAccessToken exchanges API Credentials for an application Access Token
+// https://docs.joinmastodon.org/api/oauth-tokens/#app-tokens
+func (c *Client) GetAppAccessToken(ctx context.Context, redirectURI string) error {
+	params := url.Values{
+		"client_id":     {c.Config.ClientID},
+		"client_secret": {c.Config.ClientSecret},
+		"grant_type":    {"client_credentials"},
+		"redirect_uri":  {redirectURI},
+	}
+
+	return c.getAccessToken(ctx, params)
+}
+
 // AuthenticateToken logs in using a grant token returned by Application.AuthURI.
-//
 // redirectURI should be the same as Application.RedirectURI.
+// DEPRECATED:  Use GetUserAccessToken() instead
 func (c *Client) AuthenticateToken(ctx context.Context, authCode, redirectURI string) error {
 	params := url.Values{
 		"client_id":     {c.Config.ClientID},
@@ -191,6 +207,21 @@ func (c *Client) AuthenticateToken(ctx context.Context, authCode, redirectURI st
 	return c.authenticate(ctx, params)
 }
 
+// GetUserAccessToken exhanges a user provided authorization code for an User Access Token
+// https://docs.joinmastodon.org/api/oauth-tokens/#user-tokens
+func (c *Client) GetUserAccessToken(ctx context.Context, authCode, redirectURI string) error {
+	params := url.Values{
+		"client_id":     {c.Config.ClientID},
+		"client_secret": {c.Config.ClientSecret},
+		"grant_type":    {"authorization_code"},
+		"code":          {authCode},
+		"redirect_uri":  {redirectURI},
+	}
+
+	return c.getAccessToken(ctx, params)
+}
+
+// DEPRECATED: Use getAccessToken() instead
 func (c *Client) authenticate(ctx context.Context, params url.Values) error {
 	u, err := url.Parse(c.Config.Server)
 	if err != nil {
@@ -225,6 +256,46 @@ func (c *Client) authenticate(ctx context.Context, params url.Values) error {
 		return err
 	}
 	c.Config.AccessToken = res.AccessToken
+	return nil
+}
+
+// Exchanges credentials for an access token to be used by applications and sets the access token in the client config
+func (c *Client) getAccessToken(ctx context.Context, params url.Values) error {
+	u, err := url.Parse(c.Config.Server)
+	if err != nil {
+		return err
+	}
+	u.Path = path.Join(u.Path, "/oauth/token")
+
+	req, err := http.NewRequest(http.MethodPost, u.String(), strings.NewReader(params.Encode()))
+	if err != nil {
+		return err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	if c.UserAgent != "" {
+		req.Header.Set("User-Agent", c.UserAgent)
+	}
+	resp, err := c.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return parseAPIError("bad authorization", resp)
+	}
+
+	var res struct {
+		AccessToken string `json:"access_token"`
+	}
+	err = json.NewDecoder(resp.Body).Decode(&res)
+	if err != nil {
+		return err
+	}
+
+	c.Config.AccessToken = res.AccessToken
+
 	return nil
 }
 

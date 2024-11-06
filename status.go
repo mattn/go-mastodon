@@ -496,7 +496,8 @@ func (c *Client) UploadMediaFromReader(ctx context.Context, reader io.Reader) (*
 // UploadMediaFromMedia uploads a media attachment from a Media struct.
 func (c *Client) UploadMediaFromMedia(ctx context.Context, media *Media) (*Attachment, error) {
 	var attachment Attachment
-	if err := c.doAPI(ctx, http.MethodPost, "/api/v1/media", media, &attachment, nil); err != nil {
+	// "/api/v2/media" USING V2 TODO: IMPORTANT
+	if err := c.doAPI(ctx, http.MethodPost, "/api/v2/media", media, &attachment, nil); err != nil {
 		return nil, err
 	}
 	return &attachment, nil

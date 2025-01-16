@@ -2,7 +2,6 @@ package mastodon
 
 import (
 	"encoding/json"
-	"fmt"
 	"strconv"
 )
 
@@ -21,7 +20,7 @@ func (id *ID) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &n); err != nil {
 		return err
 	}
-	*id = ID(fmt.Sprint(n))
+	*id = ID(strconv.FormatInt(n, 10))
 	return nil
 }
 

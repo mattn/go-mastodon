@@ -25,6 +25,44 @@ func (id *ID) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// Compare compares the Mastodon IDs i and j.
+// Compare returns:
+//
+//	-1 if i is less than j,
+//	 0 if i equals j,
+//	-1 if j is greater than i.
+//
+// Compare can be used as an argument of [slices.SortFunc]:
+//
+//	slices.SortFunc([]mastodon.ID{id1, id2}, mastodon.ID.Compare)
+func (i ID) Compare(j ID) int {
+	var (
+		ii = i.u64()
+		jj = j.u64()
+	)
+
+	switch {
+	case ii < jj:
+		return -1
+	case ii == jj:
+		return 0
+	case jj < ii:
+		return +1
+	}
+	panic("impossible")
+}
+
+func (i ID) u64() uint64 {
+	if i == "" {
+		return 0
+	}
+	v, err := strconv.ParseUint(string(i), 10, 64)
+	if err != nil {
+		panic(err)
+	}
+	return v
+}
+
 type Sbool bool
 
 func (s *Sbool) UnmarshalJSON(data []byte) error {

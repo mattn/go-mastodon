@@ -892,7 +892,7 @@ func TestGetFollowedTags(t *testing.T) {
 	if !followedTags[0].Following {
 		t.Fatalf("want following, but got false")
 	}
-	if 3 != len(followedTags[0].History) {
+	if len(followedTags[0].History) != 3 {
 		t.Fatalf("expecting first tag history length to be %d but got %d", 3, len(followedTags[0].History))
 	}
 	if followedTags[1].Name != "Test2" {
@@ -904,7 +904,7 @@ func TestGetFollowedTags(t *testing.T) {
 	if !followedTags[1].Following {
 		t.Fatalf("want following, but got false")
 	}
-	if 1 != len(followedTags[1].History) {
+	if len(followedTags[1].History) != 1 {
 		t.Fatalf("expecting first tag history length to be %d but got %d", 1, len(followedTags[1].History))
 	}
 }

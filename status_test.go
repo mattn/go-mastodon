@@ -72,7 +72,7 @@ func TestGetFavouritesSavedJSONTwice(t *testing.T) {
 
 	// We get a trailing `\n` from the API which we need to trim
 	// off before we compare it with our literal above.
-	theirJSON := strings.TrimSpace(string(buf.Bytes()))
+	theirJSON := strings.TrimSpace(buf.String())
 
 	if theirJSON != ourJSON {
 		t.Fatalf("want %q but %q", ourJSON, theirJSON)
@@ -96,7 +96,7 @@ func TestGetFavouritesSavedJSONTwice(t *testing.T) {
 
 	// We get a trailing `\n` from the API which we need to trim
 	// off before we compare it with our literal above.
-	theirJSON = strings.TrimSpace(string(buf.Bytes()))
+	theirJSON = strings.TrimSpace(buf.String())
 
 	if theirJSON != ourJSON {
 		t.Fatalf("want %q but %q", ourJSON, theirJSON)
@@ -136,7 +136,7 @@ func TestGetFavouritesSavedJSON(t *testing.T) {
 
 	// We get a trailing `\n` from the API which we need to trim
 	// off before we compare it with our literal above.
-	theirJSON := strings.TrimSpace(string(buf.Bytes()))
+	theirJSON := strings.TrimSpace(buf.String())
 
 	if theirJSON != ourJSON {
 		t.Fatalf("want %q but %q", ourJSON, theirJSON)

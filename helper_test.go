@@ -1,7 +1,7 @@
 package mastodon
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"strings"
@@ -39,7 +39,7 @@ func TestBase64Encode(t *testing.T) {
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
-	_, err = ioutil.ReadAll(logo)
+	_, err = io.ReadAll(logo)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
@@ -72,7 +72,7 @@ func TestString(t *testing.T) {
 
 func TestParseAPIError(t *testing.T) {
 	// No api error.
-	r := ioutil.NopCloser(strings.NewReader(`<html><head><title>404</title></head></html>`))
+	r := io.NopCloser(strings.NewReader(`<html><head><title>404</title></head></html>`))
 	err := parseAPIError("bad request", &http.Response{
 		Status:     "404 Not Found",
 		StatusCode: http.StatusNotFound,
@@ -84,7 +84,7 @@ func TestParseAPIError(t *testing.T) {
 	}
 
 	// With api error.
-	r = ioutil.NopCloser(strings.NewReader(`{"error":"Record not found"}`))
+	r = io.NopCloser(strings.NewReader(`{"error":"Record not found"}`))
 	err = parseAPIError("bad request", &http.Response{
 		Status:     "404 Not Found",
 		StatusCode: http.StatusNotFound,

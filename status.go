@@ -334,6 +334,16 @@ func (c *Client) GetTimelineHome(ctx context.Context, pg *Pagination) ([]*Status
 	return statuses, nil
 }
 
+// GetTrendingStatuses return statuses from explore timeline.
+func (c *Client) GetTrendingStatuses(ctx context.Context, pg *Pagination) ([]*Status, error) {
+	var statuses []*Status
+	err := c.doAPI(ctx, http.MethodGet, "/api/v1/trends/statuses", nil, &statuses, pg)
+	if err != nil {
+		return nil, err
+	}
+	return statuses, nil
+}
+
 // GetTimelinePublic return statuses from public timeline.
 func (c *Client) GetTimelinePublic(ctx context.Context, isLocal bool, pg *Pagination) ([]*Status, error) {
 	params := url.Values{}

@@ -118,7 +118,7 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params in
 		break
 	}
 
-	if resp.StatusCode != http.StatusOK {
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusAccepted {
 		return parseAPIError("bad request", resp)
 	} else if res == nil {
 		return nil

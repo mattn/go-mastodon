@@ -34,6 +34,7 @@ data: {"content": "foo"}
 	`, largeContent))
 	var wg sync.WaitGroup
 	wg.Add(1)
+	errs := make(chan error, 1)
 	go func() {
 		defer wg.Done()
 		defer close(q)
@@ -41,6 +42,7 @@ data: {"content": "foo"}
 		if err != nil {
 			t.Errorf("should not be fail: %v", err)
 		}
+		errs <- err
 	}()
 	var passUpdate, passUpdateLarge, passNotification, passDelete, passError bool
 	for e := range q {
@@ -84,6 +86,10 @@ data: {"content": "foo"}
 			passUpdate, passUpdateLarge, passNotification, passDelete, passError)
 	}
 	wg.Wait()
+	err := <-errs
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
 }
 
 func TestStreaming(t *testing.T) {

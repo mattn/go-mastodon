@@ -121,6 +121,9 @@ This option allows you to create an application that can interact with the Masto
 * [x] GET /api/v1/streaming/list?list=:list_id
 * [x] GET /api/v1/streaming/direct
 * [x] GET /api/v1/endorsements
+* [x] GET /api/v1/tags/:hashtag
+* [x] POST /api/v1/tags/:hashtag/follow
+* [x] POST /api/v1/tags/:hashtag/unfollow
 
 ## Installation
 

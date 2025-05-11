@@ -3,6 +3,7 @@ package mastodon
 import (
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -139,7 +140,7 @@ data: {"content": "foo"}
 		switch event := e.(type) {
 		case *ErrorEvent:
 			passError = true
-			if event.Err == nil {
+			if event.Err != nil && !errors.Is(event.Err, context.Canceled) {
 				t.Fatalf("should be fail: %v", event.Err)
 			}
 		case *UpdateEvent:

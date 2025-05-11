@@ -995,15 +995,19 @@ func TestSearch(t *testing.T) {
 
 func TestUploadMedia(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/api/v1/media" {
-			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-			return
-		}
 		if r.Method != "POST" {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
-		fmt.Fprintln(w, `{"id": 123}`)
+		if r.URL.Path == "/api/v1/media" {
+			fmt.Fprintln(w, `{"id": 123}`)
+			return
+		}
+		if r.URL.Path == "/api/v2/media" {
+			fmt.Fprintln(w, `{"id": 123}`)
+			return
+		}
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 	}))
 	defer ts.Close()
 

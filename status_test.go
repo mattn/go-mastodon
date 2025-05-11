@@ -284,7 +284,7 @@ func TestGetStatusFiltered(t *testing.T) {
 		t.Fatalf("want %q but %q", "http://example.com", status.Emojis[0].URL)
 	}
 	if status.Emojis[0].StaticURL != "http://example.com/static" {
-		t.Fatalf("want %q but %q", "https://example.com/static", status.Emojis[0].StaticURL)
+		t.Fatalf("want %q but %q", "http://example.com/static", status.Emojis[0].StaticURL)
 	}
 	if len(status.Filtered) != 1 {
 		t.Fatal("should have filtered")

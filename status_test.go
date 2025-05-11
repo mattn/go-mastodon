@@ -806,7 +806,7 @@ func TestGetTimelineHashtagMultiple(t *testing.T) {
 		t.Fatalf("want %q but %q", "zzz", tags[0].Content)
 	}
 	if tags[1].Content != "yyy" {
-		t.Fatalf("want %q but %q", "zzz", tags[1].Content)
+		t.Fatalf("want %q but %q", "yyy", tags[1].Content)
 	}
 }
 

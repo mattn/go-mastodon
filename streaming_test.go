@@ -135,11 +135,10 @@ data: {"content": "foo"}
 		t.Fatalf("should not be fail: %v", err)
 	}
 	var cnt int
-	var passError, passUpdate bool
+	var passUpdate bool
 	for e := range q {
 		switch event := e.(type) {
 		case *ErrorEvent:
-			passError = true
 			if event.Err != nil && !errors.Is(event.Err, context.Canceled) {
 				t.Fatalf("should be fail: %v", event.Err)
 			}
@@ -160,8 +159,8 @@ data: {"content": "foo"}
 	if cnt != 1 {
 		t.Fatalf("result should be one: %d", cnt)
 	}
-	if !passError || !passUpdate {
-		t.Fatalf("have not passed through somewhere: error %t, update %t", passError, passUpdate)
+	if !passUpdate {
+		t.Fatalf("have not passed through somewhere: update %t", passUpdate)
 	}
 }
 

@@ -547,13 +547,9 @@ func (c *Client) UploadMediaFromMedia(ctx context.Context, media *Media) (*Attac
 	return &attachment, nil
 }
 
-// GetMediaStatus returns the status of a media attachment by id.
-func (c *Client) GetMediaStatus(ctx context.Context, attachment *Attachment) (int, error) {
-	var status int
-	if err := c.doAPI(ctx, http.MethodPost, "/api/v2/media/", strconv.Itoa(int(attachment.ID.u64())), &status, nil); err != nil {
-		return 0, err
-	}
-	return status, nil
+// GetMediaStatus checks the status of a media attachment.
+func (c *Client) GetMediaStatus(ctx context.Context, attachment *Attachment) error {
+	return c.doAPI(ctx, http.MethodGet, "/api/v1/media/"+strconv.Itoa(int(attachment.ID.u64())), nil, nil, nil)
 }
 
 // GetTimelineDirect return statuses from direct timeline.

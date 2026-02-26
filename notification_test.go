@@ -11,6 +11,93 @@ import (
 	"testing"
 )
 
+func TestNotifications(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/api/v1/notifications":
+			if r.URL.Query().Get("exclude_types[]") == "follow" {
+				fmt.Fprintln(w, `[{"id": 321, "action_taken": true}]`)
+			} else {
+				fmt.Fprintln(w, `[{"id": 122, "action_taken": false}, {"id": 123, "action_taken": true}]`)
+			}
+			return
+		case "/api/v1/notifications/123":
+			fmt.Fprintln(w, `{"id": 123, "action_taken": true}`)
+			return
+		case "/api/v1/notifications/clear":
+			fmt.Fprintln(w, `{}`)
+			return
+		case "/api/v1/notifications/123/dismiss":
+			fmt.Fprintln(w, `{}`)
+			return
+		}
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+		AccessToken:  "zoo",
+	})
+
+	var (
+		ns  []*Notification
+		ctx = context.Background()
+	)
+	for n, err := range client.Notifications(ctx, nil, nil) {
+		if err != nil {
+			t.Fatalf("could not iterate over notifications: %v", err)
+		}
+		ns = append(ns, n)
+	}
+
+	if len(ns) != 2 {
+		t.Fatalf("result should be two: %d", len(ns))
+	}
+	if ns[0].ID != "122" {
+		t.Fatalf("want %v but %v", "122", ns[0].ID)
+	}
+	if ns[1].ID != "123" {
+		t.Fatalf("want %v but %v", "123", ns[1].ID)
+	}
+
+	var (
+		nse []*Notification
+		qry = &NotificationFilter{
+			Excludes: []string{"follow"},
+		}
+	)
+	for ne, err := range client.Notifications(ctx, qry, nil) {
+		if err != nil {
+			t.Fatalf("should not be fail: %v", err)
+		}
+		nse = append(nse, ne)
+	}
+	if len(nse) != 1 {
+		t.Fatalf("result should be one: %d", len(nse))
+	}
+	if nse[0].ID != "321" {
+		t.Fatalf("want %v but %v", "321", nse[0].ID)
+	}
+	n, err := client.GetNotification(context.Background(), "123")
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	if n.ID != "123" {
+		t.Fatalf("want %v but %v", "123", n.ID)
+	}
+	err = client.ClearNotifications(context.Background())
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	err = client.DismissNotification(context.Background(), "123")
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+}
+
 func TestGetNotifications(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {

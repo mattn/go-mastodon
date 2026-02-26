@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"strconv"
 	"strings"
 	"time"
 
@@ -123,12 +124,15 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params in
 	} else if res == nil {
 		return nil
 	} else if pg != nil {
-		if lh := resp.Header.Get("Link"); lh != "" {
-			pg2, err := newPagination(lh)
+		switch lh := resp.Header.Get("Link"); lh {
+		case "":
+			*pg = Pagination{}
+		default:
+			_, next, err := newPaginationPrevNext(lh)
 			if err != nil {
 				return err
 			}
-			*pg = *pg2
+			*pg = next
 		}
 	}
 
@@ -407,33 +411,39 @@ type Pagination struct {
 	Limit   int64
 }
 
-func newPagination(rawlink string) (*Pagination, error) {
+func newPaginationPrevNext(rawlink string) (prev, next Pagination, err error) {
 	if rawlink == "" {
-		return nil, errors.New("empty link header")
+		return prev, next, errors.New("empty link header")
 	}
 
-	p := &Pagination{}
 	for _, link := range linkheader.Parse(rawlink) {
 		switch link.Rel {
 		case "next":
-			maxID, err := getPaginationID(link.URL, "max_id")
+			next, err = paginationFromLink(link.URL)
 			if err != nil {
-				return nil, err
+				return prev, next, err
 			}
-			p.MaxID = maxID
-		case "prev":
-			sinceID, err := getPaginationID(link.URL, "since_id")
-			if err != nil {
-				return nil, err
-			}
-			p.SinceID = sinceID
 
-			minID, err := getPaginationID(link.URL, "min_id")
+		case "prev":
+			prev, err = paginationFromLink(link.URL)
 			if err != nil {
-				return nil, err
+				return prev, next, err
 			}
-			p.MinID = minID
 		}
+	}
+
+	return
+}
+
+func paginationFromLink(link string) (p Pagination, err error) {
+	uri, err := url.Parse(link)
+	if err != nil {
+		return p, err
+	}
+
+	err = p.fromValues(uri.Query())
+	if err != nil {
+		return p, err
 	}
 
 	return p, nil
@@ -446,6 +456,24 @@ func getPaginationID(rawurl, key string) (ID, error) {
 	}
 
 	return ID(u.Query().Get(key)), nil
+}
+
+func (p *Pagination) fromValues(vs url.Values) error {
+	p.MaxID = ID(vs.Get("max_id"))
+	p.MinID = ID(vs.Get("min_id"))
+	p.SinceID = ID(vs.Get("since_id"))
+
+	switch v := vs.Get("limit"); v {
+	case "":
+		p.Limit = 0
+	default:
+		limit, err := strconv.ParseInt(v, 10, 64)
+		if err != nil {
+			return fmt.Errorf("could not parse 'limit' query: %w", err)
+		}
+		p.Limit = limit
+	}
+	return nil
 }
 
 func (p *Pagination) toValues() url.Values {

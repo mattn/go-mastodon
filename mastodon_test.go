@@ -45,11 +45,11 @@ func TestDoAPI(t *testing.T) {
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
-	if pg.MaxID != "234" {
-		t.Fatalf("want %q but %q", "234", pg.MaxID)
+	if got, want := pg.MaxID, ID("234"); got != want {
+		t.Fatalf("want %q but %q", want, got)
 	}
-	if pg.SinceID != "890" {
-		t.Fatalf("want %q but %q", "890", pg.SinceID)
+	if got, want := pg.SinceID, ID(""); got != want {
+		t.Fatalf("want %q but %q", want, got)
 	}
 	if accounts[0].Username != "foo" {
 		t.Fatalf("want %q but %q", "foo", accounts[0].Username)
@@ -67,11 +67,11 @@ func TestDoAPI(t *testing.T) {
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
-	if pg.MaxID != "234" {
-		t.Fatalf("want %q but %q", "234", pg.MaxID)
+	if got, want := pg.MaxID, ID("234"); got != want {
+		t.Fatalf("want %q but %q", want, got)
 	}
-	if pg.SinceID != "890" {
-		t.Fatalf("want %q but %q", "890", pg.SinceID)
+	if got, want := pg.SinceID, ID(""); got != want {
+		t.Fatalf("want %q but %q", want, got)
 	}
 	if accounts[0].Username != "foo" {
 		t.Fatalf("want %q but %q", "foo", accounts[0].Username)
@@ -686,35 +686,35 @@ func TestForTheCoverages(t *testing.T) {
 }
 
 func TestNewPagination(t *testing.T) {
-	_, err := newPagination("")
+	_, _, err := newPaginationPrevNext("")
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
 
-	_, err = newPagination(`<:>; rel="next"`)
+	_, _, err = newPaginationPrevNext(`<:>; rel="next"`)
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
 
-	_, err = newPagination(`<:>; rel="prev"`)
+	_, _, err = newPaginationPrevNext(`<:>; rel="prev"`)
 	if err == nil {
 		t.Fatalf("should be fail: %v", err)
 	}
 
-	_, err = newPagination(`<http://example.com?min_id=abc>; rel="prev"`)
+	_, _, err = newPaginationPrevNext(`<http://example.com?min_id=abc>; rel="prev"`)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
 
-	pg, err := newPagination(`<http://example.com?max_id=123>; rel="next", <http://example.com?since_id=789>; rel="prev"`)
+	prev, next, err := newPaginationPrevNext(`<http://example.com?max_id=123>; rel="next", <http://example.com?since_id=789>; rel="prev"`)
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
 	}
-	if pg.MaxID != "123" {
-		t.Fatalf("want %q but %q", "123", pg.MaxID)
+	if next.MaxID != "123" {
+		t.Fatalf("want %q but %q", "123", next.MaxID)
 	}
-	if pg.SinceID != "789" {
-		t.Fatalf("want %q but %q", "789", pg.SinceID)
+	if prev.SinceID != "789" {
+		t.Fatalf("want %q but %q", "789", prev.SinceID)
 	}
 }
 

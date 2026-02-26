@@ -2,9 +2,11 @@ package mastodon
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 	"time"
 )
@@ -142,6 +144,120 @@ func TestAccountUpdate(t *testing.T) {
 	}
 	if a.Username != "zzz" {
 		t.Fatalf("want %q but %q", "zzz", a.Username)
+	}
+}
+
+func TestAccountStatuses(t *testing.T) {
+	type statusT struct {
+		Content string `json:"content"`
+	}
+	slice := []statusT{
+		{"0"}, {"1"}, {"2"}, {"3"}, {"4"},
+		{"5"}, {"6"}, {"7"}, {"8"}, {"9"},
+	}
+
+	var (
+		limit = 1
+		cur   int
+		end   int
+	)
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/api/v1/accounts/1234567/statuses" {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+		var (
+			err  error
+			qry  = r.URL.Query()
+			qmin = qry.Get("min_id")
+			qmax = qry.Get("max_id")
+			qlim = qry.Get("limit")
+		)
+
+		switch qmin {
+		case "":
+			limit = 1
+			cur = 0
+			end = cur + limit
+		}
+
+		switch {
+		case qlim != "":
+			limit, err = strconv.Atoi(qlim)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			end = min(cur+limit, len(slice))
+		case qmax != "":
+			vmax, err := strconv.Atoi(qmax)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			end = min(vmax, len(slice))
+		}
+
+		vs := slice[cur:end]
+		switch {
+		case end >= len(slice):
+			w.Header().Set("Link", ``)
+		default:
+			var (
+				nextMin = end
+				nextMax = end + limit
+			)
+			w.Header().Set(
+				"Link",
+				fmt.Sprintf(
+					`<http://example.com?min_id=%d&max_id=%d&since_id=%d&limit=%d>; rel="next"`,
+					nextMin, nextMax, nextMin, limit,
+				),
+			)
+		}
+
+		err = json.NewEncoder(w).Encode(vs)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		cur = end
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:       ts.URL,
+		ClientID:     "foo",
+		ClientSecret: "bar",
+		AccessToken:  "zoo",
+	})
+
+	ctx := context.Background()
+	for _, err := range client.AccountStatuses(ctx, "123", nil) {
+		if err == nil {
+			t.Fatal("expected iteration to fail")
+		}
+	}
+
+	var vs []*Status
+	for v, err := range client.AccountStatuses(ctx, "1234567", &Pagination{Limit: 3}) {
+		if err != nil {
+			t.Fatalf("could not iterate over statuses: %v", err)
+		}
+		vs = append(vs, v)
+		if len(vs) > len(slice) {
+			t.Fatal("boo")
+		}
+	}
+
+	if got, want := len(vs), len(slice); got != want {
+		t.Fatalf("invalid number of statuses: got=%d, want=%d", got, want)
+	}
+
+	for i, want := range slice {
+		if got, want := vs[i].Content, want.Content; got != want {
+			t.Fatalf("invalid status[%d] content: got=%q, want=%q", i, got, want)
+		}
 	}
 }
 

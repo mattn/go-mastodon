@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"iter"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -175,6 +176,33 @@ func (c *Client) AccountUpdate(ctx context.Context, profile *Profile) (*Account,
 		return nil, err
 	}
 	return &account, nil
+}
+
+// AccountStatuses iterates over statuses for the provided account id.
+func (c *Client) AccountStatuses(ctx context.Context, id ID, pg *Pagination) iter.Seq2[*Status, error] {
+	return func(yield func(*Status, error) bool) {
+		var zero Pagination
+		if pg == nil {
+			pg = &Pagination{}
+		}
+		for {
+			vs, err := c.GetAccountStatuses(ctx, id, pg)
+			if err != nil {
+				_ = yield(nil, err)
+				return
+			}
+
+			for _, v := range vs {
+				if !yield(v, nil) {
+					return
+				}
+			}
+
+			if *pg == zero {
+				return
+			}
+		}
+	}
 }
 
 // GetAccountStatuses return statuses by specified account.

@@ -215,6 +215,16 @@ func (c *Client) GetAccountStatuses(ctx context.Context, id ID, pg *Pagination) 
 	return statuses, nil
 }
 
+// GetAccountStatusesParams return statuses by specified account.
+func (c *Client) GetAccountStatusesParams(ctx context.Context, id ID, params url.Values, pg *Pagination) ([]*Status, error) {
+	var statuses []*Status
+	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/accounts/%s/statuses", url.PathEscape(string(id))), params, &statuses, pg)
+	if err != nil {
+		return nil, err
+	}
+	return statuses, nil
+}
+
 // GetAccountPinnedStatuses returns statuses pinned by specified accuont.
 func (c *Client) GetAccountPinnedStatuses(ctx context.Context, id ID) ([]*Status, error) {
 	var statuses []*Status

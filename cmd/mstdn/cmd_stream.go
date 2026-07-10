@@ -106,7 +106,9 @@ func cmdStream(c *cli.Context) error {
 				})
 			}
 		} else if asFormat != "" {
-			tx.ExecuteTemplate(c.App.Writer, "mstdn", e)
+			if err := tx.ExecuteTemplate(c.App.Writer, "mstdn", e); err != nil {
+				return err
+			}
 		} else {
 			switch t := e.(type) {
 			case *mastodon.UpdateEvent:

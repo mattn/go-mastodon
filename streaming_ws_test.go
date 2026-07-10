@@ -340,6 +340,21 @@ func TestDialRedirect(t *testing.T) {
 	}
 }
 
+func TestDialRedirectLoop(t *testing.T) {
+	var ts *httptest.Server
+	ts = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Redirect to ourselves forever.
+		http.Redirect(w, r, ts.URL, http.StatusMovedPermanently)
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{}).NewWSClient()
+	_, err := client.dialRedirect("ws://" + ts.Listener.Addr().String())
+	if err == nil {
+		t.Fatalf("should be fail: %v", err)
+	}
+}
+
 func TestDial(t *testing.T) {
 	canErr := true
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

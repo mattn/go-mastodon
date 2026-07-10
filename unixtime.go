@@ -18,3 +18,7 @@ func (t *Unixtime) UnmarshalJSON(data []byte) error {
 	*t = Unixtime(time.Unix(ts, 0))
 	return nil
 }
+
+func (t Unixtime) MarshalJSON() ([]byte, error) {
+	return []byte(strconv.FormatInt(time.Time(t).Unix(), 10)), nil
+}

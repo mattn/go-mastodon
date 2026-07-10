@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net/url"
@@ -10,7 +11,10 @@ import (
 )
 
 func cmdXSearch(c *cli.Context) error {
-	return xSearch(c.App.Metadata["xsearch_url"].(string), c.Args().First(), c.App.Writer)
+	if !c.Args().Present() {
+		return errors.New("arguments required")
+	}
+	return xSearch(c.App.Metadata["xsearch_url"].(string), argstr(c), c.App.Writer)
 }
 
 func xSearch(xsearchRawurl, query string, w io.Writer) error {

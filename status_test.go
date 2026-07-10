@@ -743,7 +743,7 @@ func TestGetTimelinePublic(t *testing.T) {
 
 func TestGetTimelineDirect(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, `[{"id": "4", "unread":false, "last_status" : {"content": "zzz"}}, {"id": "3", "unread":true, "last_status" : {"content": "bar"}}]`)
+		fmt.Fprintln(w, `[{"id": "4", "unread":false, "last_status" : {"content": "zzz"}}, {"id": "3", "unread":true, "last_status" : {"content": "bar"}}, {"id": "2", "unread":false, "last_status" : null}]`)
 	}))
 	defer ts.Close()
 

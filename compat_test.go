@@ -53,3 +53,23 @@ func TestIDCompare(t *testing.T) {
 		t.Fatalf("invalid sorted slices:\ngot= %q\nwant=%q", got, want)
 	}
 }
+
+func TestIDCompareNonNumeric(t *testing.T) {
+	// Non-numeric IDs (e.g. ULIDs used by GoToSocial) must not panic.
+	ids := []mastodon.ID{
+		"01F8MH5ZYAS9XKD4NK1FSD5J1Z",
+		"01F8MH0BBE73B7VKDGZRE2M3XM",
+		"123",
+	}
+
+	slices.SortFunc(ids, mastodon.ID.Compare)
+	want := []mastodon.ID{
+		"123",
+		"01F8MH0BBE73B7VKDGZRE2M3XM",
+		"01F8MH5ZYAS9XKD4NK1FSD5J1Z",
+	}
+
+	if got, want := ids, want; !reflect.DeepEqual(got, want) {
+		t.Fatalf("invalid sorted slices:\ngot= %q\nwant=%q", got, want)
+	}
+}

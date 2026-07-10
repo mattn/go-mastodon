@@ -3,6 +3,7 @@ package mastodon
 import (
 	"encoding/json"
 	"strconv"
+	"strings"
 )
 
 type ID string
@@ -33,37 +34,24 @@ func (id *ID) UnmarshalJSON(data []byte) error {
 //
 //	-1 if i is less than j,
 //	 0 if i equals j,
-//	-1 if j is greater than i.
+//	+1 if i is greater than j.
+//
+// Shorter IDs sort before longer ones and IDs of the same length are
+// compared lexicographically. This matches the numeric order of the
+// integer IDs used by Mastodon while also supporting non-numeric IDs
+// (e.g. ULIDs) used by other implementations.
 //
 // Compare can be used as an argument of [slices.SortFunc]:
 //
 //	slices.SortFunc([]mastodon.ID{id1, id2}, mastodon.ID.Compare)
 func (i ID) Compare(j ID) int {
-	var (
-		ii = i.u64()
-		jj = j.u64()
-	)
-
-	switch {
-	case ii < jj:
-		return -1
-	case ii == jj:
-		return 0
-	case jj < ii:
+	if len(i) != len(j) {
+		if len(i) < len(j) {
+			return -1
+		}
 		return +1
 	}
-	panic("impossible")
-}
-
-func (i ID) u64() uint64 {
-	if i == "" {
-		return 0
-	}
-	v, err := strconv.ParseUint(string(i), 10, 64)
-	if err != nil {
-		panic(err)
-	}
-	return v
+	return strings.Compare(string(i), string(j))
 }
 
 type Sbool bool

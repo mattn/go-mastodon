@@ -24,7 +24,7 @@ func TestCmdSearch(t *testing.T) {
 			app.Run([]string{"mstdn", "search", "zzz"})
 		},
 	)
-	for _, s := range []string{"zzz", "yyy", "www", "わろす"} {
+	for _, s := range []string{"zzz", "yyy", "#www", "#わろす"} {
 		if !strings.Contains(out, s) {
 			t.Fatalf("%q should be contained in output of command: %v", s, out)
 		}

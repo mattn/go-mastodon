@@ -314,6 +314,21 @@ func (c *Client) getAccessToken(ctx context.Context, params url.Values) error {
 	return nil
 }
 
+// RevokeToken revokes the access token of the client and clears it from the
+// config on success.
+func (c *Client) RevokeToken(ctx context.Context) error {
+	params := url.Values{
+		"client_id":     {c.Config.ClientID},
+		"client_secret": {c.Config.ClientSecret},
+		"token":         {c.Config.AccessToken},
+	}
+	if err := c.doAPI(ctx, http.MethodPost, "/oauth/revoke", params, nil, nil); err != nil {
+		return err
+	}
+	c.Config.AccessToken = ""
+	return nil
+}
+
 // Convenience constants for Toot.Visibility
 const (
 	VisibilityPublic        = "public"

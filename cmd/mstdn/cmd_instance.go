@@ -27,7 +27,7 @@ func cmdInstance(c *cli.Context) error {
 	}
 	if instance.URLs != nil {
 		var keys []string
-		for _, k := range instance.URLs {
+		for k := range instance.URLs {
 			keys = append(keys, k)
 		}
 		sort.Strings(keys)

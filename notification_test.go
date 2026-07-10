@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 )
 
@@ -240,5 +241,38 @@ func TestPushSubscription(t *testing.T) {
 	err = client.RemovePushSubscription(context.Background())
 	if err != nil {
 		t.Fatalf("should not be fail: %v", err)
+	}
+}
+
+func TestUpdatePushSubscriptionPartialAlerts(t *testing.T) {
+	var form url.Values
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		form = r.PostForm
+		fmt.Fprintln(w, `{"id":1,"endpoint":"https://example.org","alerts":{"mention":"true"},"server_key":"foobar"}`)
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:      ts.URL,
+		AccessToken: "zoo",
+	})
+
+	enabled := new(Sbool)
+	*enabled = true
+
+	// Only Mention is set; Favourite is nil and must not be sent.
+	_, err := client.UpdatePushSubscription(context.Background(), &PushAlerts{Mention: enabled})
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	if form.Has("data[alerts][favourite]") {
+		t.Fatalf("favourite should not be sent: %v", form)
+	}
+	if got := form.Get("data[alerts][mention]"); got != "true" {
+		t.Fatalf("want %v but %v", "true", got)
 	}
 }

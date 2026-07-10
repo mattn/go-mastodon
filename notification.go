@@ -165,7 +165,7 @@ func (c *Client) UpdatePushSubscription(ctx context.Context, alerts *PushAlerts)
 	if alerts.Follow != nil {
 		params.Add("data[alerts][follow]", strconv.FormatBool(bool(*alerts.Follow)))
 	}
-	if alerts.Mention != nil {
+	if alerts.Favourite != nil {
 		params.Add("data[alerts][favourite]", strconv.FormatBool(bool(*alerts.Favourite)))
 	}
 	if alerts.Reblog != nil {

@@ -810,6 +810,30 @@ func TestGetTimelineHashtagMultiple(t *testing.T) {
 	}
 }
 
+func TestGetTimelineHashtagUnicode(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// The tag must arrive percent-encoded exactly once.
+		if r.URL.Path != "/api/v1/timelines/tag/日本語" {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+		fmt.Fprintln(w, `[{"content": "zzz"}]`)
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:      ts.URL,
+		AccessToken: "zoo",
+	})
+	tags, err := client.GetTimelineHashtag(context.Background(), "日本語", false, nil)
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	if len(tags) != 1 {
+		t.Fatalf("should have %d entries but %d", 1, len(tags))
+	}
+}
+
 func TestGetTimelineHashtag(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/api/v1/timelines/tag/zzz" {

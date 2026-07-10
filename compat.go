@@ -8,6 +8,10 @@ import (
 type ID string
 
 func (id *ID) UnmarshalJSON(data []byte) error {
+	if string(data) == "null" {
+		*id = ""
+		return nil
+	}
 	if len(data) > 0 && data[0] == '"' && data[len(data)-1] == '"' {
 		var s string
 		if err := json.Unmarshal(data, &s); err != nil {

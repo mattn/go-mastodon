@@ -23,5 +23,7 @@ jobs:
       - run: git diff --cached --exit-code
       - run: go test ./... -v -cover -coverprofile coverage.out
       - run: go test -bench . -benchmem
+      - run: go test ./...
+        working-directory: cmd/mstdn
 
       - uses: codecov/codecov-action@v2

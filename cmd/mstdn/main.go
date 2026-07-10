@@ -213,7 +213,7 @@ func makeApp() *cli.App {
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:  "type",
-					Usage: "stream type (public,public/local,user:NAME,hashtag:TAG)",
+					Usage: "stream type (public,public/local,user,hashtag:TAG)",
 				},
 				&cli.BoolFlag{
 					Name:  "json",

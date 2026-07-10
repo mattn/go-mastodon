@@ -65,7 +65,7 @@ func cmdStream(c *cli.Context) error {
 		q, err = client.StreamingPublic(ctx, false)
 	} else if t == "" || t == "public/local" {
 		q, err = client.StreamingPublic(ctx, true)
-	} else if strings.HasPrefix(t, "user:") {
+	} else if t == "user" {
 		q, err = client.StreamingUser(ctx)
 	} else if strings.HasPrefix(t, "hashtag:") {
 		q, err = client.StreamingHashtag(ctx, t[8:], false)
@@ -106,7 +106,9 @@ func cmdStream(c *cli.Context) error {
 				})
 			}
 		} else if asFormat != "" {
-			tx.ExecuteTemplate(c.App.Writer, "mstdn", e)
+			if err := tx.ExecuteTemplate(c.App.Writer, "mstdn", e); err != nil {
+				return err
+			}
 		} else {
 			switch t := e.(type) {
 			case *mastodon.UpdateEvent:

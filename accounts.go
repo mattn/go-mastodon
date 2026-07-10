@@ -72,6 +72,10 @@ func (u *UnixTimeString) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+func (u UnixTimeString) MarshalJSON() ([]byte, error) {
+	return json.Marshal(strconv.FormatInt(u.Unix(), 10))
+}
+
 // History is the history of a followed tag
 type FollowedTagHistory struct {
 	Day      UnixTimeString `json:"day,omitempty"`

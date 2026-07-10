@@ -60,7 +60,13 @@ func TestStreamingWSHashtag(t *testing.T) {
 }
 
 func TestStreamingWSList(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(wsMock))
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Query().Get("list") != "123" {
+			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			return
+		}
+		wsMock(w, r)
+	}))
 	defer ts.Close()
 
 	client := NewClient(&Config{Server: ts.URL}).NewWSClient()

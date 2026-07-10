@@ -66,7 +66,11 @@ func (c *WSClient) streamingWS(ctx context.Context, stream, tag string) (chan Ev
 	params.Set("access_token", c.client.Config.AccessToken)
 	params.Set("stream", stream)
 	if tag != "" {
-		params.Set("tag", tag)
+		if stream == "list" {
+			params.Set("list", tag)
+		} else {
+			params.Set("tag", tag)
+		}
 	}
 
 	u, err := changeWebSocketScheme(c.client.Config.Server)

@@ -93,6 +93,38 @@ func TestDoAPI(t *testing.T) {
 	}
 }
 
+func TestDoAPIRetryResendsBody(t *testing.T) {
+	attempts := 0
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		attempts++
+		if attempts == 1 {
+			http.Error(w, "throttled", http.StatusTooManyRequests)
+			return
+		}
+		if r.FormValue("status") != "foo" {
+			http.Error(w, "empty body on retry", http.StatusBadRequest)
+			return
+		}
+		fmt.Fprintln(w, `{"content": "foo"}`)
+	}))
+	defer ts.Close()
+
+	c := NewClient(&Config{Server: ts.URL})
+	var status Status
+	params := url.Values{}
+	params.Set("status", "foo")
+	err := c.doAPI(context.Background(), http.MethodPost, "/api/v1/statuses", params, &status, nil)
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	if attempts != 2 {
+		t.Fatalf("want %d attempts but %d", 2, attempts)
+	}
+	if status.Content != "foo" {
+		t.Fatalf("want %q but %q", "foo", status.Content)
+	}
+}
+
 func TestAuthenticate(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.FormValue("username") != "valid" || r.FormValue("password") != "user" {

@@ -115,6 +115,14 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params in
 				return ctx.Err()
 			}
 
+			// the request body was consumed by the previous attempt.
+			if req.GetBody != nil {
+				req.Body, err = req.GetBody()
+				if err != nil {
+					return err
+				}
+			}
+
 			backoff = time.Duration(1.5 * float64(backoff))
 			continue
 		}

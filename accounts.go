@@ -24,6 +24,7 @@ type Account struct {
 	StatusesCount  int64          `json:"statuses_count"`
 	Note           string         `json:"note"`
 	URL            string         `json:"url"`
+	URI            string         `json:"uri"`
 	Avatar         string         `json:"avatar"`
 	AvatarStatic   string         `json:"avatar_static"`
 	Header         string         `json:"header"`

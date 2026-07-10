@@ -14,7 +14,7 @@ func TestCmdAccount(t *testing.T) {
 		func(w http.ResponseWriter, r *http.Request) {
 			switch r.URL.Path {
 			case "/api/v1/accounts/verify_credentials":
-				fmt.Fprintln(w, `{"username": "zzz"}`)
+				fmt.Fprintln(w, `{"username": "zzz", "uri": "https://example.com/users/zzz"}`)
 				return
 			}
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
@@ -26,5 +26,8 @@ func TestCmdAccount(t *testing.T) {
 	)
 	if !strings.Contains(out, "zzz") {
 		t.Fatalf("%q should be contained in output of command: %v", "zzz", out)
+	}
+	if !strings.Contains(out, "URI           : https://example.com/users/zzz") {
+		t.Fatalf("%q should be contained in output of command: %v", "URI           : https://example.com/users/zzz", out)
 	}
 }

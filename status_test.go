@@ -1050,6 +1050,28 @@ func TestUploadMedia(t *testing.T) {
 
 }
 
+func TestGetMediaStatus(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Mastodon IDs are opaque strings; other implementations use
+		// non-numeric IDs such as ULIDs.
+		if r.URL.Path == "/api/v1/media/01F8MH5ZYAS9XKD4NK1FSD5J1Z" {
+			fmt.Fprintln(w, `{"id": "01F8MH5ZYAS9XKD4NK1FSD5J1Z", "type": "image"}`)
+			return
+		}
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{
+		Server:      ts.URL,
+		AccessToken: "zoo",
+	})
+	err := client.GetMediaStatus(context.Background(), &Attachment{ID: "01F8MH5ZYAS9XKD4NK1FSD5J1Z"})
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+}
+
 func TestGetConversations(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/api/v1/conversations" {

@@ -3,6 +3,7 @@ package mastodon
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/url"
 	"path"
@@ -177,7 +178,7 @@ func (c *WSClient) handleWS(ctx context.Context, rawurl string, q chan Event) er
 }
 
 func (c *WSClient) dialRedirect(rawurl string) (conn *websocket.Conn, err error) {
-	for {
+	for i := 0; i < 10; i++ {
 		conn, rawurl, err = c.dial(rawurl)
 		if err != nil {
 			return nil, err
@@ -185,6 +186,7 @@ func (c *WSClient) dialRedirect(rawurl string) (conn *websocket.Conn, err error)
 			return conn, nil
 		}
 	}
+	return nil, errors.New("too many redirects")
 }
 
 func (c *WSClient) dial(rawurl string) (*websocket.Conn, string, error) {

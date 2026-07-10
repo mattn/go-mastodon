@@ -43,7 +43,9 @@ func (c *Client) doAPI(ctx context.Context, method string, uri string, params in
 	if err != nil {
 		return err
 	}
-	u.Path = path.Join(u.Path, uri)
+	// uri may contain percent-encoded path segments (e.g. hashtags); JoinPath
+	// keeps them intact instead of escaping the percent signs again.
+	u = u.JoinPath(uri)
 
 	var req *http.Request
 	ct := "application/x-www-form-urlencoded"

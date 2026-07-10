@@ -30,7 +30,7 @@ func (c *Client) TagFollow(ctx context.Context, tag string) (*FollowedTag, error
 // TagUnfollow unfollows a hashtag.
 func (c *Client) TagUnfollow(ctx context.Context, ID string) (*FollowedTag, error) {
 	var tag FollowedTag
-	err := c.doAPI(ctx, http.MethodPost, fmt.Sprintf("/api/v1/tags/%s/unfollow", ID), nil, &tag, nil)
+	err := c.doAPI(ctx, http.MethodPost, fmt.Sprintf("/api/v1/tags/%s/unfollow", url.PathEscape(ID)), nil, &tag, nil)
 	if err != nil {
 		return nil, err
 	}

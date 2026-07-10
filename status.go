@@ -564,8 +564,10 @@ func (c *Client) GetTimelineDirect(ctx context.Context, pg *Pagination) ([]*Stat
 	var statuses = []*Status{}
 
 	for _, c := range conversations {
-		s := c.LastStatus
-		statuses = append(statuses, s)
+		// LastStatus is nullable, e.g. when the last status was deleted.
+		if c.LastStatus != nil {
+			statuses = append(statuses, c.LastStatus)
+		}
 	}
 
 	return statuses, nil

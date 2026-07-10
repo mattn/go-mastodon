@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 )
@@ -42,7 +43,7 @@ func Base64Encode(file *os.File) (string, error) {
 	}
 
 	d := make([]byte, fi.Size())
-	_, err = file.Read(d)
+	_, err = io.ReadFull(file, d)
 	if err != nil {
 		return "", err
 	}

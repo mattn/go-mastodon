@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -283,6 +284,52 @@ func TestHandleWS(t *testing.T) {
 	client.handleWS(context.Background(), "ws://"+ts.Listener.Addr().String(), q)
 
 	wg.Wait()
+}
+
+func TestHandleWSClosesConnOnReconnect(t *testing.T) {
+	connClosed := make(chan struct{})
+	var first atomic.Bool
+	first.Store(true)
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		u := websocket.Upgrader{}
+		conn, err := u.Upgrade(w, r, nil)
+		if err != nil {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+		defer conn.Close()
+
+		if first.Swap(false) {
+			// Force a read error on the client so it reconnects, then
+			// wait until the client closes this connection.
+			if err := conn.WriteMessage(websocket.TextMessage, []byte(`<html></html>`)); err != nil {
+				return
+			}
+			conn.ReadMessage()
+			close(connClosed)
+			return
+		}
+		time.Sleep(10 * time.Second)
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{Server: ts.URL}).NewWSClient()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	q, err := client.StreamingWSDirect(ctx)
+	if err != nil {
+		t.Fatalf("should not be fail: %v", err)
+	}
+	go func() {
+		for range q {
+		}
+	}()
+
+	select {
+	case <-connClosed:
+	case <-time.After(5 * time.Second):
+		t.Fatal("client did not close the connection before reconnecting")
+	}
 }
 
 func TestDialRedirect(t *testing.T) {

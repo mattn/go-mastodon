@@ -1,12 +1,33 @@
 package mastodon_test
 
 import (
+	"encoding/json"
 	"reflect"
 	"slices"
 	"testing"
 
 	"github.com/mattn/go-mastodon"
 )
+
+func TestIDUnmarshalJSON(t *testing.T) {
+	tests := []struct {
+		in   string
+		want mastodon.ID
+	}{
+		{`"123"`, "123"},
+		{`123`, "123"},
+		{`null`, ""},
+	}
+	for _, test := range tests {
+		var id mastodon.ID
+		if err := json.Unmarshal([]byte(test.in), &id); err != nil {
+			t.Fatalf("should not be fail: %v", err)
+		}
+		if id != test.want {
+			t.Fatalf("want %q but %q for input %s", test.want, id, test.in)
+		}
+	}
+}
 
 func TestIDCompare(t *testing.T) {
 	ids := []mastodon.ID{

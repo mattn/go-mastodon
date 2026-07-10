@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -549,7 +548,7 @@ func (c *Client) UploadMediaFromMedia(ctx context.Context, media *Media) (*Attac
 
 // GetMediaStatus checks the status of a media attachment.
 func (c *Client) GetMediaStatus(ctx context.Context, attachment *Attachment) error {
-	return c.doAPI(ctx, http.MethodGet, "/api/v1/media/"+strconv.Itoa(int(attachment.ID.u64())), nil, nil, nil)
+	return c.doAPI(ctx, http.MethodGet, "/api/v1/media/"+url.PathEscape(string(attachment.ID)), nil, nil, nil)
 }
 
 // GetTimelineDirect return statuses from direct timeline.

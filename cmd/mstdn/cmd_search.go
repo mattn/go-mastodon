@@ -39,7 +39,7 @@ func cmdSearch(c *cli.Context) error {
 	if len(results.Hashtags) > 0 {
 		fmt.Fprintln(c.App.Writer, "===HASHTAG===")
 		for _, result := range results.Hashtags {
-			fmt.Fprintf(c.App.Writer, "#%v\n", result)
+			fmt.Fprintf(c.App.Writer, "#%v\n", result.Name)
 		}
 		fmt.Fprintln(c.App.Writer)
 	}

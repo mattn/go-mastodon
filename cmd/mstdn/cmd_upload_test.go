@@ -13,7 +13,7 @@ func TestCmdUpload(t *testing.T) {
 	out := testWithServer(
 		func(w http.ResponseWriter, r *http.Request) {
 			switch r.URL.Path {
-			case "/api/v1/media":
+			case "/api/v2/media":
 				fmt.Fprintln(w, `{"id": 123}`)
 				return
 			}

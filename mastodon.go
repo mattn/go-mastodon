@@ -175,6 +175,7 @@ func (c *Client) Authenticate(ctx context.Context, username, password string) er
 		"username":      {username},
 		"password":      {password},
 		"scope":         {"read write follow"},
+		"redirect_uri":  {"urn:ietf:wg:oauth:2.0:oob"},
 	}
 
 	return c.authenticate(ctx, params)

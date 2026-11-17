@@ -9,8 +9,10 @@ import (
 	"os"
 )
 
+// APIError describes an unsuccessful API response.
 type APIError struct {
-	prefix     string
+	prefix string
+	// Message is the error field of a JSON object, or a bare JSON string.
 	Message    string
 	StatusCode int
 }
@@ -60,11 +62,16 @@ func parseAPIError(prefix string, resp *http.Response) error {
 		prefix:     prefix,
 		StatusCode: resp.StatusCode,
 	}
+	var body json.RawMessage
+	json.NewDecoder(resp.Body).Decode(&body)
+
 	var e struct {
 		Error string `json:"error"`
 	}
 
-	json.NewDecoder(resp.Body).Decode(&e)
+	if json.Unmarshal(body, &e) != nil {
+		json.Unmarshal(body, &e.Error)
+	}
 	if e.Error != "" {
 		res.Message = e.Error
 	}

@@ -3,6 +3,7 @@ package mastodon
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -37,6 +38,50 @@ func TestGetAccount(t *testing.T) {
 	}
 	if a.Username != "zzz" {
 		t.Fatalf("want %q but %q", "zzz", a.Username)
+	}
+}
+
+func TestGetAccountAPIError(t *testing.T) {
+	for _, tt := range []struct {
+		name    string
+		body    string
+		message string
+	}{
+		{
+			name:    "object",
+			body:    `{"error":"Record not found","error_description":"Other details"}`,
+			message: "Record not found",
+		},
+		{
+			name:    "string",
+			body:    `"Server says: \"try again\"\nlater"`,
+			message: "Server says: \"try again\"\nlater",
+		},
+		{name: "empty object", body: `{}`},
+		{name: "null", body: `null`},
+		{name: "array", body: `["Record not found"]`},
+		{name: "non-JSON", body: `<html>Not Found</html>`},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusNotFound)
+				fmt.Fprint(w, tt.body)
+			}))
+			defer ts.Close()
+
+			client := NewClient(&Config{Server: ts.URL})
+			_, err := client.GetAccount(context.Background(), "1")
+			var apiErr *APIError
+			if !errors.As(err, &apiErr) {
+				t.Fatalf("GetAccount() error = %v; want *APIError", err)
+			}
+			if apiErr.StatusCode != http.StatusNotFound {
+				t.Errorf("StatusCode = %d; want %d", apiErr.StatusCode, http.StatusNotFound)
+			}
+			if apiErr.Message != tt.message {
+				t.Errorf("Message = %q; want %q", apiErr.Message, tt.message)
+			}
+		})
 	}
 }
 

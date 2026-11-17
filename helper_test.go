@@ -2,9 +2,7 @@ package mastodon
 
 import (
 	"io"
-	"net/http"
 	"os"
-	"strings"
 	"testing"
 )
 
@@ -67,31 +65,5 @@ func TestString(t *testing.T) {
 	sp := String(s)
 	if *sp != s {
 		t.Fatalf("want %q but %q", s, *sp)
-	}
-}
-
-func TestParseAPIError(t *testing.T) {
-	// No api error.
-	r := io.NopCloser(strings.NewReader(`<html><head><title>404</title></head></html>`))
-	err := parseAPIError("bad request", &http.Response{
-		Status:     "404 Not Found",
-		StatusCode: http.StatusNotFound,
-		Body:       r,
-	})
-	want := "bad request: 404 Not Found"
-	if err.Error() != want {
-		t.Fatalf("want %q but %q", want, err.Error())
-	}
-
-	// With api error.
-	r = io.NopCloser(strings.NewReader(`{"error":"Record not found"}`))
-	err = parseAPIError("bad request", &http.Response{
-		Status:     "404 Not Found",
-		StatusCode: http.StatusNotFound,
-		Body:       r,
-	})
-	want = "bad request: 404 Not Found: Record not found"
-	if err.Error() != want {
-		t.Fatalf("want %q but %q", want, err.Error())
 	}
 }

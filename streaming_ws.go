@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/url"
 	"path"
 	"strings"
@@ -205,7 +206,17 @@ func (c *WSClient) dial(rawurl string) (*websocket.Conn, string, error) {
 		return nil, u.String(), nil
 	}
 
-	return conn, "", err
+	if err != nil {
+		// Include the HTTP status and response body so the caller can tell
+		// why the handshake failed (e.g. 401 Unauthorized).
+		b, _ := io.ReadAll(io.LimitReader(resp.Body, 512))
+		if msg := strings.TrimSpace(string(b)); msg != "" {
+			return nil, "", fmt.Errorf("%w: %s: %s", err, resp.Status, msg)
+		}
+		return nil, "", fmt.Errorf("%w: %s", err, resp.Status)
+	}
+
+	return conn, "", nil
 }
 
 func changeWebSocketScheme(rawurl string) (*url.URL, error) {

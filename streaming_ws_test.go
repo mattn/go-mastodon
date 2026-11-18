@@ -2,6 +2,7 @@ package mastodon
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"sync"
@@ -385,6 +386,26 @@ func TestDial(t *testing.T) {
 	}
 	if rawurl != "ws://www.example.com/" {
 		t.Fatalf("want %q but %q", "ws://www.example.com/", rawurl)
+	}
+}
+
+func TestDialBadHandshakeStatus(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, `{"error":"Invalid access token"}`, http.StatusUnauthorized)
+	}))
+	defer ts.Close()
+
+	client := NewClient(&Config{}).NewWSClient()
+	_, err := client.dialRedirect("ws://" + ts.Listener.Addr().String())
+	if err == nil {
+		t.Fatal("should be fail")
+	}
+	if !errors.Is(err, websocket.ErrBadHandshake) {
+		t.Fatalf("want errors.Is(err, websocket.ErrBadHandshake) but got %v", err)
+	}
+	want := `websocket: bad handshake: 401 Unauthorized: {"error":"Invalid access token"}`
+	if err.Error() != want {
+		t.Fatalf("want %q but %q", want, err.Error())
 	}
 }
 
